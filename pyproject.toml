@@ -10,3 +10,9 @@ dependencies = [
     "numpy>=2.2.6",
     "scipy>=1.15.3",
 ]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+    "pytest>=9.0.1",
+]
