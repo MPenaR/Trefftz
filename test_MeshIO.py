@@ -1,4 +1,4 @@
-from MeshIO import Mesh
+from MeshIO import Mesh, Mesh_from_Matplotlib
 from matplotlib.tri import Triangulation
 import numpy as np
 
@@ -10,7 +10,9 @@ def test_from_matplotlib():
                           [2, 3, 0]])
     Tri = Triangulation(x=x, y=y, triangles=triangles)
 
-    mesh = Mesh()
-    mesh.from_matplotlib(Tri)
-    assert mesh.get_cell(0.2, 0.5) == 1 and mesh.get_cell(0.5, 0.2) == 0 and mesh.n_points == 4 and mesh.n_edges == 5
+    # mesh = Mesh()
+    # mesh.from_matplotlib(Tri)
+    # assert mesh.get_cell(0.2, 0.5) == 1 and mesh.get_cell(0.5, 0.2) == 0 and mesh.n_points == 4 and mesh.n_edges == 5
 
+    mesh = Mesh_from_Matplotlib(Tri=Tri)
+    assert mesh.get_cell(np.array([0.2, 0.5])) == 1 and mesh.get_cell(np.array([0.5, 0.2])) == 0 and mesh.n_points == 4 and mesh.n_edges == 5
