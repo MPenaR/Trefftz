@@ -54,22 +54,25 @@ class _KDTreeLocator(_CellLocator):
         self.radius = np.max(np.linalg.norm(self.points[self.triangles] - centroids[:, np.newaxis,:], axis=-1))  # precomputed
 
     def find_cell(self, p: float_array):
+        p = np.asarray(p)
         candidates = self.tree.query_ball_point(p, self.radius)
-        indexes = np.full(p.shape[0], dtype=np.int64, fill_value=-1)
-        # for i in candidates:
-        #     if in_triangle(p, *self.points[self.triangles[i]]):
-        #         return i
-        # return -1
-        for j, (p_, candidates_) in enumerate(zip(p,candidates)):
-            for i in candidates_:
-                if in_triangle(p_, *self.points[self.triangles[i]]):
-                    indexes[j]=i
-        return indexes
-            
-
-    
 
 
+        if p.shape == (2,):
+            for i in candidates:
+                if in_triangle(p, *self.points[self.triangles[i]]):
+                    return i
+            return -1    
+
+        elif p.ndim == 2 and p.shape[1] == 2:
+            indexes = np.full(p.shape[0], dtype=np.int64, fill_value=-1)
+            for j, (p_, candidates_) in enumerate(zip(p,candidates)):
+                for i in candidates_:
+                    if in_triangle(p_, *self.points[self.triangles[i]]):
+                        indexes[j]=i
+            return indexes
+        else:
+            raise ValueError("Input must have shape (2,) or (M, 2)")
 
 
 def Mesh_from_Matplotlib(Tri: Triangulation):
@@ -183,12 +186,14 @@ if __name__ == "__main__":
 
     with pygmsh.geo.Geometry() as geom:
         for T in triangles:
-            geom.add_polygon(points[T], mesh_size=0.1)
+            geom.add_polygon(points[T], mesh_size=10)
         M = geom.generate_mesh()
     mesh = Mesh_from_meshio(M)
     p = np.array([[0.2, 0.5],
                   [0.5, 0.2]])
     indexes = np.array([1, 0])
+    print(mesh.get_cell(p[0]))
+    print(mesh.get_cell([0.5,0.2]))
     # for T in M._triangles:
     #     print(in_triangle(np.array([0.5,0.25]), *(M._points[T])))
 
