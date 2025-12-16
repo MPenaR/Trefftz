@@ -102,6 +102,15 @@ class Mesh():
         self._edges = edges
         self._triangles = triangles
         self.locator = locator
+
+
+    def construct_edge_connectivity(self)
+        mask = np.isin(self._edges[:, None, :], self._triangles[None, :, :])  # (NE, NT, 2)
+        belongs = mask.all(axis=2)  # (NE, NT)
+        self.boundary_edges_list = np.where(belongs.sum(axis=1)==1)[0]
+        self.inner_edges_list = np.where(belongs.sum(axis=1)==2)[0]
+        
+
     
 
     def get_cell(self, p: float_array):
