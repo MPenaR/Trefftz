@@ -55,10 +55,18 @@ class _KDTreeLocator(_CellLocator):
 
     def find_cell(self, p: float_array):
         candidates = self.tree.query_ball_point(p, self.radius)
-        for i in candidates:
-            if in_triangle(p, *self.points[self.triangles[i]]):
-                return i
-        return -1
+        indexes = np.full(p.shape[0], dtype=np.int64, fill_value=-1)
+        # for i in candidates:
+        #     if in_triangle(p, *self.points[self.triangles[i]]):
+        #         return i
+        # return -1
+        for j, (p_, candidates_) in enumerate(zip(p,candidates)):
+            for i in candidates_:
+                if in_triangle(p_, *self.points[self.triangles[i]]):
+                    indexes[j]=i
+        return indexes
+            
+
     
 
 
@@ -137,12 +145,12 @@ class Mesh():
 
 
 def _id_tester(M: Mesh):
-    x = np.linspace(0,1)
+    x = np.linspace(0,1,100)
     y = x
     X, Y = np.meshgrid(x,y)
     xy = np.column_stack([X.flatten(), Y.flatten()])
     Z = mesh.get_cell(xy).reshape(X.shape)
-    plt.pcolormesh(X,Y,Z)
+    plt.pcolormesh(X,Y,Z,cmap="flag")
     plt.show()
 
 
@@ -175,13 +183,13 @@ if __name__ == "__main__":
 
     with pygmsh.geo.Geometry() as geom:
         for T in triangles:
-            geom.add_polygon(points[T], mesh_size=10.0)
+            geom.add_polygon(points[T], mesh_size=0.1)
         M = geom.generate_mesh()
     mesh = Mesh_from_meshio(M)
     p = np.array([[0.2, 0.5],
                   [0.5, 0.2]])
     indexes = np.array([1, 0])
-    print(mesh.get_cell(p[1]))
     # for T in M._triangles:
     #     print(in_triangle(np.array([0.5,0.25]), *(M._points[T])))
 
+    _id_tester(mesh)

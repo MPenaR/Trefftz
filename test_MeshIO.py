@@ -32,7 +32,7 @@ def test_from_meshio():
     p = np.array([[0.2, 0.5],
                   [0.5, 0.2]])
     indexes = np.array([1, 0])
-    assert mesh.get_cell(p[0]) == indexes[0] and mesh.get_cell(p[1]) == indexes[1]
-
-    # assert np.array_equal(mesh.get_cell(p), indexes) and mesh.n_points == 4 and mesh.n_edges == 5
+    # assert mesh.get_cell(p[0]) == indexes[0] and mesh.get_cell(p[1]) == indexes[1]
+    print(mesh.get_cell(p))
+    assert np.array_equal(mesh.get_cell(p), indexes)
     
