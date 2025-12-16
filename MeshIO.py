@@ -51,7 +51,7 @@ class _KDTreeLocator(_CellLocator):
     def build_index(self):
         centroids = self.points[self.triangles].mean(axis=1)
         self.tree = cKDTree(centroids)
-        self.radius = np.max(np.linalg.norm(self.points[self._triangles] - centroids[:, np.newaxis,:], axis=-1))  # precomputed
+        self.radius = np.max(np.linalg.norm(self.points[self.triangles] - centroids[:, np.newaxis,:], axis=-1))  # precomputed
 
     def find_cell(self, p: float_array):
         candidates = self.tree.query_ball_point(p, self.radius)
@@ -60,9 +60,7 @@ class _KDTreeLocator(_CellLocator):
                 return i
         return -1
     
-    def find_cell(self, p: float_array):
-        p_x, p_y = np.transpose(p)
-        return self.trifinder(p_x, p_y)
+
 
 
 
@@ -79,7 +77,7 @@ def Mesh_from_meshio(mesh):
         points = mesh.points[:,0:2]
         edges = mesh.cells[1].data
         triangles = mesh.cells[1].data
-        locator = _GeneralLocator(points=points, triangles=triangles)
+        locator = _KDTreeLocator(points=points, triangles=triangles)
         return Mesh(points=points, edges=edges, triangles=triangles, locator=locator)
 
 
@@ -129,10 +127,23 @@ class Mesh():
     def n_edges(self) -> np.int64:
         return self._edges.shape[0]
         
+    def plot_mesh(self):
+        plt.triplot(Triangulation(x=self._points[:,0], y=self._points[:,1], triangles=self._triangles))
+        plt.show()
+
 
     def generate_Edges(self):
         pass
 
+
+def _id_tester(M: Mesh):
+    x = np.linspace(0,1)
+    y = x
+    X, Y = np.meshgrid(x,y)
+    xy = np.column_stack([X.flatten(), Y.flatten()])
+    Z = mesh.get_cell(xy).reshape(X.shape)
+    plt.pcolormesh(X,Y,Z)
+    plt.show()
 
 
 
@@ -144,30 +155,33 @@ if __name__ == "__main__":
     #                       [2, 3, 0]])
     # Tri = Triangulation(x=x, y=y, triangles=triangles)
 
-    # mesh = Mesh()
-    # mesh.from_matplotlib(Tri)
+    # mesh = Mesh_from_Matplotlib(Tri)
+    # x = np.linspace(0,1)
+    # y = x
+    # X, Y = np.meshgrid(x,y)
+    # xy = np.column_stack([X.flatten(), Y.flatten()])
+    # Z = mesh.get_cell(xy).reshape(X.shape)
+    # plt.pcolormesh(X,Y,Z)
+    # plt.show()
+
     import pygmsh
     
-    with pygmsh.geo.Geometry() as geom:
-        geom.add_polygon(
-            [
-                [0.0, 0.0],
-                [1.0, 0.0],
-                [1.0, 1.0],
-                [0.0, 1.0],
-            ],
-            mesh_size=1.0,
-        )
-        mesh = geom.generate_mesh()
-    M = Mesh()
-    M.from_gmsh(mesh)
-    x = M._points[:,0]
-    y = M._points[:,1]
-    triangles = M._triangles
-    Tri = Triangulation(x=x,y=y,triangles=triangles)
-    plt.triplot(Tri)
-    plt.show()   
+    points = np.array([[0.0, 0.0],
+                       [1.0, 0.0],
+                       [1.0, 1.0],
+                       [0.0, 1.0]])
+    triangles = np.array([[0, 1, 2],
+                          [2, 3, 0]])
 
-    for T in M._triangles:
-        print(in_triangle(np.array([0.5,0.25]), *(M._points[T])))
+    with pygmsh.geo.Geometry() as geom:
+        for T in triangles:
+            geom.add_polygon(points[T], mesh_size=10.0)
+        M = geom.generate_mesh()
+    mesh = Mesh_from_meshio(M)
+    p = np.array([[0.2, 0.5],
+                  [0.5, 0.2]])
+    indexes = np.array([1, 0])
+    print(mesh.get_cell(p[1]))
+    # for T in M._triangles:
+    #     print(in_triangle(np.array([0.5,0.25]), *(M._points[T])))
 
