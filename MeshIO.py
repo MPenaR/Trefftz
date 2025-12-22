@@ -104,7 +104,7 @@ class Mesh():
         self.locator = locator
 
 
-    def construct_edge_connectivity(self)
+    def construct_edge_connectivity(self):
         mask = np.isin(self._edges[:, None, :], self._triangles[None, :, :])  # (NE, NT, 2)
         belongs = mask.all(axis=2)  # (NE, NT)
         self.boundary_edges_list = np.where(belongs.sum(axis=1)==1)[0]
@@ -157,13 +157,54 @@ class Mesh():
 
 
 def _id_tester(M: Mesh):
+    fig, ax = plt.subplots()
+
     x = np.linspace(0,1,100)
     y = x
     X, Y = np.meshgrid(x,y)
     xy = np.column_stack([X.flatten(), Y.flatten()])
     Z = mesh.get_cell(xy).reshape(X.shape)
-    plt.pcolormesh(X,Y,Z,cmap="flag")
+    pc = ax.pcolormesh(X,Y,Z)
+    ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles), color='k')
+    fig.colorbar(mappable=pc)
+
+
+    # Your function: f(x, y) -> text
+    def hover_text(x, y):
+        return f'ID = {M.get_cell([x, y])}'
+
+    # Create annotation (label)
+    annot = ax.annotate(
+        "",
+        xy=(0, 0),
+        xytext=(10, 10),
+        textcoords="offset points",
+        bbox=dict(boxstyle="round", fc="w"),
+        arrowprops=dict(arrowstyle="->"),
+    )
+    annot.set_visible(False)
+    annot.arrowprops = None
+
+
+    def on_move(event):
+        if event.inaxes != ax:
+            annot.set_visible(False)
+            fig.canvas.draw_idle()
+            return
+
+        xdata, ydata = event.xdata, event.ydata
+
+        # Update annotation
+        annot.xy = (xdata, ydata)
+        annot.set_text(hover_text(xdata, ydata))
+        annot.set_visible(True)
+        fig.canvas.draw_idle()
+
+    # Connect event
+    fig.canvas.mpl_connect("motion_notify_event", on_move)
+
     plt.show()
+
 
 
 
@@ -195,7 +236,7 @@ if __name__ == "__main__":
 
     with pygmsh.geo.Geometry() as geom:
         for T in triangles:
-            geom.add_polygon(points[T], mesh_size=10)
+            geom.add_polygon(points[T], mesh_size=0.2)
         M = geom.generate_mesh()
     mesh = Mesh_from_meshio(M)
     p = np.array([[0.2, 0.5],
