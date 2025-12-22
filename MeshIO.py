@@ -102,15 +102,25 @@ class Mesh():
         self._edges = edges
         self._triangles = triangles
         self.locator = locator
+        self.construct_edge_connectivity()
 
 
-    def construct_edge_connectivity(self):
-        mask = np.isin(self._edges[:, None, :], self._triangles[None, :, :])  # (NE, NT, 2)
-        belongs = mask.all(axis=2)  # (NE, NT)
-        self.boundary_edges_list = np.where(belongs.sum(axis=1)==1)[0]
-        self.inner_edges_list = np.where(belongs.sum(axis=1)==2)[0]
+    # def construct_edge_connectivity(self):
+    #     mask = np.isin(self._edges[:, None, :], self._triangles[None, :, :])  # (NE, NT, 2)
+    #     print(mask)
+    #     print(mask.shape)
+    #     belongs = mask.all(axis=2)  # (NE, NT)
+    #     self.boundary_edges_list = np.where(belongs.sum(axis=1)==1)[0]
+    #     self.inner_edges_list = np.where(belongs.sum(axis=1)==2)[0]
         
-
+    def construct_edge_connectivity(self):
+        edges = np.array([frozenset(E) for E in self._edges])
+        triangles = np.array([frozenset(T) for T in self._triangles])
+        numpy_subset = np.frompyfunc(lambda A, B: A <= B, 2, 1)
+        mask = numpy_subset(edges[:,None], triangles[None,:])
+        self.boundary_edges_list = np.where(mask.sum(axis=1)==1)[0]
+        self.inner_edges_list = np.where(mask.sum(axis=1)==2)[0]
+ 
     
 
     def get_cell(self, p: float_array):
@@ -205,28 +215,8 @@ def _id_tester(M: Mesh):
 
     plt.show()
 
-
-
-
-
-if __name__ == "__main__":
-    # x = np.array([0, 1, 1, 0])
-    # y = np.array([0, 0, 1, 1])
-    # triangles = np.array([[0, 1, 2],
-    #                       [2, 3, 0]])
-    # Tri = Triangulation(x=x, y=y, triangles=triangles)
-
-    # mesh = Mesh_from_Matplotlib(Tri)
-    # x = np.linspace(0,1)
-    # y = x
-    # X, Y = np.meshgrid(x,y)
-    # xy = np.column_stack([X.flatten(), Y.flatten()])
-    # Z = mesh.get_cell(xy).reshape(X.shape)
-    # plt.pcolormesh(X,Y,Z)
-    # plt.show()
-
+def _gmsh_sample_mesh():
     import pygmsh
-    
     points = np.array([[0.0, 0.0],
                        [1.0, 0.0],
                        [1.0, 1.0],
@@ -238,13 +228,31 @@ if __name__ == "__main__":
         for T in triangles:
             geom.add_polygon(points[T], mesh_size=0.2)
         M = geom.generate_mesh()
-    mesh = Mesh_from_meshio(M)
+    return Mesh_from_meshio(M)
+
+
+def _triangulation_sample_mesh():
+    x = np.array([0, 1, 1, 0])
+    y = np.array([0, 0, 1, 1])
+    triangles = np.array([[0, 1, 2],
+                          [2, 3, 0]])
+    Tri = Triangulation(x=x, y=y, triangles=triangles)
+
+    return Mesh_from_Matplotlib(Tri)
+
+
+
+
+
+if __name__ == "__main__":
+
+    mesh = _triangulation_sample_mesh()    
+    
     p = np.array([[0.2, 0.5],
                   [0.5, 0.2]])
     indexes = np.array([1, 0])
-    print(mesh.get_cell(p[0]))
-    print(mesh.get_cell([0.5,0.2]))
-    # for T in M._triangles:
-    #     print(in_triangle(np.array([0.5,0.25]), *(M._points[T])))
 
     _id_tester(mesh)
+    print(mesh.inner_edges_list)
+    print(mesh.boundary_edges_list)
+    print(mesh._edges)
