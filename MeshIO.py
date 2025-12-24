@@ -86,8 +86,8 @@ def Mesh_from_Matplotlib(Tri: Triangulation):
 def Mesh_from_meshio(mesh):
         '''Returns a Mesh from a meshio object'''
         points = mesh.points[:,0:2]
-        edges = mesh.cells[1].data
-        triangles = mesh.cells[1].data
+        edges = mesh.cells_dict["line"]
+        triangles = mesh.cells_dict["triangle"]
         locator = _KDTreeLocator(points=points, triangles=triangles)
         return Mesh(points=points, edges=edges, triangles=triangles, locator=locator)
 
@@ -120,7 +120,6 @@ class Mesh():
         mask = numpy_subset(edges[:,None], triangles[None,:])
         self.boundary_edges_list = np.where(mask.sum(axis=1)==1)[0]
         self.inner_edges_list = np.where(mask.sum(axis=1)==2)[0]
- 
     
 
     def get_cell(self, p: float_array):
@@ -175,15 +174,20 @@ def _id_tester(M: Mesh):
     xy = np.column_stack([X.flatten(), Y.flatten()])
     Z = mesh.get_cell(xy).reshape(X.shape)
     pc = ax.pcolormesh(X,Y,Z)
-    ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles), color='k')
+    lw = 4
+    ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
+    for e_ID in M.boundary_edges_list:
+        P, Q = M._edges[e_ID]
+        p_x, p_y = M._points[P, :]
+        q_x, q_y = M._points[Q, :]
+        ax.plot([p_x,q_x],[p_y,q_y],'r',linewidth=lw)
+
     fig.colorbar(mappable=pc)
 
 
-    # Your function: f(x, y) -> text
     def hover_text(x, y):
         return f'ID = {M.get_cell([x, y])}'
 
-    # Create annotation (label)
     annot = ax.annotate(
         "",
         xy=(0, 0),
@@ -223,11 +227,16 @@ def _gmsh_sample_mesh():
                        [0.0, 1.0]])
     triangles = np.array([[0, 1, 2],
                           [2, 3, 0]])
+    
 
     with pygmsh.geo.Geometry() as geom:
-        for T in triangles:
-            geom.add_polygon(points[T], mesh_size=0.2)
+        # for T in triangles:
+        #     geom.add_polygon(points[T], mesh_size=0.2)
+        # M = geom.generate_mesh()
+    
+        square = geom.add_polygon(points, mesh_size=0.05)
         M = geom.generate_mesh()
+        
     return Mesh_from_meshio(M)
 
 
@@ -246,13 +255,10 @@ def _triangulation_sample_mesh():
 
 if __name__ == "__main__":
 
-    mesh = _triangulation_sample_mesh()    
-    
+    # mesh = _triangulation_sample_mesh()    
+    mesh = _gmsh_sample_mesh()
     p = np.array([[0.2, 0.5],
                   [0.5, 0.2]])
     indexes = np.array([1, 0])
 
     _id_tester(mesh)
-    print(mesh.inner_edges_list)
-    print(mesh.boundary_edges_list)
-    print(mesh._edges)

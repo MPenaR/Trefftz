@@ -1,0 +1,12 @@
+a point x in R^n is _never_ in a subset with 0 n-Lebesgue measure. Hence get_ID only returns triangles.
+
+A mesh has two types of structures and philosophies:
+- For mesh creation and manipulation we use pythonic datacontainers and methods ( collections, lists comprehensions, dictionaries...). 
+They are not vectorized but they are only called a couple of times
+- Mesh only exports numpy structured arrays for fast manipulation by the DG-Trefftz assembler. These are vectorized, the assembler knows nothing about the mesh internals.
+
+Mesh internals: 
+- an edge IS a couple of nodes, they could be a frozenset, they could be hashable.
+
+A mesh should export two different sets of edges: inner edges and outer edges
+The former belong to two triangles while the last only to one. Furthermore the this two subset of edges should be further separated by boundary conditions (by boundary definition)
