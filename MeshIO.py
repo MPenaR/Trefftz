@@ -168,13 +168,16 @@ class Mesh():
 def _id_tester(M: Mesh):
     fig, ax = plt.subplots()
 
-    x = np.linspace(0,1,100)
-    y = x
+    xmin, xmax = np.min(M._points[:,0]), np.max(M._points[:,0]) 
+    ymin, ymax = np.min(M._points[:,1]), np.max(M._points[:,1])
+
+    x = np.linspace(xmin,xmax,100)
+    y = np.linspace(ymin,ymax,100)
     X, Y = np.meshgrid(x,y)
     xy = np.column_stack([X.flatten(), Y.flatten()])
     Z = mesh.get_cell(xy).reshape(X.shape)
     pc = ax.pcolormesh(X,Y,Z)
-    lw = 4
+    lw = 2
     ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
     for e_ID in M.boundary_edges_list:
         P, Q = M._edges[e_ID]
@@ -183,6 +186,7 @@ def _id_tester(M: Mesh):
         ax.plot([p_x,q_x],[p_y,q_y],'r',linewidth=lw)
 
     fig.colorbar(mappable=pc)
+    ax.axis('equal')
 
 
     def hover_text(x, y):
@@ -250,6 +254,31 @@ def _triangulation_sample_mesh():
     return Mesh_from_Matplotlib(Tri)
 
 
+def WaveGuide(R=5, H=1, lc=0.2) -> Mesh:
+    from pygmsh.geo import Geometry
+    points = np.array([[-R, 0.],
+                       [ R, 0.],
+                       [ R, H ],
+                       [-R, H ]])
+    with Geometry() as geom:
+        geom.add_polygon(points, mesh_size=lc)
+        M = geom.generate_mesh()
+    return Mesh_from_meshio(M)
+
+
+def Unbounded(r = 0.1, R=5, lc=0.2) -> Mesh:
+    from pygmsh.occ import Geometry
+    with Geometry() as geom:
+        # hole = geom.add_circle( [0., 0.], r, mesh_size=lc)
+        # domain = geom.add_circle( [0., 0.], R, mesh_size=lc)
+        hole = geom.add_disk( [0., 0.], r)
+        domain = geom.add_disk( [0., 0.], R)
+
+        geom.boolean_difference(domain, hole)
+        M = geom.generate_mesh()
+    return Mesh_from_meshio(M)
+
+
 
 
 
@@ -260,5 +289,9 @@ if __name__ == "__main__":
     p = np.array([[0.2, 0.5],
                   [0.5, 0.2]])
     indexes = np.array([1, 0])
+
+    mesh = WaveGuide()
+    mesh = Unbounded()
+    
 
     _id_tester(mesh)
