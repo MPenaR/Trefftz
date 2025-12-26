@@ -13,8 +13,10 @@ int_array = NDArray[np.int64]
 
 # import ngsolve as ns
 
-
 DIM: Final = 2
+
+edge_dtype = [("P", np.float64, DIM), ("Q", np.float64, DIM)]
+
 
 def in_triangle(P, A, B, C) -> bool:
     '''Computes if a point is inside a triangle'''
@@ -89,7 +91,8 @@ def Mesh_from_meshio(mesh):
         edges = mesh.cells_dict["line"]
         triangles = mesh.cells_dict["triangle"]
         locator = _KDTreeLocator(points=points, triangles=triangles)
-        return Mesh(points=points, edges=edges, triangles=triangles, locator=locator)
+        cell_sets = mesh.cell_sets_dict
+        return Mesh(points=points, edges=edges, triangles=triangles, locator=locator, cell_sets=cell_sets)
 
 
 
@@ -97,21 +100,25 @@ class Mesh():
     '''Holds only the relevant data
     as numpy structured-arrays for easy manipulation'''
 
-    def __init__(self, points: float_array, edges: int_array, triangles: int_array, locator: _CellLocator):
+    def __init__(self, points: float_array, edges: int_array, triangles: int_array, locator: _CellLocator, cell_sets : dict):
         self._points = points
         self._edges = edges
         self._triangles = triangles
         self.locator = locator
         self.construct_edge_connectivity()
+        self._cell_sets = cell_sets
+        self.construct_numpy_arrays()
 
 
-    # def construct_edge_connectivity(self):
-    #     mask = np.isin(self._edges[:, None, :], self._triangles[None, :, :])  # (NE, NT, 2)
-    #     print(mask)
-    #     print(mask.shape)
-    #     belongs = mask.all(axis=2)  # (NE, NT)
-    #     self.boundary_edges_list = np.where(belongs.sum(axis=1)==1)[0]
-    #     self.inner_edges_list = np.where(belongs.sum(axis=1)==2)[0]
+    def construct_numpy_arrays(self):
+        edges = np.zeros(self.n_edges, dtype=edge_dtype)
+        points = self._points
+        for e, edge in enumerate(self._edges):
+            edges[e]["P"] = points[edge[0],:]
+            edges[e]["Q"] = points[edge[1],:]
+
+        self.edges = edges
+
         
     def construct_edge_connectivity(self):
         edges = np.array([frozenset(E) for E in self._edges])
@@ -122,29 +129,8 @@ class Mesh():
         self.inner_edges_list = np.where(mask.sum(axis=1)==2)[0]
     
 
-    def get_cell(self, p: float_array):
+    def get_cell(self, p: float_array) -> int_array:
         return self.locator.find_cell(p)
-
-    # def from_matplotlib(self, Tri: Triangulation):
-    #     '''Constructs the object from a Matptlotlib.tri.Triangulation'''
-    #     self._points = np.column_stack([Tri.x, Tri.y])
-    #     self._edges = Tri.edges 
-    #     self._triangles = Tri.triangles
-    #     self.get_cell = Tri.get_trifinder()
-    
-    # # def from_netgen(self, Tri: ns.Mesh):
-    # #     pass
-    # def from_gmsh(self, mesh):
-    #     self._points = mesh.points[:,0:2]
-    #     mesh._edges = mesh.cells[1].data
-    #     self._triangles = mesh.cells[1].data
-    #     self._centroids = np.mean(self._points[self._triangles], axis=1)
-
-
-
-    #     def get_cell(P: float_array) -> int_array:                
-    #         tree = cKDTree(self._centroids)
-    #         neighbours_radius = np.max(np.linalg.norm(self._points[self._triangles] - self._centroids[:, np.newaxis,:], axis=-1))
         
 
 
@@ -171,11 +157,14 @@ def _id_tester(M: Mesh):
     xmin, xmax = np.min(M._points[:,0]), np.max(M._points[:,0]) 
     ymin, ymax = np.min(M._points[:,1]), np.max(M._points[:,1])
 
-    x = np.linspace(xmin,xmax,100)
-    y = np.linspace(ymin,ymax,100)
+    N = 200
+
+    x = np.linspace(xmin,xmax,N)
+    y = np.linspace(ymin,ymax,N)
     X, Y = np.meshgrid(x,y)
     xy = np.column_stack([X.flatten(), Y.flatten()])
-    Z = mesh.get_cell(xy).reshape(X.shape)
+    Z = mesh.get_cell(xy).reshape(X.shape).astype(float)
+    Z[Z==-1] = np.nan
     pc = ax.pcolormesh(X,Y,Z)
     lw = 2
     ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
@@ -223,6 +212,38 @@ def _id_tester(M: Mesh):
 
     plt.show()
 
+
+
+def plot_waveguide(M: Mesh):
+    from matplotlib.collections import LineCollection
+    fig, ax = plt.subplots()
+
+    xmin, xmax = np.min(M._points[:,0]), np.max(M._points[:,0]) 
+    ymin, ymax = np.min(M._points[:,1]), np.max(M._points[:,1])
+
+    lw = 2
+    ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
+
+    S = M._cell_sets["S"]["line"]
+    G = M._cell_sets["Gamma"]["line"]
+
+    lines = np.stack([mesh.edges[S]["P"], mesh.edges[S]["Q"]], axis=1)
+    ax.add_collection(LineCollection(lines, colors='r', linewidths=lw))
+
+    
+    # lines = [ np.vstack([mesh.edges[e_ID]["P"], mesh.edges[e_ID]["Q"]]) for e_ID in G]
+
+    lines = np.stack([mesh.edges[G]["P"], mesh.edges[G]["Q"]], axis=1)
+    ax.add_collection(LineCollection(lines, colors='b', linewidths=lw))
+
+
+    ax.axis('equal')
+
+    plt.show()
+
+
+
+
 def _gmsh_sample_mesh():
     import pygmsh
     points = np.array([[0.0, 0.0],
@@ -254,29 +275,80 @@ def _triangulation_sample_mesh():
     return Mesh_from_Matplotlib(Tri)
 
 
-def WaveGuide(R=5, H=1, lc=0.2) -> Mesh:
+def CleanWaveGuide(R=5, H=1, lc=0.3) -> Mesh:
     from pygmsh.geo import Geometry
-    points = np.array([[-R, 0.],
-                       [ R, 0.],
-                       [ R, H ],
-                       [-R, H ]])
     with Geometry() as geom:
-        geom.add_polygon(points, mesh_size=lc)
+        p0 = geom.add_point([-R, 0.], mesh_size=lc)
+        p1 = geom.add_point([ R, 0.], mesh_size=lc)
+        p2 = geom.add_point([ R, H ], mesh_size=lc)
+        p3 = geom.add_point([-R, H ], mesh_size=lc)
+        bottom = geom.add_line( p0, p1)
+        right  = geom.add_line(p1, p2)
+        top    = geom.add_line(p2, p3)
+        left   = geom.add_line(p3, p0)
+        boundary = geom.add_curve_loop([bottom, right, top, left])
+        domain = geom.add_plane_surface(boundary)
+        
+        geom.add_physical(domain, "Omega")
+        geom.add_physical([bottom, top], "Gamma")
+        geom.add_physical(left, "S_L")
+        geom.add_physical(right, "S_R")
+        geom.add_physical([left, right], "S")
+        
+        
         M = geom.generate_mesh()
+       #  print(M.cell_sets_dict)
     return Mesh_from_meshio(M)
 
+# def CleanWaveGuide(R=5, H=1, lc=0.2) -> Mesh:
+#     from pygmsh.geo import Geometry
+#     points = np.array([[-R, 0.],
+#                        [ R, 0.],
+#                        [ R, H ],
+#                        [-R, H ]])
+#     with Geometry() as geom:
+#         geom.add_polygon(points, mesh_size=lc)
+#         M = geom.generate_mesh()
+#     return Mesh_from_meshio(M)
 
-def Unbounded(r = 0.1, R=5, lc=0.2) -> Mesh:
-    from pygmsh.occ import Geometry
+
+
+
+# def Unbounded(r = 0.1, R=5, lc=0.2) -> Mesh:
+#     from pygmsh.occ import Geometry
+#     with Geometry() as geom:
+#         # hole = geom.add_circle( [0., 0.], r, mesh_size=lc)
+#         # domain = geom.add_circle( [0., 0.], R, mesh_size=lc)
+#         hole = geom.add_disk( [0., 0.], r)
+#         domain = geom.add_disk( [0., 0.], R)
+
+#         domain = geom.boolean_difference(domain, hole)
+#         geom.add_physical("domain")
+#         M = geom.generate_mesh()
+#     return Mesh_from_meshio(M)
+
+def Unbounded(r = 0.5, R=5, lc=0.2) -> Mesh:
+    from pygmsh.geo import Geometry
     with Geometry() as geom:
-        # hole = geom.add_circle( [0., 0.], r, mesh_size=lc)
-        # domain = geom.add_circle( [0., 0.], R, mesh_size=lc)
-        hole = geom.add_disk( [0., 0.], r)
-        domain = geom.add_disk( [0., 0.], R)
+        center = (0, 0)
 
-        geom.boolean_difference(domain, hole)
-        M = geom.generate_mesh()
-    return Mesh_from_meshio(M)
+        outer = geom.add_circle(center, R, make_surface=False, mesh_size=lc)
+        inner = geom.add_circle(center, r, make_surface=False, mesh_size=lc)
+
+        domain = geom.add_plane_surface(
+            outer.curve_loop,
+            holes=[inner.curve_loop]
+        )
+
+        geom.add_physical(domain, 'domain')
+        geom.add_physical(outer.curve_loop, 'S_R')
+        geom.add_physical(inner.curve_loop, 'S_r')
+        
+        
+        mesh = geom.generate_mesh()
+
+    return Mesh_from_meshio(mesh)
+
 
 
 
@@ -290,8 +362,9 @@ if __name__ == "__main__":
                   [0.5, 0.2]])
     indexes = np.array([1, 0])
 
-    mesh = WaveGuide()
-    mesh = Unbounded()
+    mesh = CleanWaveGuide()
+    # mesh = Unbounded()
     
 
-    _id_tester(mesh)
+    # _id_tester(mesh)
+    plot_waveguide(mesh)
