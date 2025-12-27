@@ -88,10 +88,36 @@ def Mesh_from_Matplotlib(Tri: Triangulation):
 def Mesh_from_meshio(mesh):
         '''Returns a Mesh from a meshio object'''
         points = mesh.points[:,0:2]
-        edges = mesh.cells_dict["line"]
+        meshed_edges = np.sort(mesh.cells_dict["line"], axis=1) 
         triangles = mesh.cells_dict["triangle"]
+
+
+        # creating edges from adyacency
+        edges = np.vstack([triangles[:, [0, 1]],
+                           triangles[:, [1, 2]],
+                           triangles[:, [2, 0]]])
+
+        edges = np.sort(edges, axis=1)
+        edges, counts = np.unique(edges, axis=0, return_counts=True)
+        boundary_edges = edges[counts == 1]
+        interior_edges = edges[counts == 2]
+
+
+        # pythonic loop easy to understand code, later it can be vectorized
+        edge_to_index = { (i, j): idx for idx, (i, j) in enumerate(edges)}
+        meshed_to_generated = np.array([edge_to_index[tuple(e)] for e in meshed_edges])
+
+
         locator = _KDTreeLocator(points=points, triangles=triangles)
         cell_sets = mesh.cell_sets_dict
+
+        for phys_ID in cell_sets.keys():
+            print(cell_sets[phys_ID])
+            for key in cell_sets[phys_ID].keys():
+                if key == "line":
+                    cell_sets[phys_ID][key] = meshed_to_generated[cell_sets[phys_ID][key]]
+
+
         return Mesh(points=points, edges=edges, triangles=triangles, locator=locator, cell_sets=cell_sets)
 
 
@@ -121,10 +147,19 @@ class Mesh():
 
         
     def construct_edge_connectivity(self):
+       
         edges = np.array([frozenset(E) for E in self._edges])
+        # print("edges:")
+        # print(edges)
+
         triangles = np.array([frozenset(T) for T in self._triangles])
+        
+        # print("triangles:")
+        # print(triangles)
+        
         numpy_subset = np.frompyfunc(lambda A, B: A <= B, 2, 1)
         mask = numpy_subset(edges[:,None], triangles[None,:])
+        # print(mask)
         self.boundary_edges_list = np.where(mask.sum(axis=1)==1)[0]
         self.inner_edges_list = np.where(mask.sum(axis=1)==2)[0]
     
@@ -216,22 +251,22 @@ def _id_tester(M: Mesh):
 
 def plot_waveguide(M: Mesh):
     from matplotlib.collections import LineCollection
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
 
-    xmin, xmax = np.min(M._points[:,0]), np.max(M._points[:,0]) 
-    ymin, ymax = np.min(M._points[:,1]), np.max(M._points[:,1])
-
-    lw = 2
-    ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
+    lw = 1
+    # ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
 
     S = M._cell_sets["S"]["line"]
-    G = M._cell_sets["Gamma"]["line"]
+    G = M._cell_sets["Gamma"]["line"] #it allows for multidimensional subsets
+
+    inner = M.inner_edges_list
+
+
+    lines = np.stack([mesh.edges[inner]["P"], mesh.edges[inner]["Q"]], axis=1)
+    ax.add_collection(LineCollection(lines, colors='k', linewidths=lw))
 
     lines = np.stack([mesh.edges[S]["P"], mesh.edges[S]["Q"]], axis=1)
     ax.add_collection(LineCollection(lines, colors='r', linewidths=lw))
-
-    
-    # lines = [ np.vstack([mesh.edges[e_ID]["P"], mesh.edges[e_ID]["Q"]]) for e_ID in G]
 
     lines = np.stack([mesh.edges[G]["P"], mesh.edges[G]["Q"]], axis=1)
     ax.add_collection(LineCollection(lines, colors='b', linewidths=lw))
@@ -357,10 +392,10 @@ def Unbounded(r = 0.5, R=5, lc=0.2) -> Mesh:
 if __name__ == "__main__":
 
     # mesh = _triangulation_sample_mesh()    
-    mesh = _gmsh_sample_mesh()
-    p = np.array([[0.2, 0.5],
-                  [0.5, 0.2]])
-    indexes = np.array([1, 0])
+    # mesh = _gmsh_sample_mesh()
+    # p = np.array([[0.2, 0.5],
+    #               [0.5, 0.2]])
+    # indexes = np.array([1, 0])
 
     mesh = CleanWaveGuide()
     # mesh = Unbounded()
