@@ -2,11 +2,13 @@
 
 from typing import Final
 import numpy as np
+from numpy.linalg import norm
 from matplotlib.tri import Triangulation
 import matplotlib.pyplot as plt 
 from numpy.typing import NDArray
 from scipy.spatial import cKDTree
 from typing import Protocol
+from meshio import Mesh as meshioMesh
 
 float_array = NDArray[np.float64]
 int_array = NDArray[np.int64]
@@ -15,16 +17,21 @@ int_array = NDArray[np.int64]
 
 DIM: Final = 2
 
-edge_dtype = [("P", np.float64, DIM), ("Q", np.float64, DIM)]
+edge_dtype = [("P", np.float64, DIM),
+              ("Q", np.float64, DIM),
+              ("T", np.float64, DIM),
+              ("N", np.float64, DIM),
+              ("M", np.float64, DIM),
+              ("l", float)]
 
 
-def in_triangle(P, A, B, C) -> bool:
+def in_triangle(P: float | float_array, A: float | float_array, B: float | float_array, C: float | float_array) -> bool:
     '''Computes if a point is inside a triangle'''
     AC = C - A
     AB = B - A
     AP = P - A
 
-    u, v = np.linalg.solve(np.column_stack([AC,AB]), AP) #computing baricentric coordinates
+    u, v = np.linalg.solve(np.column_stack([AC, AB]), AP)  # computing baricentric coordinates
     tol = 1E-16
 
     return (u >= -tol) and (v >= -tol) and (u + v <= 1 + tol)
@@ -44,8 +51,9 @@ class _MatplotlibLocator(_CellLocator):
         p_x, p_y = np.transpose(p)
         return self.trifinder(p_x, p_y)
     
+
 class _KDTreeLocator(_CellLocator):
-    def __init__(self, points, triangles):
+    def __init__(self, points: float_array, triangles: int_array):
         self.points = points
         self.triangles = triangles
         self.build_index()
@@ -53,12 +61,11 @@ class _KDTreeLocator(_CellLocator):
     def build_index(self):
         centroids = self.points[self.triangles].mean(axis=1)
         self.tree = cKDTree(centroids)
-        self.radius = np.max(np.linalg.norm(self.points[self.triangles] - centroids[:, np.newaxis,:], axis=-1))  # precomputed
+        self.radius = np.max(np.linalg.norm(self.points[self.triangles] - centroids[:, np.newaxis, :], axis=-1))
 
     def find_cell(self, p: float_array):
         p = np.asarray(p)
         candidates = self.tree.query_ball_point(p, self.radius)
-
 
         if p.shape == (2,):
             for i in candidates:
@@ -68,60 +75,13 @@ class _KDTreeLocator(_CellLocator):
 
         elif p.ndim == 2 and p.shape[1] == 2:
             indexes = np.full(p.shape[0], dtype=np.int64, fill_value=-1)
-            for j, (p_, candidates_) in enumerate(zip(p,candidates)):
+            for j, (p_, candidates_) in enumerate(zip(p, candidates)):
                 for i in candidates_:
                     if in_triangle(p_, *self.points[self.triangles[i]]):
-                        indexes[j]=i
+                        indexes[j] = i
             return indexes
         else:
             raise ValueError("Input must have shape (2,) or (M, 2)")
-
-
-def Mesh_from_Matplotlib(Tri: Triangulation):
-        '''Returns a Mesh from a Matptlotlib.tri.Triangulation'''
-        points = np.column_stack([Tri.x, Tri.y])
-        edges = Tri.edges 
-        triangles = Tri.triangles
-        locator = _MatplotlibLocator(Tri=Tri)
-        return Mesh(points=points, edges=edges, triangles=triangles, locator=locator)
-
-def Mesh_from_meshio(mesh):
-        '''Returns a Mesh from a meshio object'''
-        points = mesh.points[:,0:2]
-        meshed_edges = np.sort(mesh.cells_dict["line"], axis=1) 
-        triangles = mesh.cells_dict["triangle"]
-
-
-        # creating edges from adyacency
-        edges = np.vstack([triangles[:, [0, 1]],
-                           triangles[:, [1, 2]],
-                           triangles[:, [2, 0]]])
-
-        edges = np.sort(edges, axis=1)
-        edges, counts = np.unique(edges, axis=0, return_counts=True)
-        # boundary_edges = edges[counts == 1]
-        # inner_edges = edges[counts == 2]
-
-        boundary_edges_list = np.nonzero(counts==1)
-        inner_edges_list = np.nonzero(counts==2)
-
-
-        # pythonic loop easy to understand code, later it can be vectorized
-        edge_to_index = { (i, j): idx for idx, (i, j) in enumerate(edges)}
-        meshed_to_generated = np.array([edge_to_index[tuple(e)] for e in meshed_edges])
-
-
-        locator = _KDTreeLocator(points=points, triangles=triangles)
-        cell_sets = mesh.cell_sets_dict
-
-        for phys_ID in cell_sets.keys():
-            for key in cell_sets[phys_ID].keys():
-                if key == "line":
-                    cell_sets[phys_ID][key] = meshed_to_generated[cell_sets[phys_ID][key]]
-
-
-        return Mesh(points=points, edges=edges, triangles=triangles, 
-                    inner_edges_list=inner_edges_list, boundary_edges_list=boundary_edges_list, locator=locator, cell_sets=cell_sets)
 
 
 # def construct_edge_connectivity(self):
@@ -141,7 +101,7 @@ class Mesh():
     as numpy structured-arrays for easy manipulation'''
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
-                 inner_edges_list: int_array, boundary_edges_list: int_array, locator: _CellLocator, cell_sets : dict):
+                 inner_edges_list: int_array, boundary_edges_list: int_array, locator: _CellLocator, cell_sets: dict):
         self._points = points
         self._edges = edges
         self._triangles = triangles
@@ -151,100 +111,133 @@ class Mesh():
         self._cell_sets = cell_sets
         self.construct_numpy_arrays()
 
-
     def construct_numpy_arrays(self):
         edges = np.zeros(self.n_edges, dtype=edge_dtype)
         points = self._points
-        edges["P"] = points[self._edges[:,0],:]
-        edges["Q"] = points[self._edges[:,1],:]
+        edges["P"] = points[self._edges[:, 0], :]
+        edges["Q"] = points[self._edges[:, 1], :]
+        edges["M"] = 0.5*(edges["P"]+edges["Q"])
+        edges["l"] = norm(edges["Q"] - edges["P"], axis=1)
+        edges["T"] = 1/edges["l"][:, np.newaxis]*(edges["Q"] - edges["P"])
+        edges["N"] = np.column_stack([edges["T"][:,1], -edges["T"][:,0]])
         self.edges = edges
 
-        
-    
 
     def get_cell(self, p: float_array) -> int_array:
         return self.locator.find_cell(p)
-        
-
 
     @property
-    def n_points(self) -> np.int64:
+    def n_points(self) -> int:
         return self._points.shape[0]
 
     @property
-    def n_edges(self) -> np.int64:
+    def n_edges(self) -> int:
         return self._edges.shape[0]
-        
-    def plot_mesh(self):
-        plt.triplot(Triangulation(x=self._points[:,0], y=self._points[:,1], triangles=self._triangles))
-        plt.show()
+    # def plot_mesh(self):
+    #     plt.triplot(Triangulation(x=self._points[:, 0], y=self._points[:, 1], triangles=self._triangles))
+    #     plt.show()
 
 
-    def generate_Edges(self):
-        pass
+def Mesh_from_Matplotlib(Tri: Triangulation):
+    '''Returns a Mesh from a Matptlotlib.tri.Triangulation'''
+    points = np.column_stack([Tri.x, Tri.y])
+    edges = Tri.edges
+    triangles = Tri.triangles
+    locator = _MatplotlibLocator(Tri=Tri)
+    return Mesh(points=points, edges=edges, triangles=triangles, locator=locator)
 
 
-def _id_tester(M: Mesh):
-    fig, ax = plt.subplots()
+def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
+    '''Returns a Mesh from a meshio object'''
+    points = mesh.points[:, 0:2]
+    meshed_edges = np.sort(mesh.cells_dict["line"], axis=1)
+    triangles = mesh.cells_dict["triangle"]
 
-    xmin, xmax = np.min(M._points[:,0]), np.max(M._points[:,0]) 
-    ymin, ymax = np.min(M._points[:,1]), np.max(M._points[:,1])
+    # creating edges from adyacency
+    edges = np.vstack([triangles[:, [0, 1]],
+                       triangles[:, [1, 2]],
+                       triangles[:, [2, 0]]])
 
-    N = 200
+    edges = np.sort(edges, axis=1)
+    edges, counts = np.unique(edges, axis=0, return_counts=True)
+    # boundary_edges = edges[counts == 1]
+    # inner_edges = edges[counts == 2]
 
-    x = np.linspace(xmin,xmax,N)
-    y = np.linspace(ymin,ymax,N)
-    X, Y = np.meshgrid(x,y)
-    xy = np.column_stack([X.flatten(), Y.flatten()])
-    Z = mesh.get_cell(xy).reshape(X.shape).astype(float)
-    Z[Z==-1] = np.nan
-    pc = ax.pcolormesh(X,Y,Z)
-    lw = 2
-    ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
-    for e_ID in M.boundary_edges_list:
-        P, Q = M._edges[e_ID]
-        p_x, p_y = M._points[P, :]
-        q_x, q_y = M._points[Q, :]
-        ax.plot([p_x,q_x],[p_y,q_y],'r',linewidth=lw)
+    boundary_edges_list = np.nonzero(counts == 1)
+    inner_edges_list = np.nonzero(counts == 2)
 
-    fig.colorbar(mappable=pc)
-    ax.axis('equal')
+    # pythonic loop easy to understand code, later it can be vectorized
+    edge_to_index = {(i, j): idx for idx, (i, j) in enumerate(edges)}
+    meshed_to_generated = np.array([edge_to_index[tuple(e)] for e in meshed_edges])
 
+    locator = _KDTreeLocator(points=points, triangles=triangles)
+    cell_sets = mesh.cell_sets_dict
 
-    def hover_text(x, y):
-        return f'ID = {M.get_cell([x, y])}'
+    for phys_ID in cell_sets.keys():
+        for key in cell_sets[phys_ID].keys():
+            if key == "line":
+                cell_sets[phys_ID][key] = meshed_to_generated[cell_sets[phys_ID][key]]
 
-    annot = ax.annotate(
-        "",
-        xy=(0, 0),
-        xytext=(10, 10),
-        textcoords="offset points",
-        bbox=dict(boxstyle="round", fc="w"),
-        arrowprops=dict(arrowstyle="->"),
-    )
-    annot.set_visible(False)
-    annot.arrowprops = None
+    tri_edges = np.sort( np.stack([triangles[:, [0, 1]],
+                                   triangles[:, [1, 2]],
+                                   triangles[:, [2, 0]],], axis=1), axis=2)  # shape (nT, 3, 2)
+
+    flat_edges = tri_edges.reshape(-1, 2)   # (3*nT, 2)
+    tri_ids    = np.repeat(np.arange(len(triangles)), 3)
 
 
-    def on_move(event):
-        if event.inaxes != ax:
-            annot.set_visible(False)
-            fig.canvas.draw_idle()
-            return
 
-        xdata, ydata = event.xdata, event.ydata
 
-        # Update annotation
-        annot.xy = (xdata, ydata)
-        annot.set_text(hover_text(xdata, ydata))
-        annot.set_visible(True)
-        fig.canvas.draw_idle()
+    return Mesh(points=points, edges=edges, triangles=triangles, 
+                inner_edges_list=inner_edges_list, boundary_edges_list=boundary_edges_list, locator=locator, cell_sets=cell_sets)
+# def _id_tester(M: Mesh):
+#     fig, ax = plt.subplots()
+#     xmin, xmax = np.min(M._points[:,0]), np.max(M._points[:,0]) 
+#     ymin, ymax = np.min(M._points[:,1]), np.max(M._points[:,1])
+#     N = 200
+#     x = np.linspace(xmin,xmax,N)
+#     y = np.linspace(ymin,ymax,N)
+#     X, Y = np.meshgrid(x,y)
+#     xy = np.column_stack([X.flatten(), Y.flatten()])
+#     Z = mesh.get_cell(xy).reshape(X.shape).astype(float)
+#     Z[Z==-1] = np.nan
+#     pc = ax.pcolormesh(X,Y,Z)
+#     lw = 2
+#     ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
+#     for e_ID in M.boundary_edges_list:
+#         P, Q = M._edges[e_ID]
+#         p_x, p_y = M._points[P, :]
+#         q_x, q_y = M._points[Q, :]
+#         ax.plot([p_x,q_x],[p_y,q_y],'r',linewidth=lw)
+#     fig.colorbar(mappable=pc)
+#     ax.axis('equal')
+#     def hover_text(x, y):
+#         return f'ID = {M.get_cell([x, y])}'
+#     annot = ax.annotate(
+#         "",
+#         xy=(0, 0),
+#         xytext=(10, 10),
+#         textcoords="offset points",
+#         bbox=dict(boxstyle="round", fc="w"),
+#         arrowprops=dict(arrowstyle="->"),
+#     )
+#     annot.set_visible(False)
+#     annot.arrowprops = None
+#     def on_move(event):
+#         if event.inaxes != ax:
+#             annot.set_visible(False)
+#             fig.canvas.draw_idle()
+#             return
+#         xdata, ydata = event.xdata, event.ydata
+#         # Update annotation
+#         annot.xy = (xdata, ydata)
+#         annot.set_text(hover_text(xdata, ydata))
+#         annot.set_visible(True)
+#         fig.canvas.draw_idle()
 
-    # Connect event
-    fig.canvas.mpl_connect("motion_notify_event", on_move)
-
-    plt.show()
-
+#     # Connect event
+#     fig.canvas.mpl_connect("motion_notify_event", on_move)
+#     plt.show()
 
 
 def plot_waveguide(M: Mesh):
@@ -255,25 +248,33 @@ def plot_waveguide(M: Mesh):
     # ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
 
     S = M._cell_sets["S"]["line"]
-    G = M._cell_sets["Gamma"]["line"] #it allows for multidimensional subsets
+    G = M._cell_sets["Gamma"]["line"]  # it allows for multidimensional subsets
 
     inner = M.inner_edges_list
 
-    lines = np.stack([mesh.edges[inner]["P"], mesh.edges[inner]["Q"]], axis=1)
-    ax.add_collection(LineCollection(lines, colors='k', linewidths=lw))
+    ax.add_collection(LineCollection(np.stack([mesh.edges[inner]["P"], mesh.edges[inner]["Q"]], axis=1), 
+                                     colors='k', linewidths=lw))
+    ax.add_collection(LineCollection(np.stack([mesh.edges[S]["P"], mesh.edges[S]["Q"]], axis=1), 
+                                     colors='r', linewidths=lw))
+    ax.add_collection(LineCollection(np.stack([mesh.edges[G]["P"], mesh.edges[G]["Q"]], axis=1), 
+                                     colors='b', linewidths=lw))
+    
+    tangents = False
+    if tangents:
+        ax.quiver(mesh.edges["M"][:, 0],
+                  mesh.edges["M"][:, 1],
+                  mesh.edges["T"][:, 0],
+                  mesh.edges["T"][:, 1], angles='xy', scale_units='xy', scale=5)
 
-    lines = np.stack([mesh.edges[S]["P"], mesh.edges[S]["Q"]], axis=1)
-    ax.add_collection(LineCollection(lines, colors='r', linewidths=lw))
-
-    lines = np.stack([mesh.edges[G]["P"], mesh.edges[G]["Q"]], axis=1)
-    ax.add_collection(LineCollection(lines, colors='b', linewidths=lw))
-
+    normals = True
+    if normals:
+        ax.quiver(mesh.edges["M"][:, 0],
+                  mesh.edges["M"][:, 1],
+                  mesh.edges["N"][:, 0],
+                  mesh.edges["N"][:, 1], angles='xy', scale_units='xy', scale=5)
 
     ax.axis('equal')
-
     plt.show()
-
-
 
 
 def _gmsh_sample_mesh():
@@ -281,19 +282,12 @@ def _gmsh_sample_mesh():
     points = np.array([[0.0, 0.0],
                        [1.0, 0.0],
                        [1.0, 1.0],
-                       [0.0, 1.0]])
-    triangles = np.array([[0, 1, 2],
-                          [2, 3, 0]])
-    
+                       [0.0, 1.0]])    
 
     with pygmsh.geo.Geometry() as geom:
-        # for T in triangles:
-        #     geom.add_polygon(points[T], mesh_size=0.2)
-        # M = geom.generate_mesh()
-    
-        square = geom.add_polygon(points, mesh_size=0.05)
+        geom.add_polygon(points, mesh_size=0.05)
         M = geom.generate_mesh()
-        
+
     return Mesh_from_meshio(M)
 
 
@@ -307,32 +301,30 @@ def _triangulation_sample_mesh():
     return Mesh_from_Matplotlib(Tri)
 
 
-def CleanWaveGuide(R=5, H=1, lc=0.3) -> Mesh:
+def CleanWaveGuide(R: float = 5, H: float = 1, lc: float = 0.3) -> Mesh:
     from pygmsh.geo import Geometry
     with Geometry() as geom:
         p0 = geom.add_point([-R, 0.], mesh_size=lc)
         p1 = geom.add_point([ R, 0.], mesh_size=lc)
         p2 = geom.add_point([ R, H ], mesh_size=lc)
         p3 = geom.add_point([-R, H ], mesh_size=lc)
+
         bottom = geom.add_line( p0, p1)
         right  = geom.add_line(p1, p2)
         top    = geom.add_line(p2, p3)
         left   = geom.add_line(p3, p0)
+
         boundary = geom.add_curve_loop([bottom, right, top, left])
         domain = geom.add_plane_surface(boundary)
-        
+
         geom.add_physical(domain, "Omega")
         geom.add_physical([bottom, top], "Gamma")
         geom.add_physical(left, "S_L")
         geom.add_physical(right, "S_R")
         geom.add_physical([left, right], "S")
-        
-        
+
         M = geom.generate_mesh()
     return Mesh_from_meshio(M)
-
-
-
 # def Unbounded(r = 0.1, R=5, lc=0.2) -> Mesh:
 #     from pygmsh.occ import Geometry
 #     with Geometry() as geom:
@@ -346,7 +338,7 @@ def CleanWaveGuide(R=5, H=1, lc=0.3) -> Mesh:
 #         M = geom.generate_mesh()
 #     return Mesh_from_meshio(M)
 
-def Unbounded(r = 0.5, R=5, lc=0.2) -> Mesh:
+def Unbounded(r: float = 0.5, R: float = 5, lc: float = 0.2) -> Mesh:
     from pygmsh.geo import Geometry
     with Geometry() as geom:
         center = (0, 0)
@@ -362,28 +354,22 @@ def Unbounded(r = 0.5, R=5, lc=0.2) -> Mesh:
         geom.add_physical(domain, 'domain')
         geom.add_physical(outer.curve_loop, 'S_R')
         geom.add_physical(inner.curve_loop, 'S_r')
-        
-        
+
         mesh = geom.generate_mesh()
 
     return Mesh_from_meshio(mesh)
 
 
-
-
-
-
 if __name__ == "__main__":
 
-    # mesh = _triangulation_sample_mesh()    
+    # mesh = _triangulation_sample_mesh()
     # mesh = _gmsh_sample_mesh()
     # p = np.array([[0.2, 0.5],
     #               [0.5, 0.2]])
     # indexes = np.array([1, 0])
 
-    mesh = CleanWaveGuide()
+    mesh = CleanWaveGuide(lc=1.)
     # mesh = Unbounded()
-    
 
     # _id_tester(mesh)
     plot_waveguide(mesh)
