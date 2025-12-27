@@ -99,8 +99,11 @@ def Mesh_from_meshio(mesh):
 
         edges = np.sort(edges, axis=1)
         edges, counts = np.unique(edges, axis=0, return_counts=True)
-        boundary_edges = edges[counts == 1]
-        interior_edges = edges[counts == 2]
+        # boundary_edges = edges[counts == 1]
+        # inner_edges = edges[counts == 2]
+
+        boundary_edges_list = np.nonzero(counts==1)
+        inner_edges_list = np.nonzero(counts==2)
 
 
         # pythonic loop easy to understand code, later it can be vectorized
@@ -112,26 +115,39 @@ def Mesh_from_meshio(mesh):
         cell_sets = mesh.cell_sets_dict
 
         for phys_ID in cell_sets.keys():
-            print(cell_sets[phys_ID])
             for key in cell_sets[phys_ID].keys():
                 if key == "line":
                     cell_sets[phys_ID][key] = meshed_to_generated[cell_sets[phys_ID][key]]
 
 
-        return Mesh(points=points, edges=edges, triangles=triangles, locator=locator, cell_sets=cell_sets)
+        return Mesh(points=points, edges=edges, triangles=triangles, 
+                    inner_edges_list=inner_edges_list, boundary_edges_list=boundary_edges_list, locator=locator, cell_sets=cell_sets)
 
+
+# def construct_edge_connectivity(self):
+    
+#     edges = np.array([frozenset(E) for E in self._edges])
+
+#     triangles = np.array([frozenset(T) for T in self._triangles])
+        
+#     numpy_subset = np.frompyfunc(lambda A, B: A <= B, 2, 1)
+#     mask = numpy_subset(edges[:,None], triangles[None,:])
+#     self.boundary_edges_list = np.where(mask.sum(axis=1)==1)[0]
+#     self.inner_edges_list = np.where(mask.sum(axis=1)==2)[0]
 
 
 class Mesh():
     '''Holds only the relevant data
     as numpy structured-arrays for easy manipulation'''
 
-    def __init__(self, points: float_array, edges: int_array, triangles: int_array, locator: _CellLocator, cell_sets : dict):
+    def __init__(self, points: float_array, edges: int_array, triangles: int_array,
+                 inner_edges_list: int_array, boundary_edges_list: int_array, locator: _CellLocator, cell_sets : dict):
         self._points = points
         self._edges = edges
         self._triangles = triangles
         self.locator = locator
-        self.construct_edge_connectivity()
+        self.inner_edges_list = inner_edges_list
+        self.boundary_edges_list = boundary_edges_list
         self._cell_sets = cell_sets
         self.construct_numpy_arrays()
 
@@ -139,29 +155,11 @@ class Mesh():
     def construct_numpy_arrays(self):
         edges = np.zeros(self.n_edges, dtype=edge_dtype)
         points = self._points
-        for e, edge in enumerate(self._edges):
-            edges[e]["P"] = points[edge[0],:]
-            edges[e]["Q"] = points[edge[1],:]
-
+        edges["P"] = points[self._edges[:,0],:]
+        edges["Q"] = points[self._edges[:,1],:]
         self.edges = edges
 
         
-    def construct_edge_connectivity(self):
-       
-        edges = np.array([frozenset(E) for E in self._edges])
-        # print("edges:")
-        # print(edges)
-
-        triangles = np.array([frozenset(T) for T in self._triangles])
-        
-        # print("triangles:")
-        # print(triangles)
-        
-        numpy_subset = np.frompyfunc(lambda A, B: A <= B, 2, 1)
-        mask = numpy_subset(edges[:,None], triangles[None,:])
-        # print(mask)
-        self.boundary_edges_list = np.where(mask.sum(axis=1)==1)[0]
-        self.inner_edges_list = np.where(mask.sum(axis=1)==2)[0]
     
 
     def get_cell(self, p: float_array) -> int_array:
@@ -261,7 +259,6 @@ def plot_waveguide(M: Mesh):
 
     inner = M.inner_edges_list
 
-
     lines = np.stack([mesh.edges[inner]["P"], mesh.edges[inner]["Q"]], axis=1)
     ax.add_collection(LineCollection(lines, colors='k', linewidths=lw))
 
@@ -332,20 +329,7 @@ def CleanWaveGuide(R=5, H=1, lc=0.3) -> Mesh:
         
         
         M = geom.generate_mesh()
-       #  print(M.cell_sets_dict)
     return Mesh_from_meshio(M)
-
-# def CleanWaveGuide(R=5, H=1, lc=0.2) -> Mesh:
-#     from pygmsh.geo import Geometry
-#     points = np.array([[-R, 0.],
-#                        [ R, 0.],
-#                        [ R, H ],
-#                        [-R, H ]])
-#     with Geometry() as geom:
-#         geom.add_polygon(points, mesh_size=lc)
-#         M = geom.generate_mesh()
-#     return Mesh_from_meshio(M)
-
 
 
 
