@@ -101,7 +101,9 @@ class Mesh():
     as numpy structured-arrays for easy manipulation'''
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
-                 inner_edges_list: int_array, boundary_edges_list: int_array, locator: _CellLocator, cell_sets: dict):
+                 inner_edges_list: int_array, boundary_edges_list: int_array,
+                 inner_edges_triangles: int_array, boundary_edges_triangle: int_array,
+                 locator: _CellLocator, cell_sets: dict[str, dict[str, int_array]]):
         self._points = points
         self._edges = edges
         self._triangles = triangles
@@ -109,6 +111,8 @@ class Mesh():
         self.inner_edges_list = inner_edges_list
         self.boundary_edges_list = boundary_edges_list
         self._cell_sets = cell_sets
+        self.inner_edges_triangles = inner_edges_triangles
+        self.boundary_edges_triangle = boundary_edges_triangle
         self.construct_numpy_arrays()
 
     def construct_numpy_arrays(self):
@@ -160,11 +164,11 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
 
     edges = np.sort(edges, axis=1)
     edges, counts = np.unique(edges, axis=0, return_counts=True)
-    # boundary_edges = edges[counts == 1]
-    # inner_edges = edges[counts == 2]
+    boundary_edges = edges[counts == 1]
+    inner_edges = edges[counts == 2]
 
-    boundary_edges_list = np.nonzero(counts == 1)
-    inner_edges_list = np.nonzero(counts == 2)
+    boundary_edges_list = np.nonzero(counts == 1)[0]
+    inner_edges_list = np.nonzero(counts == 2)[0]
 
     # pythonic loop easy to understand code, later it can be vectorized
     edge_to_index = {(i, j): idx for idx, (i, j) in enumerate(edges)}
@@ -183,14 +187,37 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
                                    triangles[:, [2, 0]],], axis=1), axis=2)  # shape (nT, 3, 2)
 
     flat_edges = tri_edges.reshape(-1, 2)   # (3*nT, 2)
-    tri_ids    = np.repeat(np.arange(len(triangles)), 3)
+    tri_ids = np.repeat(np.arange(len(triangles)), 3)
 
 
 
 
-    return Mesh(points=points, edges=edges, triangles=triangles, 
-                inner_edges_list=inner_edges_list, boundary_edges_list=boundary_edges_list, locator=locator, cell_sets=cell_sets)
-# def _id_tester(M: Mesh):
+    # Building lookup from flat_edges
+    # interior edges
+    edge_keys_inner: dict[tuple[int, int], list[int]] = {tuple(e): [] for e in inner_edges}
+
+    for e, t in zip(flat_edges, tri_ids):
+        key = tuple(e)
+        if key in edge_keys_inner:
+            edge_keys_inner[key].append(t)
+
+    inner_edges_triangles = np.array([edge_keys_inner[tuple(e)] for e in inner_edges], dtype=int)  # (nE_int, 2)
+
+    # boundary edges
+    edge_keys_boundary: dict[tuple[int, int], int] = {tuple(e): -1 for e in boundary_edges}
+
+    for e, t in zip(flat_edges, tri_ids):
+        key = tuple(e)
+        if key in edge_keys_boundary:
+            edge_keys_boundary[key] = t
+
+    boundary_edges_triangle = np.array([edge_keys_boundary[tuple(e)] for e in boundary_edges], dtype=int)  # (nE_bnd,)
+
+    return Mesh(points=points, edges=edges, triangles=triangles,
+                inner_edges_list=inner_edges_list, boundary_edges_list=boundary_edges_list,
+                inner_edges_triangles=inner_edges_triangles, boundary_edges_triangle=boundary_edges_triangle,
+                locator=locator, cell_sets=cell_sets)
+# def triangle_id_tester(M: Mesh):
 #     fig, ax = plt.subplots()
 #     xmin, xmax = np.min(M._points[:,0]), np.max(M._points[:,0]) 
 #     ymin, ymax = np.min(M._points[:,1]), np.max(M._points[:,1])
@@ -240,7 +267,7 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
 #     plt.show()
 
 
-def plot_waveguide(M: Mesh):
+def plot_waveguide(M: Mesh, plot_tangents: bool = False, plot_normals: bool = False):
     from matplotlib.collections import LineCollection
     _, ax = plt.subplots()
 
@@ -259,15 +286,13 @@ def plot_waveguide(M: Mesh):
     ax.add_collection(LineCollection(np.stack([mesh.edges[G]["P"], mesh.edges[G]["Q"]], axis=1), 
                                      colors='b', linewidths=lw))
     
-    tangents = False
-    if tangents:
+    if plot_tangents:
         ax.quiver(mesh.edges["M"][:, 0],
                   mesh.edges["M"][:, 1],
                   mesh.edges["T"][:, 0],
                   mesh.edges["T"][:, 1], angles='xy', scale_units='xy', scale=5)
 
-    normals = True
-    if normals:
+    if plot_normals:
         ax.quiver(mesh.edges["M"][:, 0],
                   mesh.edges["M"][:, 1],
                   mesh.edges["N"][:, 0],
@@ -371,5 +396,5 @@ if __name__ == "__main__":
     mesh = CleanWaveGuide(lc=1.)
     # mesh = Unbounded()
 
-    # _id_tester(mesh)
-    plot_waveguide(mesh)
+    # _triangle_id_tester(mesh)
+    plot_waveguide(mesh, plot_tangents=True)
