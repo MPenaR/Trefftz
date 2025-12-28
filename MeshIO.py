@@ -103,15 +103,14 @@ class Mesh():
     as numpy structured-arrays for easy manipulation'''
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
-                 edges2triangles: int_array,
+                 edge2triangles: int_array,
                  locator: _CellLocator, cell_sets: dict[str, dict[str, int_array]]):
         self._points = points
         self._edges = edges
         self._triangles = triangles
         self.locator = locator
         self._cell_sets = cell_sets
-        self._edges2triangles = edges2triangles
-        self.boundary_edges_list = np.nonzero(edges2triangles[:, 1] == -1)[0]
+        self._edge2triangles = edge2triangles
         self.construct_numpy_arrays()
 
     def construct_numpy_arrays(self):
@@ -123,11 +122,9 @@ class Mesh():
         edges["l"] = norm(edges["Q"] - edges["P"], axis=1)
         edges["T"] = 1/edges["l"][:, np.newaxis]*(edges["Q"] - edges["P"])
         edges["N"] = np.column_stack([edges["T"][:, 1], -edges["T"][:, 0]])
-        edges["boundary"] = False
-        edges["boundary"][self.boundary_edges_list] = True # if I change the order, edges[I] is a copy, not a view
-        edges["triangles"] = self._edges2triangles
+        edges["triangles"] = self._edge2triangles
+        edges["boundary"] = edges["triangles"][:, 1] == -1
         self.edges = edges
-
 
     def get_cell(self, p: float_array) -> int_array | int:
         return self.locator.find_cell(p)
@@ -228,14 +225,14 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
 
     # integer hashing
     max_node = len(points) # edges.max() + 1
-    edge_keys = edges[:, 0] * max_node + edges[:, 1]
+    edge_keys = edges[:, 0].astype(np.int64) * max_node + edges[:, 1]
 
     # sort the keys by integer hashing in a new variable
     order = np.argsort(edge_keys)
     edge_keys_sorted = edge_keys[order]
 
     # flat_edges hashed
-    flat_keys = flat_edges[:, 0] * max_node + flat_edges[:, 1]
+    flat_keys = flat_edges[:, 0].astype(np.int64) * max_node + flat_edges[:, 1]
 
     # now we can fastly search
     pos = np.searchsorted(edge_keys_sorted, flat_keys) # position of triangle edge into the sorted global edges
@@ -251,7 +248,7 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
             edge2triangles[E, 1] = T
 
 
-    return Mesh(points=points, edges=edges, triangles=triangles, edges2triangles=edge2triangles,
+    return Mesh(points=points, edges=edges, triangles=triangles, edge2triangles=edge2triangles,
                 locator=locator, cell_sets=cell_sets)
 
 
