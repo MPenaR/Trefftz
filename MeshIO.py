@@ -315,7 +315,7 @@ def plot_waveguide(M: Mesh, plot_tangents: bool = False, plot_normals: bool = Fa
     S = M._cell_sets["S"]["line"]
     G = M._cell_sets["Gamma"]["line"]  # it allows for multidimensional subsets
 
-    inner = M.inner_edges_list
+    inner = np.where(np.logical_not(M.edges["boundary"]))[0]
 
     ax.add_collection(LineCollection(np.stack([mesh.edges[inner]["P"], mesh.edges[inner]["Q"]], axis=1), 
                                      colors='k', linewidths=lw))
@@ -452,9 +452,7 @@ def _visually_test_edges(M: Mesh):
         ax.set_title(f'Edge number: {e}, boundary: {edge["boundary"]}')
         if edge["boundary"]:
             triangle = M._triangles[edge["triangles"][0]]
-            print(f'{triangle=}')
             A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
-            print(f'{A=},\n {B=},\n {C=}')
             ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
         else:
             triangle = M._triangles[edge["triangles"][0]]
@@ -519,9 +517,9 @@ if __name__ == "__main__":
     #               [0.5, 0.2]])
     # indexes = np.array([1, 0])
 
-    mesh = CleanWaveGuide(lc=1.)
+    mesh = CleanWaveGuide(lc=0.2)
     # mesh = Unbounded()
 
     # _triangle_id_tester(mesh)
-    # plot_waveguide(mesh, plot_tangents=True)
+    plot_waveguide(mesh, plot_tangents=True)
     _visually_test_edges(mesh)
