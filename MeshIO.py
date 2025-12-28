@@ -22,7 +22,9 @@ edge_dtype = [("P", np.float64, DIM),
               ("T", np.float64, DIM),
               ("N", np.float64, DIM),
               ("M", np.float64, DIM),
-              ("l", float)]
+              ("l", float),
+              ("boundary", bool),
+              ("triangles", np.int32, 2)]
 
 
 def in_triangle(P: float | float_array, A: float | float_array, B: float | float_array, C: float | float_array) -> bool:
@@ -39,7 +41,7 @@ def in_triangle(P: float | float_array, A: float | float_array, B: float | float
 
 class _CellLocator(Protocol):
     '''Protocol for cell locators'''
-    def find_cell(self, p: float_array):
+    def find_cell(self, p: float_array) -> int_array | int:
         ...
 
 
@@ -47,7 +49,7 @@ class _MatplotlibLocator(_CellLocator):
     def __init__(self, Tri: Triangulation):
         self.trifinder = Tri.get_trifinder()
     
-    def find_cell(self, p: float_array):
+    def find_cell(self, p: float_array) -> int_array | int:
         p_x, p_y = np.transpose(p)
         return self.trifinder(p_x, p_y)
     
@@ -63,7 +65,7 @@ class _KDTreeLocator(_CellLocator):
         self.tree = cKDTree(centroids)
         self.radius = np.max(np.linalg.norm(self.points[self.triangles] - centroids[:, np.newaxis, :], axis=-1))
 
-    def find_cell(self, p: float_array):
+    def find_cell(self, p: float_array) -> int_array | int:
         p = np.asarray(p)
         candidates = self.tree.query_ball_point(p, self.radius)
 
@@ -101,18 +103,15 @@ class Mesh():
     as numpy structured-arrays for easy manipulation'''
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
-                 inner_edges_list: int_array, boundary_edges_list: int_array,
-                 inner_edges_triangles: int_array, boundary_edges_triangle: int_array,
+                 edges2triangles: int_array,
                  locator: _CellLocator, cell_sets: dict[str, dict[str, int_array]]):
         self._points = points
         self._edges = edges
         self._triangles = triangles
         self.locator = locator
-        self.inner_edges_list = inner_edges_list
-        self.boundary_edges_list = boundary_edges_list
         self._cell_sets = cell_sets
-        self.inner_edges_triangles = inner_edges_triangles
-        self.boundary_edges_triangle = boundary_edges_triangle
+        self._edges2triangles = edges2triangles
+        self.boundary_edges_list = np.nonzero(edges2triangles[:, 1] == -1)[0]
         self.construct_numpy_arrays()
 
     def construct_numpy_arrays(self):
@@ -123,11 +122,14 @@ class Mesh():
         edges["M"] = 0.5*(edges["P"]+edges["Q"])
         edges["l"] = norm(edges["Q"] - edges["P"], axis=1)
         edges["T"] = 1/edges["l"][:, np.newaxis]*(edges["Q"] - edges["P"])
-        edges["N"] = np.column_stack([edges["T"][:,1], -edges["T"][:,0]])
+        edges["N"] = np.column_stack([edges["T"][:, 1], -edges["T"][:, 0]])
+        edges["boundary"] = False
+        edges["boundary"][self.boundary_edges_list] = True # if I change the order, edges[I] is a copy, not a view
+        edges["triangles"] = self._edges2triangles
         self.edges = edges
 
 
-    def get_cell(self, p: float_array) -> int_array:
+    def get_cell(self, p: float_array) -> int_array | int:
         return self.locator.find_cell(p)
 
     @property
@@ -182,41 +184,77 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
             if key == "line":
                 cell_sets[phys_ID][key] = meshed_to_generated[cell_sets[phys_ID][key]]
 
+
+# # old method
+#     tri_edges = np.sort( np.stack([triangles[:, [0, 1]],
+#                                    triangles[:, [1, 2]],
+#                                    triangles[:, [2, 0]],], axis=1), axis=2)  # shape (nT, 3, 2)
+
+#     flat_edges = tri_edges.reshape(-1, 2)   # (3*nT, 2)
+#     tri_ids = np.repeat(np.arange(len(triangles)), 3)
+
+
+
+
+#     # Building lookup from flat_edges
+#     # interior edges
+#     edge_keys_inner: dict[tuple[int, int], list[int]] = {tuple(e): [] for e in inner_edges}
+
+#     for e, t in zip(flat_edges, tri_ids):
+#         key = tuple(e)
+#         if key in edge_keys_inner:
+#             edge_keys_inner[key].append(t)
+
+#     inner_edges_triangles = np.array([edge_keys_inner[tuple(e)] for e in inner_edges], dtype=int)  # (nE_int, 2)
+
+#     # boundary edges
+#     edge_keys_boundary: dict[tuple[int, int], int] = {tuple(e): -1 for e in boundary_edges}
+
+#     for e, t in zip(flat_edges, tri_ids):
+#         key = tuple(e)
+#         if key in edge_keys_boundary:
+#             edge_keys_boundary[key] = t
+
+#     boundary_edges_triangle = np.array([edge_keys_boundary[tuple(e)] for e in boundary_edges], dtype=int)  # (nE_bnd,)
+
+#new method
+
     tri_edges = np.sort( np.stack([triangles[:, [0, 1]],
                                    triangles[:, [1, 2]],
-                                   triangles[:, [2, 0]],], axis=1), axis=2)  # shape (nT, 3, 2)
+                                   triangles[:, [2, 0]]], axis=1), axis=2)  # (T, 3, 2)
 
-    flat_edges = tri_edges.reshape(-1, 2)   # (3*nT, 2)
+    flat_edges = tri_edges.reshape(-1, 2)       # (3T, 2)
     tri_ids = np.repeat(np.arange(len(triangles)), 3)
 
+    # integer hashing
+    max_node = len(points) # edges.max() + 1
+    edge_keys = edges[:, 0] * max_node + edges[:, 1]
+
+    # sort the keys by integer hashing in a new variable
+    order = np.argsort(edge_keys)
+    edge_keys_sorted = edge_keys[order]
+
+    # flat_edges hashed
+    flat_keys = flat_edges[:, 0] * max_node + flat_edges[:, 1]
+
+    # now we can fastly search
+    pos = np.searchsorted(edge_keys_sorted, flat_keys) # position of triangle edge into the sorted global edges
+    edge_ids = order[pos] # position of the triangle edge into the global edges
+
+    #now I want the other relation, edge to (tri1,tri2) or (tri1,-1)
+    edge2triangles = np.full((len(edges), 2), -1, dtype=int)
+
+    for E, T in zip(edge_ids, tri_ids):
+        if edge2triangles[E, 0] == -1:
+            edge2triangles[E, 0] = T
+        else:
+            edge2triangles[E, 1] = T
 
 
-
-    # Building lookup from flat_edges
-    # interior edges
-    edge_keys_inner: dict[tuple[int, int], list[int]] = {tuple(e): [] for e in inner_edges}
-
-    for e, t in zip(flat_edges, tri_ids):
-        key = tuple(e)
-        if key in edge_keys_inner:
-            edge_keys_inner[key].append(t)
-
-    inner_edges_triangles = np.array([edge_keys_inner[tuple(e)] for e in inner_edges], dtype=int)  # (nE_int, 2)
-
-    # boundary edges
-    edge_keys_boundary: dict[tuple[int, int], int] = {tuple(e): -1 for e in boundary_edges}
-
-    for e, t in zip(flat_edges, tri_ids):
-        key = tuple(e)
-        if key in edge_keys_boundary:
-            edge_keys_boundary[key] = t
-
-    boundary_edges_triangle = np.array([edge_keys_boundary[tuple(e)] for e in boundary_edges], dtype=int)  # (nE_bnd,)
-
-    return Mesh(points=points, edges=edges, triangles=triangles,
-                inner_edges_list=inner_edges_list, boundary_edges_list=boundary_edges_list,
-                inner_edges_triangles=inner_edges_triangles, boundary_edges_triangle=boundary_edges_triangle,
+    return Mesh(points=points, edges=edges, triangles=triangles, edges2triangles=edge2triangles,
                 locator=locator, cell_sets=cell_sets)
+
+
 # def triangle_id_tester(M: Mesh):
 #     fig, ax = plt.subplots()
 #     xmin, xmax = np.min(M._points[:,0]), np.max(M._points[:,0]) 
@@ -384,8 +422,19 @@ def _visually_test_edges(M: Mesh):
     px, py = edge["P"]
     qx, qy = edge["Q"]
     ax.plot([px, qx], [py, qy], "b", linewidth=2*lw )
-    if e in M.boundary_edges_list:
-        triangle = M.boundary_edges_triangle
+    if edge["boundary"]:
+        triangle = M._triangles[edge["triangles"][0]]
+        A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
+        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
+    else:
+        triangle = M._triangles[edge["triangles"][0]]
+        A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
+        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
+
+        triangle = M._triangles[edge["triangles"][1]]
+        A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
+        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='g'))
+
 
     def update_plot(e):
         ax.lines[-1].remove()
@@ -400,7 +449,23 @@ def _visually_test_edges(M: Mesh):
         px, py = edge["P"]
         qx, qy = edge["Q"]
         ax.plot([px, qx], [py, qy], "b", linewidth=2*lw )
-        ax.set_title(f'Edge number: {e}')
+        ax.set_title(f'Edge number: {e}, boundary: {edge["boundary"]}')
+        if edge["boundary"]:
+            triangle = M._triangles[edge["triangles"][0]]
+            print(f'{triangle=}')
+            A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
+            print(f'{A=},\n {B=},\n {C=}')
+            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
+        else:
+            triangle = M._triangles[edge["triangles"][0]]
+            A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
+            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
+
+            triangle = M._triangles[edge["triangles"][1]]
+            A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
+            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='g'))
+
+
         fig.canvas.draw_idle()
 
     def on_key(event):
