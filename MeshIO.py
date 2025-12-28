@@ -363,6 +363,67 @@ def CleanWaveGuide(R: float = 5, H: float = 1, lc: float = 0.3) -> Mesh:
 #         M = geom.generate_mesh()
 #     return Mesh_from_meshio(M)
 
+def _visually_test_edges(M: Mesh):
+    from matplotlib.collections import LineCollection
+    from matplotlib.patches import Polygon
+    fig, ax = plt.subplots()
+    lw = 1
+    xmin, ymin = M._points.min(axis=0)
+    xmax, ymax = M._points.max(axis=0)
+
+    N_E = M.n_edges
+
+    ax.add_collection(LineCollection(np.stack([M.edges["P"], M.edges["Q"]], axis=1), 
+                                      colors='k', linewidths=lw))
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+    ax.axis('equal')
+
+    e = 0
+    edge = M.edges[e]
+    px, py = edge["P"]
+    qx, qy = edge["Q"]
+    ax.plot([px, qx], [py, qy], "b", linewidth=2*lw )
+    if e in M.boundary_edges_list:
+        triangle = M.boundary_edges_triangle
+
+    def update_plot(e):
+        ax.lines[-1].remove()
+        fig.canvas.draw_idle()
+
+        if ax.patches:
+            ax.patches[-1].remove()
+        if ax.patches:
+            ax.patches[-1].remove()
+
+        edge = M.edges[e]
+        px, py = edge["P"]
+        qx, qy = edge["Q"]
+        ax.plot([px, qx], [py, qy], "b", linewidth=2*lw )
+        ax.set_title(f'Edge number: {e}')
+        fig.canvas.draw_idle()
+
+    def on_key(event):
+        nonlocal e
+        if event.key == "up":
+            e = min(N_E-1, e+1)
+            update_plot(e)
+
+        elif event.key == "down":
+            e = max(0, e-1)
+            update_plot(e)
+
+        elif event.key == "escape":
+            plt.close(fig)
+
+    fig.canvas.mpl_connect("key_press_event", on_key)
+    update_plot(e)
+
+
+    plt.show()
+
+
+
 def Unbounded(r: float = 0.5, R: float = 5, lc: float = 0.2) -> Mesh:
     from pygmsh.geo import Geometry
     with Geometry() as geom:
@@ -397,4 +458,5 @@ if __name__ == "__main__":
     # mesh = Unbounded()
 
     # _triangle_id_tester(mesh)
-    plot_waveguide(mesh, plot_tangents=True)
+    # plot_waveguide(mesh, plot_tangents=True)
+    _visually_test_edges(mesh)
