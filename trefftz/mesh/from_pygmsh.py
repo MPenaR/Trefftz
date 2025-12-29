@@ -3,25 +3,9 @@ from .core import CellLocator, Mesh
 from scipy.spatial import cKDTree
 from meshio import Mesh as meshioMesh
 from trefftz.numpy_types import float_array, int_array
+from trefftz.mesh.geometry import in_triangle
 
 
-def in_triangle(P: float_array, A: float_array, B: float_array, C: float_array) -> bool:
-    '''Computes if a point is inside a triangle'''
-    AC = C - A
-    AB = B - A
-    AP = P - A
-
-    u, v = np.linalg.solve(np.column_stack([AC, AB]), AP)  # computing baricentric coordinates
-    tol = 1E-16
-
-    return (u >= -tol) and (v >= -tol) and (u + v <= 1 + tol)
-
-def triangle_area(A: float_array, B: float_array, C: float_array) -> int | int_array:
-    '''Computes the area of a triangle'''
-    u = (C - A).transpose()
-    v = (B - A).transpose()
-    det = u[0]*v[1] - u[1]*v[0]
-    return 0.5*np.abs(det).transpose()
 
 
 class KDTreeLocator(CellLocator):
@@ -55,6 +39,7 @@ class KDTreeLocator(CellLocator):
         else:
             raise ValueError("Input must have shape (2,) or (M, 2)")
 
+
 def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
     '''Returns a Mesh from a meshio object'''
     points = mesh.points[:, 0:2]
@@ -68,11 +53,11 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
 
     edges = np.sort(edges, axis=1)
     edges, counts = np.unique(edges, axis=0, return_counts=True)
-    boundary_edges = edges[counts == 1]
-    inner_edges = edges[counts == 2]
+    # boundary_edges = edges[counts == 1]
+    # inner_edges = edges[counts == 2]
 
-    boundary_edges_list = np.nonzero(counts == 1)[0]
-    inner_edges_list = np.nonzero(counts == 2)[0]
+    # boundary_edges_list = np.nonzero(counts == 1)[0]
+    # inner_edges_list = np.nonzero(counts == 2)[0]
 
     # pythonic loop easy to understand code, later it can be vectorized
     edge_to_index = {(i, j): idx for idx, (i, j) in enumerate(edges)}

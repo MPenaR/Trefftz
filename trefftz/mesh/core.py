@@ -5,7 +5,7 @@ import numpy as np
 from numpy.linalg import norm
 from typing import Protocol
 from trefftz.numpy_types import float_array, int_array
-
+from .geometry import triangle_area
 DIM: Final = 2
 
 edge_dtype = [("P", np.float64, DIM),
@@ -17,6 +17,11 @@ edge_dtype = [("P", np.float64, DIM),
               ("boundary", bool),
               ("triangles", np.int32, 2)]
 
+triangle_dtype = [("A", np.float64, DIM),
+                  ("B", np.float64, DIM),
+                  ("C", np.float64, DIM),
+                  ("M", np.float64, DIM),
+                  ("area", np.float64)]
 
 class CellLocator(Protocol):
     '''Protocol for cell locators'''
@@ -52,6 +57,17 @@ class Mesh():
         edges["boundary"] = edges["triangles"][:, 1] == -1
         self.edges = edges
 
+        triangles = np.zeros(self.n_triangles, dtype=triangle_dtype)
+        triangles["A"] = points[self._triangles[:, 0], :]
+        triangles["B"] = points[self._triangles[:, 1], :]
+        triangles["C"] = points[self._triangles[:, 2], :]
+        triangles["M"] = 1/3*(triangles["A"] + triangles["B"] + triangles["C"])
+        triangles["area"] = triangle_area(A=triangles["A"],
+                                          B=triangles["B"],
+                                          C=triangles["C"])
+        
+        self.triangles = triangles
+
     def get_cell(self, p: float_array) -> int_array | int:
         return self.locator.find_cell(p)
 
@@ -62,3 +78,7 @@ class Mesh():
     @property
     def n_edges(self) -> int:
         return self._edges.shape[0]
+    
+    @property
+    def n_triangles(self) -> int:
+        return self._triangles.shape[0]
