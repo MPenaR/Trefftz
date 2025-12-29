@@ -4,7 +4,7 @@ from typing import Final
 import numpy as np
 from numpy.linalg import norm
 from typing import Protocol
-from numpy_types import float_array, int_array
+from trefftz.numpy_types import float_array, int_array
 
 DIM: Final = 2
 

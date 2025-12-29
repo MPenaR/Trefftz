@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib.tri import Triangulation
-from numpy_types import float_array, int_array
+from trefftz.numpy_types import float_array, int_array
 from .core import CellLocator, Mesh
 
 

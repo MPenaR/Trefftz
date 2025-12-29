@@ -2,7 +2,7 @@ import numpy as np
 from .core import CellLocator, Mesh
 from scipy.spatial import cKDTree
 from meshio import Mesh as meshioMesh
-from numpy_types import float_array, int_array
+from trefftz.numpy_types import float_array, int_array
 
 
 def in_triangle(P: float | float_array, A: float | float_array, B: float | float_array, C: float | float_array) -> bool:

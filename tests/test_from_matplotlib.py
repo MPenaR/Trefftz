@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib.tri import Triangulation
-from mesh.from_matplotlib import Mesh_from_Matplotlib
+from trefftz.mesh.from_matplotlib import Mesh_from_Matplotlib
 import pytest
 
 

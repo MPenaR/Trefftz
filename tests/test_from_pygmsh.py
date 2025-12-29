@@ -1,6 +1,6 @@
 import numpy as np
 import pygmsh
-from mesh.from_pygmsh import Mesh_from_meshio
+from trefftz.mesh.from_pygmsh import Mesh_from_meshio
 
 
 # def gmsh_sample_mesh():
