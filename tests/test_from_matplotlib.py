@@ -4,6 +4,17 @@ from mesh.from_matplotlib import Mesh_from_Matplotlib
 import pytest
 
 
+# def triangulation_sample_mesh():
+#     x = np.array([0, 1, 1, 0])
+#     y = np.array([0, 0, 1, 1])
+#     triangles = np.array([[0, 1, 2],
+#                           [2, 3, 0]])
+#     Tri = Triangulation(x=x, y=y, triangles=triangles)
+
+#     return Mesh_from_Matplotlib(Tri)
+
+
+
 @pytest.mark.xfail
 def test_from_matplotlib():
     x = np.array([0, 1, 1, 0])

@@ -23,5 +23,5 @@ def Mesh_from_Matplotlib(Tri: Triangulation) -> Mesh:
     edges = Tri.edges
     triangles = Tri.triangles
     locator = MatplotlibLocator(Tri=Tri)
-    return Mesh(points=points, edges=edges, triangles=triangles, locator=locator)
+    return Mesh(points=points, edges=edges, triangles=triangles, locator=locator, cell_sets={}, edge2triangles=[] )
 
