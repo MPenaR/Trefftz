@@ -1,87 +1,38 @@
-from .core import Mesh
 import matplotlib.pyplot as plt 
-from matplotlib.collections import LineCollection
-from matplotlib.patches import Polygon
+from .core import Mesh
 import numpy as np
 
-def _visually_test_edges(M: Mesh):
-    fig, ax = plt.subplots()
+
+def plot_waveguide(mesh: Mesh, plot_tangents: bool = False, plot_normals: bool = False):
+    from matplotlib.collections import LineCollection
+    _, ax = plt.subplots()
+
     lw = 1
-    xmin, ymin = M._points.min(axis=0)
-    xmax, ymax = M._points.max(axis=0)
+    # ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
 
-    N_E = M.n_edges
+    S = mesh._cell_sets["S"]["line"]
+    G = mesh._cell_sets["Gamma"]["line"]  # it allows for multidimensional subsets
 
-    ax.add_collection(LineCollection(np.stack([M.edges["P"], M.edges["Q"]], axis=1), 
-                                      colors='k', linewidths=lw))
-    ax.set_xlim(xmin, xmax)
-    ax.set_ylim(ymin, ymax)
+    inner = np.where(np.logical_not(mesh.edges["boundary"]))[0]
+
+    ax.add_collection(LineCollection(np.stack([mesh.edges[inner]["P"], mesh.edges[inner]["Q"]], axis=1), 
+                                     colors='k', linewidths=lw))
+    ax.add_collection(LineCollection(np.stack([mesh.edges[S]["P"], mesh.edges[S]["Q"]], axis=1), 
+                                     colors='r', linewidths=lw))
+    ax.add_collection(LineCollection(np.stack([mesh.edges[G]["P"], mesh.edges[G]["Q"]], axis=1), 
+                                     colors='b', linewidths=lw))
+
+    if plot_tangents:
+        ax.quiver(mesh.edges["M"][:, 0],
+                  mesh.edges["M"][:, 1],
+                  mesh.edges["T"][:, 0],
+                  mesh.edges["T"][:, 1], angles='xy', scale_units='xy', scale=5)
+
+    if plot_normals:
+        ax.quiver(mesh.edges["M"][:, 0],
+                  mesh.edges["M"][:, 1],
+                  mesh.edges["N"][:, 0],
+                  mesh.edges["N"][:, 1], angles='xy', scale_units='xy', scale=5)
+
     ax.axis('equal')
-
-    e = 0
-    edge = M.edges[e]
-    px, py = edge["P"]
-    qx, qy = edge["Q"]
-    ax.plot([px, qx], [py, qy], "b", linewidth=2*lw )
-    if edge["boundary"]:
-        triangle = M._triangles[edge["triangles"][0]]
-        A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
-        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
-    else:
-        triangle = M._triangles[edge["triangles"][0]]
-        A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
-        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
-
-        triangle = M._triangles[edge["triangles"][1]]
-        A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
-        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='g'))
-
-
-    def update_plot(e):
-        ax.lines[-1].remove()
-        fig.canvas.draw_idle()
-
-        if ax.patches:
-            ax.patches[-1].remove()
-        if ax.patches:
-            ax.patches[-1].remove()
-
-        edge = M.edges[e]
-        px, py = edge["P"]
-        qx, qy = edge["Q"]
-        ax.plot([px, qx], [py, qy], "b", linewidth=2*lw )
-        ax.set_title(f'Edge number: {e}, boundary: {edge["boundary"]}')
-        if edge["boundary"]:
-            triangle = M._triangles[edge["triangles"][0]]
-            A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
-            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
-        else:
-            triangle = M._triangles[edge["triangles"][0]]
-            A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
-            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
-
-            triangle = M._triangles[edge["triangles"][1]]
-            A, B, C = M._points[triangle[0]], M._points[triangle[1]], M._points[triangle[2]]
-            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='g'))
-
-
-        fig.canvas.draw_idle()
-
-    def on_key(event):
-        nonlocal e
-        if event.key == "up":
-            e = min(N_E-1, e+1)
-            update_plot(e)
-
-        elif event.key == "down":
-            e = max(0, e-1)
-            update_plot(e)
-
-        elif event.key == "escape":
-            plt.close(fig)
-
-    fig.canvas.mpl_connect("key_press_event", on_key)
-    update_plot(e)
-
-
     plt.show()

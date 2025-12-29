@@ -1,5 +1,5 @@
 import numpy as np
-from .core import CellLocator, Mesh, _visually_test_edges
+from .core import CellLocator, Mesh
 from scipy.spatial import cKDTree
 from meshio import Mesh as meshioMesh
 from numpy.typing import NDArray
