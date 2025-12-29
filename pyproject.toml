@@ -17,6 +17,7 @@ dependencies = [
 dev = [
     "mypy>=1.18.2",
     "pytest>=9.0.1",
+    "scipy-stubs>=1.15.3.0",
 ]
 
 [build-system]
