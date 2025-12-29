@@ -4,11 +4,7 @@ from typing import Final
 import numpy as np
 from numpy.linalg import norm
 from typing import Protocol
-
-from numpy.typing import NDArray
-float_array = NDArray[np.float64]
-int_array = NDArray[np.int64]
-
+from numpy_types import float_array, int_array
 
 DIM: Final = 2
 

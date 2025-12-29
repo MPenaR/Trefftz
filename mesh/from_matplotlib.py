@@ -1,11 +1,7 @@
 import numpy as np
 from matplotlib.tri import Triangulation
-from numpy.typing import NDArray
+from numpy_types import float_array, int_array
 from .core import CellLocator, Mesh
-
-
-float_array = NDArray[np.float64]
-int_array = NDArray[np.int64]
 
 
 class MatplotlibLocator(CellLocator):
