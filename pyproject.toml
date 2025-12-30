@@ -7,6 +7,20 @@ requires-python = ">=3.10"
 dependencies = [
     "ipykernel>=7.1.0",
     "matplotlib>=3.10.7",
+    "ngsolve>=6.2.2506",
     "numpy>=2.2.6",
+    "pygmsh>=7.1.17",
     "scipy>=1.15.3",
 ]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+    "pytest>=9.0.1",
+    "scipy-stubs>=1.15.3.0",
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
