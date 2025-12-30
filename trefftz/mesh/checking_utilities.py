@@ -17,6 +17,7 @@ def explore_edges(mesh: Mesh):
     ax.set_xlim(xmin, xmax)
     ax.set_ylim(ymin, ymax)
     ax.axis('equal')
+    alpha = 0.5
 
     e = 0
     edge = mesh.edges[e]
@@ -26,15 +27,15 @@ def explore_edges(mesh: Mesh):
     if edge["boundary"]:
         triangle = mesh._triangles[edge["triangles"][0]]
         A, B, C = mesh._points[triangle[0]], mesh._points[triangle[1]], mesh._points[triangle[2]]
-        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
+        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r', alpha=alpha))
     else:
         triangle = mesh._triangles[edge["triangles"][0]]
         A, B, C = mesh._points[triangle[0]], mesh._points[triangle[1]], mesh._points[triangle[2]]
-        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
+        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r', alpha=alpha))
 
         triangle = mesh._triangles[edge["triangles"][1]]
         A, B, C = mesh._points[triangle[0]], mesh._points[triangle[1]], mesh._points[triangle[2]]
-        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='g'))
+        ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='g', alpha=alpha))
 
     plot_normals = True
 
@@ -62,15 +63,15 @@ def explore_edges(mesh: Mesh):
         if edge["boundary"]:
             triangle = mesh._triangles[edge["triangles"][0]]
             A, B, C = mesh._points[triangle[0]], mesh._points[triangle[1]], mesh._points[triangle[2]]
-            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
+            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r', alpha=alpha))
         else:
             triangle = mesh._triangles[edge["triangles"][0]]
             A, B, C = mesh._points[triangle[0]], mesh._points[triangle[1]], mesh._points[triangle[2]]
-            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r'))
+            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r', alpha=alpha))
 
             triangle = mesh._triangles[edge["triangles"][1]]
             A, B, C = mesh._points[triangle[0]], mesh._points[triangle[1]], mesh._points[triangle[2]]
-            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='g'))
+            ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='g', alpha=alpha))
 
 
         fig.canvas.draw_idle()

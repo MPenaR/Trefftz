@@ -74,7 +74,19 @@ class Mesh():
         baricenters = boundary_triangles["M"]
         midpoints = boundary_edges["M"]
         boundary_normals = np.sign(np.vecdot(midpoints-baricenters, boundary_edges["N"]))[:, np.newaxis]*boundary_edges["N"]
-        edges["N"][edges["boundary"]] = boundary_normals 
+        edges["N"][edges["boundary"]] = boundary_normals
+
+        # orienting inner normals (i don't think it should matter)
+
+        inner_edges = edges[np.logical_not(edges["boundary"])]
+        inner_triangles = triangles[inner_edges["triangles"]]
+        bar_plus = inner_triangles[:, 0]["M"]
+        bar_minus = inner_triangles[:, 1]["M"]
+        
+        #midpoints = boundary_edges["M"]
+        inner_normals = np.sign(np.vecdot(bar_minus-bar_plus, inner_edges["N"]))[:, np.newaxis]*inner_edges["N"]
+        edges["N"][np.logical_not(edges["boundary"])] = inner_normals
+
 
     def get_cell(self, p: float_array) -> int_array | int:
         return self.locator.find_cell(p)
