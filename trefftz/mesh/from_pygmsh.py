@@ -106,6 +106,7 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
                 locator=locator, cell_sets=cell_sets)
 
 def CleanWaveGuide(R: float = 5, H: float = 1, lc: float = 0.3) -> Mesh:
+    '''Construct a waveguide mesh without scatterers'''
     from pygmsh.geo import Geometry
     with Geometry() as geom:
         p0 = geom.add_point([-R, 0.], mesh_size=lc)

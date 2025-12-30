@@ -30,7 +30,7 @@ class CellLocator(Protocol):
 
 
 class Mesh():
-    '''Holds only the relevant data
+    '''Returns only the relevant data
     as numpy structured-arrays for easy manipulation'''
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
@@ -86,7 +86,6 @@ class Mesh():
         #midpoints = boundary_edges["M"]
         inner_normals = np.sign(np.vecdot(bar_minus-bar_plus, inner_edges["N"]))[:, np.newaxis]*inner_edges["N"]
         edges["N"][np.logical_not(edges["boundary"])] = inner_normals
-
 
     def get_cell(self, p: float_array) -> int_array | int:
         return self.locator.find_cell(p)
