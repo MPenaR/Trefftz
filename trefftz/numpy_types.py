@@ -1,3 +1,5 @@
+'''Types hints for numeric arrays.'''
+
 from numpy import float64, int64
 from numpy.typing import NDArray
 from typing import TypeAlias
