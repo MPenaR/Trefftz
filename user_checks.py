@@ -29,7 +29,7 @@ from trefftz.mesh.from_pygmsh import CleanWaveGuide
     #               [0.5, 0.2]])
     # indexes = np.array([1, 0])
 
-mesh = CleanWaveGuide(lc=0.3)
+mesh = CleanWaveGuide(lc=0.5)
     # mesh = Unbounded()
 
     # _triangle_id_tester(mesh)

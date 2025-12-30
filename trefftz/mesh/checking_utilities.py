@@ -36,6 +36,14 @@ def explore_edges(mesh: Mesh):
         A, B, C = mesh._points[triangle[0]], mesh._points[triangle[1]], mesh._points[triangle[2]]
         ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='g'))
 
+    plot_normals = True
+
+    if plot_normals:
+        ax.quiver(mesh.edges["M"][:, 0],
+                  mesh.edges["M"][:, 1],
+                  mesh.edges["N"][:, 0],
+                  mesh.edges["N"][:, 1], angles='xy', scale_units='xy', scale=5)
+
 
     def update_plot(e):
         ax.lines[-1].remove()
