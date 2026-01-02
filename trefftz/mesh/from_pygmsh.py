@@ -105,28 +105,3 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
     return Mesh(points=points, edges=edges, triangles=triangles, edge2triangles=edge2triangles,
                 locator=locator, cell_sets=cell_sets)
 
-def CleanWaveGuide(R: float = 5, H: float = 1, lc: float = 0.3) -> Mesh:
-    '''Construct a waveguide mesh without scatterers'''
-    from pygmsh.geo import Geometry
-    with Geometry() as geom:
-        p0 = geom.add_point([-R, 0.], mesh_size=lc)
-        p1 = geom.add_point([ R, 0.], mesh_size=lc)
-        p2 = geom.add_point([ R, H ], mesh_size=lc)
-        p3 = geom.add_point([-R, H ], mesh_size=lc)
-
-        bottom = geom.add_line( p0, p1)
-        right  = geom.add_line(p1, p2)
-        top    = geom.add_line(p2, p3)
-        left   = geom.add_line(p3, p0)
-
-        boundary = geom.add_curve_loop([bottom, right, top, left])
-        domain = geom.add_plane_surface(boundary)
-
-        geom.add_physical(domain, "Omega")
-        geom.add_physical([bottom, top], "Gamma")
-        geom.add_physical(left, "S_L")
-        geom.add_physical(right, "S_R")
-        geom.add_physical([left, right], "S")
-
-        M = geom.generate_mesh()
-    return Mesh_from_meshio(M)

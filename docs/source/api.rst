@@ -6,11 +6,11 @@ API Reference
    :undoc-members:
    :show-inheritance:
 
+
 .. automodule:: trefftz.mesh
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 
 .. automodule:: trefftz.mesh.geometry
