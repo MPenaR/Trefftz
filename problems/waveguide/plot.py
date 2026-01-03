@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 
 def plot_waveguide(mesh: Mesh, plot_tangents: bool = False, plot_normals: bool = False):
     from matplotlib.collections import LineCollection
-    _, ax = plt.subplots()
-
+    _, ax = plt.subplots(figsize=(16,4))
+    R= 5 
+    H = 1
     lw = 1
     # ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
 
@@ -37,4 +38,7 @@ def plot_waveguide(mesh: Mesh, plot_tangents: bool = False, plot_normals: bool =
                   mesh.edges["N"][:, 1], angles='xy', scale_units='xy', scale=5)
 
     ax.axis('equal')
+    ax.set_ylim([ 0, H])
+    ax.set_xlim([-1.01*R, 1.01*R])
+    ax.axis('off')
     plt.show()
