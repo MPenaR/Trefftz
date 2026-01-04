@@ -80,22 +80,20 @@ class Waveguide:
         plt.show()
     
 
-    def plot_field(self, u: Callable[[NDArray[Any], NDArray[Any]], float],
-                   N: int = 100, figsize: Optional[tuple[int, int]] = (16, 2)):
+    def plot_field(self, u: Callable[[NDArray[Any], NDArray[Any]], NDArray[Any]],
+                   N: int = 100, figsize: Optional[tuple[int, int]] = (16, 2), real_part: bool = False):
         x = np.linspace(-self.R, self.R, N)
         y = np.linspace(0., self.H, N)
         X, Y = np.meshgrid(x, y)
         Z = u(X, Y)
 
+        if real_part:
+            Z = np.real(Z)
+
         _, ax = plt.subplots(figsize=figsize)
 
         ax.pcolorfast((-self.R, self.R), (0., self.H), Z)
         plt.show()
-
-
-
-    def assemble_matrix(self) -> csc_matrix:
-        pass
 
 
 
