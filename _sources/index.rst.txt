@@ -1,18 +1,22 @@
-.. Trefftz documentation master file, created by
-   sphinx-quickstart on Tue Dec 30 16:20:18 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Trefftz documentation
-=====================
-
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
-
+Welcome to Trefftz's Documentation
+==================================
 
 .. toctree::
-   :maxdepth: 10
+   :maxdepth: 2
    :caption: Contents:
 
-   api
+   theory/overview
+   theory/dg_trefftz
+   design/data_structures
+   design/assembly_flow
+   tutorials/quickstart
+   api/mesh
+   api/fem
+   api/boundary_conditions
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
