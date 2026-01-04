@@ -6,6 +6,7 @@ Welcome to Trefftz's Documentation
    :caption: Contents:
 
    theory/overview
+   theory/fluxes
    theory/dg_trefftz
    design/data_structures
    design/assembly_flow
