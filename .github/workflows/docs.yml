@@ -21,6 +21,11 @@ jobs:
       #   with:
       #     python-version: 3.11
 
+      - name: Create virtual environment
+        run: |
+          uv venv
+
+
       # 3️⃣ Install Sphinx and optional theme
       - name: Install dependencies
         run: |
