@@ -22,8 +22,8 @@ jobs:
       # 3️⃣ Install Sphinx and optional theme
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install sphinx furo sphinx-autodoc-typehints
+          uv pip install -e . --group dev
+
 
       # 4️⃣ Build the docs
       - name: Build HTML documentation
