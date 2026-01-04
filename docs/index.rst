@@ -2,7 +2,7 @@ Welcome to Trefftz's Documentation
 ==================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    theory/overview
