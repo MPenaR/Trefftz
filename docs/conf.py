@@ -26,6 +26,7 @@ extensions = [
     "sphinx.ext.viewcode",     # Add links to source code
     "sphinx.ext.intersphinx",  # Link to other projects (e.g., NumPy, SciPy)
     "sphinx.ext.todo",         # Optional: include TODOs
+    "myst_parser",
 ]
 
 # Type hints in documentation
