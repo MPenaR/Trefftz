@@ -1,4 +1,4 @@
-FEM Assembly
+FEM module
 ============
 
 .. automodule:: trefftz.fem
