@@ -27,6 +27,12 @@ extensions = [
     "sphinx.ext.intersphinx",  # Link to other projects (e.g., NumPy, SciPy)
     "sphinx.ext.todo",         # Optional: include TODOs
     "myst_parser",
+    "sphinx.ext.mathjax"
+]
+
+myst_enable_extensions = [
+    "amsmath",     #  block math environments
+    "dollarmath",  #  $...$ and $$...$$
 ]
 
 # Type hints in documentation
