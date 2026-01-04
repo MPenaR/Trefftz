@@ -25,5 +25,5 @@ then the corresponding flux becomes:
 So the term corresponding to test function $\psi_m$ and trial function $\varphi_n$ is:
 
 ```{math}
-\int_E \left(\varphi_n(\mathbf(x)) + \frac{\mathfrak{d}_1}{ik} \nabla \varphi_n(\mathbf(x)) \cdot \mathbf{n}_E\right)\overline{\nabla \psi_m(\mathbf(x)) \cdot \mathbf{n}_E} \,\mathrm d \ell
+\int_E \left(\varphi_n(\mathbf{x}) + \frac{\mathfrak{d}_1}{ik} \nabla \varphi_n(\mathbf{x}) \cdot \mathbf{n}_E\right)\overline{\nabla \psi_m(\mathbf{x}) \cdot \mathbf{n}_E} \,\mathrm d \ell = -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E  )\int_E \varphi_n(\mathbf{x} \right)\overline{ \psi_m(\mathbf{x}) } \,\mathrm d \ell 
 ```
