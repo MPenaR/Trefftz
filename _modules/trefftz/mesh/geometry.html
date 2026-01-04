@@ -1,15 +1,14 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="./">
+<html class="no-js" lang="en" data-content_root="../../../">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
-        <title>API Reference - Trefftz 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+        <title>trefftz.mesh.geometry - Trefftz 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -161,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Trefftz 0.1.0 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Trefftz 0.1.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -172,7 +171,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -180,11 +179,11 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   <span class="sidebar-brand-text">Trefftz 0.1.0 documentation</span>
   
-</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
@@ -192,8 +191,8 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api/mesh.html">Mesh Module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/fem.html">FEM Assembly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/mesh.html">Mesh Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/fem.html">FEM Assembly</a></li>
 </ul>
 
 </div>
@@ -213,13 +212,7 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="view-this-page">
-  <a class="muted-link" href="_sources/api.rst.txt" title="View this page">
-    <svg><use href="#svg-eye"></use></svg>
-    <span class="visually-hidden">View this page</span>
-  </a>
-</div>
-<div class="theme-toggle-container theme-toggle-content">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -227,61 +220,82 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-trefftz.numpy_types">
-<span id="api-reference"></span><h1>API Reference<a class="headerlink" href="#module-trefftz.numpy_types" title="Link to this heading">¶</a></h1>
-<p>Types hints for numeric arrays.</p>
-<p id="module-trefftz.mesh.geometry">Module for functions that compute geometric quantities or relations.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="trefftz.mesh.geometry.in_triangle">
-<span class="sig-prename descclassname"><span class="pre">trefftz.mesh.geometry.</span></span><span class="sig-name descname"><span class="pre">in_triangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trefftz/mesh/geometry.html#in_triangle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.geometry.in_triangle" title="Link to this definition">¶</a></dt>
-<dd><p>Checks if a point is inside a given triangle.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>P</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>float_array</em>) – point to check.</p></li>
-<li><p><strong>A</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>float_array</em>) – Vertex A of triangle ABC.</p></li>
-<li><p><strong>B</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>float_array</em>) – Vertex B of triangle ABC.</p></li>
-<li><p><strong>C</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>float_array</em>) – Vertex C of triangle ABC.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if the point P is inside triangle ABC.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
+          <h1>Source code for trefftz.mesh.geometry</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Module for functions that compute geometric quantities or relations.</span>
+<span class="sd">&#39;&#39;&#39;</span>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="trefftz.mesh.geometry.triangle_area">
-<span class="sig-prename descclassname"><span class="pre">trefftz.mesh.geometry.</span></span><span class="sig-name descname"><span class="pre">triangle_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trefftz/mesh/geometry.html#triangle_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.geometry.triangle_area" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the area of a triangle</p>
-<p>If several triangles are passed it computes their areas in a vectorized manner.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>float_array</em>) – Vertex A of triangle ABC.</p></li>
-<li><p><strong>B</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>float_array</em>) – Vertex B of triangle ABC.</p></li>
-<li><p><strong>C</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>float_array</em>) – Vertex C of triangle ABC.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Surface area of the triangle ABC.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
 
-</section>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.numpy_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+
+<div class="viewcode-block" id="in_triangle">
+<a class="viewcode-back" href="../../../api.html#trefftz.mesh.geometry.in_triangle">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_triangle</span><span class="p">(</span><span class="n">P</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">B</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">C</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if a point is inside a given triangle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    P : (2,) float_array</span>
+<span class="sd">        point to check.</span>
+<span class="sd">    A : (2,) float_array</span>
+<span class="sd">        Vertex A of triangle ABC.</span>
+<span class="sd">    B : (2,) float_array</span>
+<span class="sd">        Vertex B of triangle ABC.</span>
+<span class="sd">    C : (2,) float_array</span>
+<span class="sd">        Vertex C of triangle ABC.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the point P is inside triangle ABC.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">AC</span> <span class="o">=</span> <span class="n">C</span> <span class="o">-</span> <span class="n">A</span>
+    <span class="n">AB</span> <span class="o">=</span> <span class="n">B</span> <span class="o">-</span> <span class="n">A</span>
+    <span class="n">AP</span> <span class="o">=</span> <span class="n">P</span> <span class="o">-</span> <span class="n">A</span>
+
+    <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">AC</span><span class="p">,</span> <span class="n">AB</span><span class="p">]),</span> <span class="n">AP</span><span class="p">)</span>  <span class="c1"># computing baricentric coordinates</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="mf">1E-16</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">u</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="n">tol</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="n">tol</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">u</span> <span class="o">+</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">tol</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="triangle_area">
+<a class="viewcode-back" href="../../../api.html#trefftz.mesh.geometry.triangle_area">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">triangle_area</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">B</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">C</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">int_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the area of a triangle</span>
+
+<span class="sd">    If several triangles are passed it computes their areas in a vectorized manner.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : (2,) float_array</span>
+<span class="sd">        Vertex A of triangle ABC.</span>
+<span class="sd">    B : (2,) float_array</span>
+<span class="sd">        Vertex B of triangle ABC.</span>
+<span class="sd">    C : (2,) float_array</span>
+<span class="sd">        Vertex C of triangle ABC.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Surface area of the triangle ABC.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="n">C</span> <span class="o">-</span> <span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">B</span> <span class="o">-</span> <span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">det</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">det</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span></div>
+
+</pre></div>
         </article>
       </div>
       <footer>
@@ -307,35 +321,15 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">API Reference</a><ul>
-<li><a class="reference internal" href="#trefftz.mesh.geometry.in_triangle"><code class="docutils literal notranslate"><span class="pre">in_triangle()</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.mesh.geometry.triangle_area"><code class="docutils literal notranslate"><span class="pre">triangle_area()</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=01f34227"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+</div><script src="../../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>
