@@ -11,5 +11,5 @@ $$
 then the corresponding flux becomes:
 
 $$
-\int_E \left(u + \frac{\mathfrak{d}_1}{ik} \nabla u \cdot \mathbf{n}\right)\nabla v \cdot \mathbf{n}_E \,\mathrm d \ell
+\int_E \left(u + \frac{\mathfrak{d}_1}{ik} \nabla u \cdot \mathbf{n}\right)\overline{\nabla v \cdot \mathbf{n}_E} \,\mathrm d \ell
 $$

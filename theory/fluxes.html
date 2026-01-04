@@ -234,18 +234,24 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="fluxes">
+          <section class="tex2jax_ignore mathjax_ignore" id="fluxes">
 <h1>Fluxes<a class="headerlink" href="#fluxes" title="Link to this heading">¶</a></h1>
 <section id="sound-hard-boundary-condition">
 <h2>Sound-hard boundary condition<a class="headerlink" href="#sound-hard-boundary-condition" title="Link to this heading">¶</a></h2>
 <p>If the edge belongs to a boundary where we have imposed a sound-hard boundary condition, i.e.:</p>
-<p>$$
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
 \nabla u \cdot \mathbf{n} = 0
-$$</p>
+\]</div>
+</div>
 <p>then the corresponding flux becomes:</p>
-<p>$$
-\int_E \left(u + \frac{\mathfrak{d}_1}{ik} \nabla u \cdot \mathbf{n}\right)\nabla v \cdot \mathbf{n}_E ,\mathrm d \ell
-$$</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+\int_E \left(u + \frac{\mathfrak{d}_1}{ik} \nabla u \cdot \mathbf{n}\right)\overline{\nabla v \cdot \mathbf{n}_E} \,\mathrm d \ell
+\]</div>
+</div>
 </section>
 </section>
 
@@ -321,5 +327,7 @@ $$</p>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>
