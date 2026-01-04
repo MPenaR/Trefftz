@@ -1,6 +1,6 @@
 # Fluxes
 
-All along we will be using $l$ as the length of the edge going from $\mathbf{P}$ to $\mathbf{Q}$. Its mid point will be denoted as $\mathbf{M}$ and the tangent and normal as $\boldsymbol{\tau}$ and $\mathbf{n}$ respectively.
+All along we will be using $l_E$ as the length of the edge going from $\mathbf{P}$ to $\mathbf{Q}$. Its mid point will be denoted as $\mathbf{M}_E$ and the tangent and normal as $\boldsymbol{\tau}_E$ and $\mathbf{n}_E$ respectively.
 
 The trial and test functions will be plane waves of the form:
 
@@ -27,6 +27,8 @@ So the term corresponding to test function $\psi_m$ and trial function $\varphi_
 ```{math}
 \begin{align*}
 \int_E \left(\varphi_n(\mathbf{x}) + \frac{\mathfrak{d}_1}{ik} \nabla \varphi_n(\mathbf{x}) \cdot \mathbf{n}_E\right)\overline{\nabla \psi_m(\mathbf{x}) \cdot \mathbf{n}_E} \,\mathrm d \ell &= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E \varphi_n(\mathbf{x})\overline{ \psi_m(\mathbf{x}) } \,\mathrm d \ell \\
-&= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{x}} \,\mathrm d \ell
+&= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{x}} \,\mathrm d \ell \\
+&= -ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{M}}\int_{-\frac{1}{2}}^{\frac{1}{2}} e^{ikl\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\boldsymbol{\tau}_Et} \,\mathrm dt
+
 \end{align*}
 ```
