@@ -19,16 +19,15 @@ If the edge belongs to a boundary where we have imposed a sound-hard boundary co
 then the corresponding flux becomes:
 
 ```{math}
-\int_E \left(u + \frac{\mathfrak{d}_1}{ik} \nabla u \cdot \mathbf{n}_E\right)\overline{\nabla v \cdot \mathbf{n}_E} \,\mathrm d \ell
+\int_E \left(u + \frac{\mathfrak{d}_1}{ik} \nabla u \cdot \mathbf{n}_E\right)\overline{\nabla v \cdot \mathbf{n}_E} \,\mathrm{d} \ell
 ```
 
 So the term corresponding to test function $\psi_m$ and trial function $\varphi_n$ is:
 
 ```{math}
 \begin{align*}
-\int_E \left(\varphi_n(\mathbf{x}) + \frac{\mathfrak{d}_1}{ik} \nabla \varphi_n(\mathbf{x}) \cdot \mathbf{n}_E\right)\overline{\nabla \psi_m(\mathbf{x}) \cdot \mathbf{n}_E} \,\mathrm d \ell &= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E \varphi_n(\mathbf{x})\overline{ \psi_m(\mathbf{x}) } \,\mathrm d \ell \\
+\int_E \left(\varphi_n(\mathbf{x}) + \frac{\mathfrak{d}_1}{ik} \nabla \varphi_n(\mathbf{x}) \cdot \mathbf{n}_E\right)\overline{\nabla \psi_m(\mathbf{x}) \cdot \mathbf{n}_E} \,\mathrm d \ell &= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E \varphi_n(\mathbf{x})\overline{ \psi_m(\mathbf{x}) } \,\mathrm {d} \ell \\
 &= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{x}} \,\mathrm d \ell \\
-&= -ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{M}}\int_{-\frac{1}{2}}^{\frac{1}{2}} e^{ikl\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\boldsymbol{\tau}_Et} \,\mathrm dt
-
+&= -ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{M}}  \mathrm{sinc}(\frac{kl}{2\pi}\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\boldsymbol{\tau}_E)} 
 \end{align*}
 ```
