@@ -10,6 +10,9 @@ def serial_assembler(mesh: Mesh, N_theta: int):
     A = np.zeros((DOF, DOF), dtype=np.complex64)
     edges = mesh.edges
     for edge in edges[np.logical_not(edges["boundary"])]:
+        for i in range(N_theta):
+            for j in range(N_theta):
+                A[i,j]
 
 
 
