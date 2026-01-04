@@ -24,7 +24,7 @@ jobs:
       # 3️⃣ Install Sphinx and optional theme
       - name: Install dependencies
         run: |
-          pip install -e . --group dev
+          uv pip install -e . --group dev
 
 
       # 4️⃣ Build the docs
