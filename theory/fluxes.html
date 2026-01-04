@@ -236,21 +236,28 @@
         <article role="main" id="furo-main-content">
           <section class="tex2jax_ignore mathjax_ignore" id="fluxes">
 <h1>Fluxes<a class="headerlink" href="#fluxes" title="Link to this heading">¶</a></h1>
+<p>All along we will be using <span class="math notranslate nohighlight">\(l\)</span> as the length of the edge going from <span class="math notranslate nohighlight">\(\mathbf{P}\)</span> to <span class="math notranslate nohighlight">\(\mathbf{Q}\)</span>. Its mid point will be denoted as <span class="math notranslate nohighlight">\(\mathbf{M}\)</span> and the tangent and normal as <span class="math notranslate nohighlight">\(\boldsymbol{\tau}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{n}\)</span> respectively.</p>
+<p>The trial and test functions will be plane waves of the form:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[e^{ik\mathbf{d}\cdot\mathbf{x}}\]</div>
+</div>
 <section id="sound-hard-boundary-condition">
 <h2>Sound-hard boundary condition<a class="headerlink" href="#sound-hard-boundary-condition" title="Link to this heading">¶</a></h2>
 <p>If the edge belongs to a boundary where we have imposed a sound-hard boundary condition, i.e.:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[
-\nabla u \cdot \mathbf{n} = 0
-\]</div>
+\[\nabla u \cdot \mathbf{n} = 0\]</div>
 </div>
 <p>then the corresponding flux becomes:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[
-\int_E \left(u + \frac{\mathfrak{d}_1}{ik} \nabla u \cdot \mathbf{n}\right)\overline{\nabla v \cdot \mathbf{n}_E} \,\mathrm d \ell
-\]</div>
+\[\int_E \left(u + \frac{\mathfrak{d}_1}{ik} \nabla u \cdot \mathbf{n}_E\right)\overline{\nabla v \cdot \mathbf{n}_E} \,\mathrm d \ell\]</div>
+</div>
+<p>So the term corresponding to test function <span class="math notranslate nohighlight">\(\psi_m\)</span> and trial function <span class="math notranslate nohighlight">\(\varphi_n\)</span> is:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\int_E \left(\varphi_n(\mathbf(x)) + \frac{\mathfrak{d}_1}{ik} \nabla \varphi_n(\mathbf(x)) \cdot \mathbf{n}_E\right)\overline{\nabla \psi_m(\mathbf(x)) \cdot \mathbf{n}_E} \,\mathrm d \ell\]</div>
 </div>
 </section>
 </section>
