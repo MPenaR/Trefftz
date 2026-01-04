@@ -11,18 +11,20 @@ jobs:
 
     steps:
       # 1️⃣ Checkout the repo
-      - uses: actions/checkout@v3
-
-      # 2️⃣ Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
+      - uses: actions/checkout@v4
+      
+      
+      - uses: astral-sh/setup-uv@v3
+      # # 2️⃣ Set up Python
+      # - name: Set up Python
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: 3.11
 
       # 3️⃣ Install Sphinx and optional theme
       - name: Install dependencies
         run: |
-          uv pip install -e . --group dev
+          pip install -e . --group dev
 
 
       # 4️⃣ Build the docs
