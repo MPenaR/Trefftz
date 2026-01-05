@@ -6,6 +6,13 @@ The trial and test functions will be plane waves of the form:
 
 ```{math}
 e^{ik\mathbf{d}\cdot\mathbf{x}}
+
+```
+
+Also we will be using the $\mathrm{sinc}$ function as defined in [numpy](https://numpy.org/doc/stable/reference/generated/numpy.sinc.html), that is: 
+
+```{math}
+\mathrm{sinc}(x) := \frac{\sin(\pi x)}{\pi x}
 ```
 
 ## Sound-hard boundary condition
