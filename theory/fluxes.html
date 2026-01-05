@@ -260,9 +260,30 @@
 \[\begin{split}\begin{align*}
 \int_E \left(\varphi_n(\mathbf{x}) + \frac{\mathfrak{d}_1}{ik} \nabla \varphi_n(\mathbf{x}) \cdot \mathbf{n}_E\right)\overline{\nabla \psi_m(\mathbf{x}) \cdot \mathbf{n}_E} \,\mathrm d \ell &amp;= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E \varphi_n(\mathbf{x})\overline{ \psi_m(\mathbf{x}) } \,\mathrm {d} \ell \\
 &amp;= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{x}} \,\mathrm d \ell \\
-&amp;= -ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{M}}  \mathrm{sinc}(\frac{kl}{2\pi}\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\boldsymbol{\tau}_E) 
+&amp;= -ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{M}}  \mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\boldsymbol{\tau}_E\right) 
 \end{align*}\end{split}\]</div>
 </div>
+<p>This clearly shows that each edge with a sound-hard boundary condition contributes to the whole assembled matrix with a full <span class="math notranslate nohighlight">\(N_\theta \time N_\theta\)</span> block in the main diagonal (corresponding to the triangle to the edge belongs) whose shape can be computed in a vectorized manner as:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[G = ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{-ikD\mathbf{M}}  \mathrm{sinc}\left(\frac{kl}{2\pi}(D\mathbf{\tau}_E)\right)\]</div>
+</div>
+<p>where <span class="math notranslate nohighlight">\(\mathscr{D}\)</span> is the  <span class="math notranslate nohighlight">\(N_\theta \times N_\theta \times 2 \)</span> array constructed as the “outer difference” of the set of directions:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\mathscr{D}_{mnl} = D_{ml} - D_{nl}\]</div>
+</div>
+<p><span class="math notranslate nohighlight">\(D\)</span> beint the <span class="math notranslate nohighlight">\(N_\theta\times 2\)</span> array of directions:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\begin{split}D = \begin{bmatrix}
+\cos(\theta_0) &amp; \sin(\theta_0) \\
+\cos(\theta_1) &amp; \sin(\theta_1) \\
+\vdots &amp; \vdots \\
+\cos(\theta_{N_\theta-1}) &amp; \sin(\theta_{N_\theta-1}) \\
+\end{bmatrix}\end{split}\]</div>
+</div>
+<p>and the product with <span class="math notranslate nohighlight">\(\mathbf{n}\)</span> or <span class="math notranslate nohighlight">\(\mathbf{M}\)</span> is computed along the last axis.</p>
 </section>
 </section>
 
