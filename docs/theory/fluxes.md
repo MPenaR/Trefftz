@@ -28,6 +28,31 @@ So the term corresponding to test function $\psi_m$ and trial function $\varphi_
 \begin{align*}
 \int_E \left(\varphi_n(\mathbf{x}) + \frac{\mathfrak{d}_1}{ik} \nabla \varphi_n(\mathbf{x}) \cdot \mathbf{n}_E\right)\overline{\nabla \psi_m(\mathbf{x}) \cdot \mathbf{n}_E} \,\mathrm d \ell &= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E \varphi_n(\mathbf{x})\overline{ \psi_m(\mathbf{x}) } \,\mathrm {d} \ell \\
 &= -ik\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right)\int_E e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{x}} \,\mathrm d \ell \\
-&= -ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{M}}  \mathrm{sinc}(\frac{kl}{2\pi}\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\boldsymbol{\tau}_E) 
+&= -ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{M}}  \mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\boldsymbol{\tau}_E\right) 
 \end{align*}
 ```
+
+This clearly shows that each edge with a sound-hard boundary condition contributes to the whole assembled matrix with a full $N_\theta \time N_\theta$ block in the main diagonal (corresponding to the triangle to the edge belongs) whose shape can be computed in a vectorized manner as:
+
+```{math}
+G = ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{-ikD\mathbf{M}}  \mathrm{sinc}\left(\frac{kl}{2\pi}(D\mathbf{\tau}_E)\right)
+```
+
+where $\mathscr{D}$ is the  $N_\theta \times N_\theta \times 2 $ array constructed as the "outer difference" of the set of directions:
+
+```{math}
+\mathscr{D}_{mnl} = D_{ml} - D_{nl}
+```
+
+$D$ beint the $N_\theta\times 2$ array of directions:
+
+```{math}
+D = \begin{bmatrix}
+\cos(\theta_0) & \sin(\theta_0) \\
+\cos(\theta_1) & \sin(\theta_1) \\
+\vdots & \vdots \\
+\cos(\theta_{N_\theta-1}) & \sin(\theta_{N_\theta-1}) \\
+\end{bmatrix}
+```
+
+and the product with $\mathbf{n}$ or $\mathbf{M}$ is computed along the last axis.
