@@ -35,13 +35,13 @@ So the term corresponding to test function $\psi_m$ and trial function $\varphi_
 This clearly shows that each edge with a sound-hard boundary condition contributes to the whole assembled matrix with a full $N_\theta \time N_\theta$ block in the main diagonal (corresponding to the triangle to the edge belongs) whose shape can be computed in a vectorized manner as:
 
 ```{math}
-G = ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{-ikD\mathbf{M}}  \mathrm{sinc}\left(\frac{kl}{2\pi}(D\mathbf{\tau}_E)\right)
+G = ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{-ik\Delta D\mathbf{M}}\circ \mathrm{sinc}\left(\frac{kl}{2\pi}(\Delta D\mathbf{\tau}_E)\right)
 ```
 
-where $\mathscr{D}$ is the  $N_\theta \times N_\theta \times 2 $ array constructed as the "outer difference" of the set of directions:
+where $\Delta D$ is the  $N_\theta \times N_\theta \times 2 $ array constructed as the "outer difference" of the set of directions:
 
 ```{math}
-\mathscr{D}_{mnl} = D_{ml} - D_{nl}
+\mathscr{D}_{mnl} := D_{ml} - D_{nl}
 ```
 
 $D$ beint the $N_\theta\times 2$ array of directions:
@@ -55,4 +55,4 @@ D = \begin{bmatrix}
 \end{bmatrix}
 ```
 
-and the product with $\mathbf{n}$ or $\mathbf{M}$ is computed along the last axis.
+The product with $\mathbf{n}$ or $\mathbf{M}$ is computed along the last axis and $\circ$ denotes the Haddamard or element-wise product of two same matrices with the same shape.
