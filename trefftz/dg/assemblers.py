@@ -1,7 +1,7 @@
 '''Module for defininig the assemblers (if more than one)'''
 from trefftz.mesh import Mesh
 import numpy as np
-from trefftz.fem.serial_fluxes import Inner
+from trefftz.dg.serial_fluxes import Inner
 
 
 

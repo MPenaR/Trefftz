@@ -1,8 +1,9 @@
 '''Types hints for numeric arrays.'''
 
-from numpy import float64, int64
+from numpy import floating, complexfloating, integer
 from numpy.typing import NDArray
 from typing import TypeAlias
 
-float_array: TypeAlias = NDArray[float64]
-int_array: TypeAlias = NDArray[int64]
+complex_array: TypeAlias = NDArray[complexfloating]
+float_array: TypeAlias = NDArray[floating]
+int_array: TypeAlias = NDArray[integer]

@@ -1,7 +1,7 @@
-FEM module
+dg module
 ============
 
-.. automodule:: trefftz.fem
+.. automodule:: trefftz.dg
    :members:
    :undoc-members:
    :show-inheritance:

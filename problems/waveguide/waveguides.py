@@ -1,11 +1,11 @@
 '''Module for defining a waveguide class, as it will be, I think, the most usefull'''
-from trefftz.mesh import Mesh_from_meshio, Mesh
+from trefftz.mesh import Mesh_from_meshio, Mesh, EdgeType
 from typing import Optional, Callable, Any
 from pygmsh.geo import Geometry
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
-from scipy.sparse import csc_matrix
+# from scipy.sparse import csc_matrix
 # from trefftz.numpy_types import float_array
 
 class Scatterer:
@@ -55,7 +55,7 @@ class Waveguide:
         S = self.domain._cell_sets["S"]["line"]
         G = self.domain._cell_sets["Gamma"]["line"]  # it allows for multidimensional subsets
 
-        inner = np.where(np.logical_not(self.domain.edges["boundary"]))[0]
+        inner = np.where(self.domain.edges["type"] == EdgeType.INNER)[0]
 
         ax.add_collection(LineCollection(np.stack([self.domain.edges[inner]["P"],
                                                    self.domain.edges[inner]["Q"]], axis=1),
