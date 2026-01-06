@@ -1,4 +1,5 @@
-from trefftz.mesh import Mesh, Mesh_from_meshio
+from trefftz.mesh import Mesh
+from trefftz.mesh.from_pygmsh import Mesh_from_meshio
 from pygmsh.geo import Geometry
 
 

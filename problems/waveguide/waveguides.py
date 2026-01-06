@@ -1,5 +1,6 @@
 '''Module for defining a waveguide class, as it will be, I think, the most usefull'''
-from trefftz.mesh import Mesh_from_meshio, Mesh, EdgeType
+from trefftz.mesh import Mesh, EdgeType
+from trefftz.mesh.from_pygmsh import Mesh_from_meshio
 from typing import Optional, Callable, Any
 from pygmsh.geo import Geometry
 import matplotlib.pyplot as plt

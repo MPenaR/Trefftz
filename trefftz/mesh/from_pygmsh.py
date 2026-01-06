@@ -1,11 +1,16 @@
 import numpy as np
 from .core import CellLocator, Mesh
 from scipy.spatial import cKDTree
-from meshio import Mesh as meshioMesh
 from trefftz.numpy_types import float_array, int_array
 from trefftz.mesh.geometry import in_triangle
 
-
+try:
+    from meshio import Mesh as meshioMesh
+except ImportError as e:
+    raise ImportError(
+        "The module trefftz.mesh.from_pygmsh requires pygmsh.\n"
+        "Install it with: pip install trefftz[pygmsh]"
+    ) from e
 
 
 class KDTreeLocator(CellLocator):
@@ -53,11 +58,6 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
 
     edges = np.sort(edges, axis=1)
     edges, counts = np.unique(edges, axis=0, return_counts=True)
-    # boundary_edges = edges[counts == 1]
-    # inner_edges = edges[counts == 2]
-
-    # boundary_edges_list = np.nonzero(counts == 1)[0]
-    # inner_edges_list = np.nonzero(counts == 2)[0]
 
     # pythonic loop easy to understand code, later it can be vectorized
     edge_to_index = {(i, j): idx for idx, (i, j) in enumerate(edges)}
