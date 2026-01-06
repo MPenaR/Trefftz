@@ -2,6 +2,7 @@
 from enum import IntEnum  #, auto
 from typing import Protocol, Any
 from numpy.typing import NDArray
+
 class BoundaryConditionType(IntEnum):
     '''Types of boundary condition'''
     Inner = 0  # not really a "boundary" condition
