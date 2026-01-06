@@ -39,7 +39,7 @@ So the term corresponding to test function $\psi_m$ and trial function $\varphi_
 \end{align*}
 ```
 
-This clearly shows that each edge with a sound-hard boundary condition contributes to the whole assembled matrix with a full $N_\theta \time N_\theta$ block in the main diagonal (corresponding to the triangle to the edge belongs) whose shape can be computed in a vectorized manner as:
+This clearly shows that each edge with a sound-hard boundary condition contributes to the whole assembled matrix with a full $N_\theta \times N_\theta$ block in the main diagonal (corresponding to the triangle to the edge belongs) whose shape can be computed in a vectorized manner as:
 
 ```{math}
 G = ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{-ik\Delta D\mathbf{M}}\circ \mathrm{sinc}\left(\frac{kl}{2\pi}(\Delta D\mathbf{\tau}_E)\right)
@@ -63,3 +63,8 @@ D = \begin{bmatrix}
 ```
 
 The product with $\mathbf{n}$ or $\mathbf{M}$ is computed along the last axis and $\circ$ denotes the Haddamard or element-wise product of two same matrices with the same shape.
+
+## Sound-soft boundary condition
+
+## Transmission condition (inner edge)
+

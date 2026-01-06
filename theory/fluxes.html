@@ -195,7 +195,7 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Fluxes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api/mesh.html">Mesh Module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api/fem.html">FEM module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/dg.html">dg module</a></li>
 </ul>
 
 </div>
@@ -269,7 +269,7 @@
 &amp;= -ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{ik\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\mathbf{M}}  \mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_n-\mathbf{d}_m\right)\cdot\boldsymbol{\tau}_E\right) 
 \end{align*}\end{split}\]</div>
 </div>
-<p>This clearly shows that each edge with a sound-hard boundary condition contributes to the whole assembled matrix with a full <span class="math notranslate nohighlight">\(N_\theta \time N_\theta\)</span> block in the main diagonal (corresponding to the triangle to the edge belongs) whose shape can be computed in a vectorized manner as:</p>
+<p>This clearly shows that each edge with a sound-hard boundary condition contributes to the whole assembled matrix with a full <span class="math notranslate nohighlight">\(N_\theta \times N_\theta\)</span> block in the main diagonal (corresponding to the triangle to the edge belongs) whose shape can be computed in a vectorized manner as:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[G = ikl_E\mathbf{d}_m \cdot \mathbf{n}_E \left(1 + \mathfrak{d}_1\mathbf{d}_n \cdot \mathbf{n}_E \right) e^{-ik\Delta D\mathbf{M}}\circ \mathrm{sinc}\left(\frac{kl}{2\pi}(\Delta D\mathbf{\tau}_E)\right)\]</div>
@@ -290,6 +290,12 @@
 \end{bmatrix}\end{split}\]</div>
 </div>
 <p>The product with <span class="math notranslate nohighlight">\(\mathbf{n}\)</span> or <span class="math notranslate nohighlight">\(\mathbf{M}\)</span> is computed along the last axis and <span class="math notranslate nohighlight">\(\circ\)</span> denotes the Haddamard or element-wise product of two same matrices with the same shape.</p>
+</section>
+<section id="sound-soft-boundary-condition">
+<h2>Sound-soft boundary condition<a class="headerlink" href="#sound-soft-boundary-condition" title="Link to this heading">¶</a></h2>
+</section>
+<section id="transmission-condition-inner-edge">
+<h2>Transmission condition (inner edge)<a class="headerlink" href="#transmission-condition-inner-edge" title="Link to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -350,6 +356,8 @@
             <ul>
 <li><a class="reference internal" href="#">Fluxes</a><ul>
 <li><a class="reference internal" href="#sound-hard-boundary-condition">Sound-hard boundary condition</a></li>
+<li><a class="reference internal" href="#sound-soft-boundary-condition">Sound-soft boundary condition</a></li>
+<li><a class="reference internal" href="#transmission-condition-inner-edge">Transmission condition (inner edge)</a></li>
 </ul>
 </li>
 </ul>

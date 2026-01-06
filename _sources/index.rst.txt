@@ -12,7 +12,7 @@ Welcome to Trefftz's Documentation
    design/assembly_flow
    tutorials/quickstart
    api/mesh
-   api/fem
+   api/dg
    api/boundary_conditions
 
 Indices and tables
