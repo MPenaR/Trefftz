@@ -237,8 +237,8 @@
           <section id="module-trefftz.mesh">
 <span id="mesh-module"></span><h1>Mesh Module<a class="headerlink" href="#module-trefftz.mesh" title="Link to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="trefftz.mesh.Mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trefftz.mesh.</span></span><span class="sig-name descname"><span class="pre">Mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triangles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge2triangles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_sets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/core.html#Mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.Mesh" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="trefftz.mesh.TrefftzMesh">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trefftz.mesh.</span></span><span class="sig-name descname"><span class="pre">TrefftzMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triangles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge2triangles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_sets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/core.html#TrefftzMesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.TrefftzMesh" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Returns only the relevant data
 as numpy structured-arrays for easy manipulation</p>
@@ -255,13 +255,13 @@ as numpy structured-arrays for easy manipulation</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="trefftz.mesh.Mesh.construct_numpy_arrays">
-<span class="sig-name descname"><span class="pre">construct_numpy_arrays</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/core.html#Mesh.construct_numpy_arrays"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.Mesh.construct_numpy_arrays" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="trefftz.mesh.TrefftzMesh.construct_numpy_arrays">
+<span class="sig-name descname"><span class="pre">construct_numpy_arrays</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/core.html#TrefftzMesh.construct_numpy_arrays"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.TrefftzMesh.construct_numpy_arrays" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="trefftz.mesh.Mesh.get_cell">
-<span class="sig-name descname"><span class="pre">get_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/core.html#Mesh.get_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.Mesh.get_cell" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="trefftz.mesh.TrefftzMesh.get_cell">
+<span class="sig-name descname"><span class="pre">get_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/core.html#TrefftzMesh.get_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.TrefftzMesh.get_cell" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a><em>]</em><em>]</em>)</p>
@@ -273,18 +273,18 @@ as numpy structured-arrays for easy manipulation</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="trefftz.mesh.Mesh.n_points">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_points</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#trefftz.mesh.Mesh.n_points" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="trefftz.mesh.TrefftzMesh.n_points">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_points</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#trefftz.mesh.TrefftzMesh.n_points" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="trefftz.mesh.Mesh.n_edges">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_edges</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#trefftz.mesh.Mesh.n_edges" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="trefftz.mesh.TrefftzMesh.n_edges">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_edges</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#trefftz.mesh.TrefftzMesh.n_edges" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="trefftz.mesh.Mesh.n_triangles">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_triangles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#trefftz.mesh.Mesh.n_triangles" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="trefftz.mesh.TrefftzMesh.n_triangles">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_triangles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#trefftz.mesh.TrefftzMesh.n_triangles" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -364,12 +364,12 @@ as numpy structured-arrays for easy manipulation</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Mesh Module</a><ul>
-<li><a class="reference internal" href="#trefftz.mesh.Mesh"><code class="docutils literal notranslate"><span class="pre">Mesh</span></code></a><ul>
-<li><a class="reference internal" href="#trefftz.mesh.Mesh.construct_numpy_arrays"><code class="docutils literal notranslate"><span class="pre">Mesh.construct_numpy_arrays()</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.mesh.Mesh.get_cell"><code class="docutils literal notranslate"><span class="pre">Mesh.get_cell()</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.mesh.Mesh.n_points"><code class="docutils literal notranslate"><span class="pre">Mesh.n_points</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.mesh.Mesh.n_edges"><code class="docutils literal notranslate"><span class="pre">Mesh.n_edges</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.mesh.Mesh.n_triangles"><code class="docutils literal notranslate"><span class="pre">Mesh.n_triangles</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.mesh.TrefftzMesh"><code class="docutils literal notranslate"><span class="pre">TrefftzMesh</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.mesh.TrefftzMesh.construct_numpy_arrays"><code class="docutils literal notranslate"><span class="pre">TrefftzMesh.construct_numpy_arrays()</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.mesh.TrefftzMesh.get_cell"><code class="docutils literal notranslate"><span class="pre">TrefftzMesh.get_cell()</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.mesh.TrefftzMesh.n_points"><code class="docutils literal notranslate"><span class="pre">TrefftzMesh.n_points</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.mesh.TrefftzMesh.n_edges"><code class="docutils literal notranslate"><span class="pre">TrefftzMesh.n_edges</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.mesh.TrefftzMesh.n_triangles"><code class="docutils literal notranslate"><span class="pre">TrefftzMesh.n_triangles</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#trefftz.mesh.EdgeType"><code class="docutils literal notranslate"><span class="pre">EdgeType</span></code></a><ul>
