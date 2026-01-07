@@ -2980,6 +2980,9 @@ dev = [
     { name = "sphinx-autodoc-typehints" },
     { name = "sphinx-rtd-theme" },
 ]
+gmsh = [
+    { name = "gmsh" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -3003,6 +3006,7 @@ dev = [
     { name = "sphinx-autodoc-typehints", specifier = ">=3.0.1" },
     { name = "sphinx-rtd-theme", specifier = ">=0.5.1" },
 ]
+gmsh = [{ name = "gmsh", specifier = ">=4.15.0" }]
 
 [[package]]
 name = "typing-extensions"

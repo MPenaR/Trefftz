@@ -14,6 +14,13 @@ class EdgeType(IntEnum):
     BOUNDARY = 1
 
 
+class FluxType(IntEnum):
+    TRANSMISSION = 0
+    SOUNDHARD = 1
+    SOUNDSOFT = 2
+    RADIATION = 3
+
+
 DIM: Final = 2
 
 edge_dtype = [("P", np.float64, DIM),
@@ -23,6 +30,7 @@ edge_dtype = [("P", np.float64, DIM),
               ("M", np.float64, DIM),
               ("l", float),
               ("type", np.int8),
+              ("flux_type", np.int8),
               ("triangles", np.int32, 2)]
 
 triangle_dtype = [("A", np.float64, DIM),
@@ -37,7 +45,7 @@ class CellLocator(Protocol):
         ...
 
 
-class Mesh():
+class TrefftzMesh():
     '''Returns only the relevant data
     as numpy structured-arrays for easy manipulation'''
 
@@ -63,6 +71,7 @@ class Mesh():
         edges["N"] = np.column_stack([edges["T"][:, 1], -edges["T"][:, 0]])
         edges["triangles"] = self._edge2triangles
         edges["type"] = (edges["triangles"][:, 1] == -1).astype(np.int8)
+        edges["flux_type"][edges["type"] == EdgeType.INNER] = FluxType.TRANSMISSION
         self.edges = edges
 
         triangles = np.zeros(self.n_triangles, dtype=triangle_dtype)

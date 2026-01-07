@@ -1,3 +1,3 @@
-from .core import Mesh, EdgeType
+from .core import TrefftzMesh, EdgeType
 
-__all__ = ["Mesh", "EdgeType"]
+__all__ = ["TrefftzMesh", "EdgeType"]

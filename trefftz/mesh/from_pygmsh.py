@@ -1,11 +1,11 @@
 import numpy as np
-from .core import CellLocator, Mesh
+from .core import CellLocator, TrefftzMesh
 from scipy.spatial import cKDTree
 from trefftz.numpy_types import float_array, int_array
 from trefftz.mesh.geometry import in_triangle
 
 try:
-    from meshio import Mesh as meshioMesh
+    from meshio import Mesh
 except ImportError as e:
     raise ImportError(
         "The module trefftz.mesh.from_pygmsh requires pygmsh.\n"
@@ -45,7 +45,7 @@ class KDTreeLocator(CellLocator):
             raise ValueError("Input must have shape (2,) or (M, 2)")
 
 
-def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
+def Mesh_from_meshio(mesh: Mesh) -> TrefftzMesh:
     '''Returns a Mesh from a meshio object'''
     points = mesh.points[:, 0:2]
     meshed_edges = np.sort(mesh.cells_dict["line"], axis=1)
@@ -102,6 +102,6 @@ def Mesh_from_meshio(mesh: meshioMesh) -> Mesh:
         else:
             edge2triangles[E, 1] = T
 
-    return Mesh(points=points, edges=edges, triangles=triangles, edge2triangles=edge2triangles,
+    return TrefftzMesh(points=points, edges=edges, triangles=triangles, edge2triangles=edge2triangles,
                 locator=locator, cell_sets=cell_sets)
 

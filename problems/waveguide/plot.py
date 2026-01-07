@@ -1,9 +1,12 @@
 '''Module for plotting waveguides'''
-from trefftz.mesh import Mesh
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from trefftz.mesh import TrefftzMesh
+
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_waveguide(mesh: Mesh, plot_tangents: bool = False, plot_normals: bool = False):
+def plot_waveguide(mesh: "TrefftzMesh", plot_tangents: bool = False, plot_normals: bool = False):
     from matplotlib.collections import LineCollection
     _, ax = plt.subplots(figsize=(16,4))
     R= 5 

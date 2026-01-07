@@ -28,6 +28,9 @@ dev = [
     "sphinx-autodoc-typehints>=3.0.1",
     "sphinx-rtd-theme>=0.5.1",
 ]
+gmsh = [
+    "gmsh>=4.15.0",
+]
 
 [build-system]
 requires = ["setuptools>=61"]

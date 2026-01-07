@@ -1,12 +1,15 @@
 '''Module for defining Trefftz-DG functions'''
 
-from typing import Any
-from trefftz.mesh import Mesh
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from trefftz.mesh import TrefftzMesh
+
 from trefftz.numpy_types import complex_array, float_array
 import numpy as np
 
 class ComplexFunction:
-    def __init__(self, domain: Mesh,  N_theta: int, k: float) -> None:
+    def __init__(self, domain: "TrefftzMesh",  N_theta: int, k: float) -> None:
         self.domain = domain
         self.N_theta = N_theta
         self.N_DOF = N_theta*domain.n_triangles

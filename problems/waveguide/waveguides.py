@@ -1,13 +1,24 @@
 '''Module for defining a waveguide class, as it will be, I think, the most usefull'''
-from trefftz.mesh import Mesh, EdgeType
+from trefftz.mesh import TrefftzMesh, EdgeType
 from trefftz.mesh.from_pygmsh import Mesh_from_meshio
 from typing import Optional, Callable, Any
 from pygmsh.geo import Geometry
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
+from enum import IntEnum
+
+
 # from scipy.sparse import csc_matrix
 # from trefftz.numpy_types import float_array
+
+
+class Region(IntEnum):
+    GAMMA = 1
+    SIGMA_L = 2
+    SIGMA_R = 3
+    SIGMA = 4
+
 
 class Scatterer:
     pass
@@ -36,15 +47,15 @@ class Waveguide:
 
             domain = geom.add_plane_surface(boundary)
 
-            geom.add_physical(domain, "Omega")
-            geom.add_physical([bottom, top], "Gamma")
-            geom.add_physical(left, "S_L")
-            geom.add_physical(right, "S_R")
-            geom.add_physical([left, right], "S")
+            geom.add_physical(domain, label="Omega")
+            geom.add_physical([bottom, top], label="Gamma")
+            geom.add_physical(left, label="S_L")
+            geom.add_physical(right, label="S_R")
+            geom.add_physical([left, right], label="S")
             self._domain = Mesh_from_meshio(geom.generate_mesh())
     
     @property
-    def domain(self) -> Mesh:
+    def domain(self) -> "TrefftzMesh":
         return self._domain
     
 
@@ -70,11 +81,6 @@ class Waveguide:
                                                    self.domain.edges[G]["Q"]], axis=1),
                                                    colors='b', linewidths=line_width))
 
-
-        # ax.add_collection(LineCollection(np.stack([mesh.edges[S]["P"], mesh.edges[S]["Q"]], axis=1),
-        #                                 colors = 'r', linewidths = line_width))
-        # ax.add_collection(LineCollection(np.stack([mesh.edges[G]["P"], mesh.edges[G]["Q"]], axis=1),
-        #                                 colors = 'b', linewidths = line_width))
 
         ax.axis('equal')
         ax.axis('off')
