@@ -2962,6 +2962,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+gmsh = [
+    { name = "gmsh" },
+]
 pygmsh = [
     { name = "pygmsh" },
 ]
@@ -2980,18 +2983,16 @@ dev = [
     { name = "sphinx-autodoc-typehints" },
     { name = "sphinx-rtd-theme" },
 ]
-gmsh = [
-    { name = "gmsh" },
-]
 
 [package.metadata]
 requires-dist = [
+    { name = "gmsh", marker = "extra == 'gmsh'", specifier = ">=4.15.0" },
     { name = "matplotlib", specifier = ">=3.10.7" },
     { name = "numpy", specifier = ">=2.2.6" },
     { name = "pygmsh", marker = "extra == 'pygmsh'", specifier = ">=7.1.17" },
     { name = "scipy", specifier = ">=1.15.3" },
 ]
-provides-extras = ["pygmsh"]
+provides-extras = ["pygmsh", "gmsh"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -3006,7 +3007,6 @@ dev = [
     { name = "sphinx-autodoc-typehints", specifier = ">=3.0.1" },
     { name = "sphinx-rtd-theme", specifier = ">=0.5.1" },
 ]
-gmsh = [{ name = "gmsh", specifier = ">=4.15.0" }]
 
 [[package]]
 name = "typing-extensions"

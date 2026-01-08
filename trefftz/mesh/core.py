@@ -3,11 +3,13 @@
 from typing import Final
 import numpy as np
 from numpy.linalg import norm
-from typing import Protocol
+from .geometry import CellLocator
 from trefftz.numpy_types import float_array, int_array
 from .geometry import triangle_area
 from enum import IntEnum
-
+from pathlib import Path
+from .readers import GmshReader
+from .geometry import CellType
 
 class EdgeType(IntEnum):
     INNER = 0
@@ -31,6 +33,7 @@ edge_dtype = [("P", np.float64, DIM),
               ("l", float),
               ("type", np.int8),
               ("flux_type", np.int8),
+              ("region", np.int8),
               ("triangles", np.int32, 2)]
 
 triangle_dtype = [("A", np.float64, DIM),
@@ -39,25 +42,20 @@ triangle_dtype = [("A", np.float64, DIM),
                   ("M", np.float64, DIM),
                   ("area", np.float64)]
 
-class CellLocator(Protocol):
-    '''Protocol for cell locators'''
-    def find_cell(self, p: float_array) -> int_array | int:
-        ...
-
-
 class TrefftzMesh():
     '''Returns only the relevant data
     as numpy structured-arrays for easy manipulation'''
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
                  edge2triangles: int_array,
-                 locator: CellLocator, cell_sets: dict[str, dict[str, int_array]]):
+                 locator: CellLocator, cell_sets: list[dict[int, int_array]]):
         self._points = points
         self._edges = edges
         self._triangles = triangles
         self.locator = locator
         self._cell_sets = cell_sets
         self._edge2triangles = edge2triangles
+        self.ready_for_assemble = False
         self.construct_numpy_arrays()
 
     def construct_numpy_arrays(self):
@@ -71,7 +69,13 @@ class TrefftzMesh():
         edges["N"] = np.column_stack([edges["T"][:, 1], -edges["T"][:, 0]])
         edges["triangles"] = self._edge2triangles
         edges["type"] = (edges["triangles"][:, 1] == -1).astype(np.int8)
+        edges["flux_type"] = -1
         edges["flux_type"][edges["type"] == EdgeType.INNER] = FluxType.TRANSMISSION
+        edges["region"] = -1
+        cell_sets_1D = self._cell_sets[0]
+        for region in  cell_sets_1D:
+            edges[cell_sets_1D[region]] = region
+
         self.edges = edges
 
         triangles = np.zeros(self.n_triangles, dtype=triangle_dtype)
@@ -81,8 +85,7 @@ class TrefftzMesh():
         triangles["M"] = 1/3*(triangles["A"] + triangles["B"] + triangles["C"])
         triangles["area"] = triangle_area(A=triangles["A"],
                                           B=triangles["B"],
-                                          C=triangles["C"])
-        
+                                          C=triangles["C"])        
         self.triangles = triangles
 
         # orienting boundary normals
@@ -104,6 +107,10 @@ class TrefftzMesh():
         inner_normals = np.sign(np.vecdot(bar_minus-bar_plus, inner_edges["N"]))[:, np.newaxis]*inner_edges["N"]
         edges["N"][edges["type"] == EdgeType.INNER] = inner_normals
 
+        if np.all(self.edges["flux_type"] >= 0):
+            print('Mesh is ready to be assebled')
+            self.ready_for_assemble = True
+
     def get_cell(self, p: float_array) -> int_array | int:
         return self.locator.find_cell(p)
 
@@ -118,3 +125,8 @@ class TrefftzMesh():
     @property
     def n_triangles(self) -> int:
         return self._triangles.shape[0]
+    
+    @classmethod
+    def from_gmsh(cls, file_path: Path | str):
+        points, edges, triangles, edges2triangles, locator, cell_sets = GmshReader(file_path)
+        return cls(points, edges, triangles, edges2triangles, locator, cell_sets)

@@ -5,6 +5,14 @@ Module for functions that compute geometric quantities or relations.
 
 from trefftz.numpy_types import float_array, int_array
 import numpy as np
+from typing import Protocol
+from enum import IntEnum
+
+
+class CellType(IntEnum):
+    POINT = 0
+    SEGMENT = 1
+    TRIANGLE = 2  # consider modifying it later for quad
 
 
 def in_triangle(P: float_array, A: float_array, B: float_array, C: float_array) -> bool:
@@ -61,3 +69,9 @@ def triangle_area(A: float_array, B: float_array, C: float_array) -> int | int_a
     v = (B - A).transpose()
     det = u[0]*v[1] - u[1]*v[0]
     return 0.5*np.abs(det).transpose()
+
+
+class CellLocator(Protocol):
+    '''Protocol for cell locators'''
+    def find_cell(self, p: float_array) -> int_array | int:
+        ...

@@ -14,6 +14,9 @@ dependencies = [
 pygmsh = [
     "pygmsh>=7.1.17",
 ]
+gmsh = [
+    "gmsh>=4.15.0",
+]
 
 [dependency-groups]
 dev = [
@@ -27,9 +30,6 @@ dev = [
     "sphinx>=8.1.3",
     "sphinx-autodoc-typehints>=3.0.1",
     "sphinx-rtd-theme>=0.5.1",
-]
-gmsh = [
-    "gmsh>=4.15.0",
 ]
 
 [build-system]

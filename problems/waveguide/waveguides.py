@@ -7,17 +7,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
 from enum import IntEnum
+import gmsh
 
+from trefftz.mesh.readers import GmshArrays
 
 # from scipy.sparse import csc_matrix
 # from trefftz.numpy_types import float_array
 
 
 class Region(IntEnum):
+    OMEGA = 0
     GAMMA = 1
-    SIGMA_L = 2
-    SIGMA_R = 3
-    SIGMA = 4
+    SIGMA_L = 3
+    SIGMA_R = 4
+    SIGMA = 2
 
 
 class Scatterer:
@@ -102,6 +105,95 @@ class Waveguide:
         ax.pcolorfast((-self.R, self.R), (0., self.H), Z)
         plt.show()
 
+
+
+class Waveguide2:
+    def __init__(self, H: float = 1., R: float = 5., lc: float = 0.3,
+                 scatterers: Optional[tuple[Scatterer]] = None, verbose: bool = False):
+        self.R = R
+        self.H = H
+        gmsh.initialize()
+        gmsh.option.setNumber("General.Terminal", int(verbose))
+        gmsh.model.add("Waveguide")
+        p0 = gmsh.model.geo.addPoint(-R, 0., 0., lc)
+        p1 = gmsh.model.geo.addPoint( R, 0., 0., lc)
+        p2 = gmsh.model.geo.addPoint( R,  H, 0., lc)
+        p3 = gmsh.model.geo.addPoint(-R,  H, 0., lc)
+        
+        bottom = gmsh.model.geo.addLine(p0, p1)
+        right  = gmsh.model.geo.addLine(p1, p2)
+        top    = gmsh.model.geo.addLine(p2, p3)
+        left   = gmsh.model.geo.addLine(p3, p0)
+
+        boundary = gmsh.model.geo.addCurveLoop([bottom, right, top, left])
+        domain = gmsh.model.geo.addPlaneSurface([boundary])
+        gmsh.model.addPhysicalGroup(2, [domain], Region.OMEGA, "Omega")
+        gmsh.model.addPhysicalGroup(1, [bottom, top], Region.GAMMA, "Gamma")
+        gmsh.model.addPhysicalGroup(1, [left], Region.SIGMA_L, "Sigma_L")
+        gmsh.model.addPhysicalGroup(1, [right], Region.SIGMA_R, "Sigma_R")
+        gmsh.model.addPhysicalGroup(1, [left, right], Region.SIGMA, "Sigma")
+        
+        gmsh.model.geo.synchronize()
+        gmsh.model.mesh.generate(2)
+        # gmsh.fltk.run()
+        # gmsh.write('CleanWaveguide.msh')
+        # gmsh.finalize()
+        # self._domain = TrefftzMesh.from_gmsh('CleanWaveguide.msh')
+        points, edges, triangles, edges2triangles, locator, cell_sets = GmshArrays(gmsh.model)
+        gmsh.finalize()
+
+        # construction cell sets (regions)
+
+        self._domain = TrefftzMesh(points, edges, triangles, edges2triangles, locator, cell_sets)
+        return
+    
+    @property
+    def domain(self) -> "TrefftzMesh":
+        return self._domain
+    
+
+    def plot(self, figsize: Optional[tuple[int, int]] = (16, 2), line_width: Optional[int] = 1):
+        from matplotlib.collections import LineCollection
+        _, ax = plt.subplots(figsize=figsize)
+        # ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
+
+        S = self.domain._cell_sets["S"]["line"]
+        G = self.domain._cell_sets["Gamma"]["line"]  # it allows for multidimensional subsets
+
+        inner = np.where(self.domain.edges["type"] == EdgeType.INNER)[0]
+
+        ax.add_collection(LineCollection(np.stack([self.domain.edges[inner]["P"],
+                                                   self.domain.edges[inner]["Q"]], axis=1),
+                                                   colors='k', linewidths=line_width))
+
+        ax.add_collection(LineCollection(np.stack([self.domain.edges[S]["P"],
+                                                   self.domain.edges[S]["Q"]], axis=1),
+                                                   colors='r', linewidths=line_width))
+
+        ax.add_collection(LineCollection(np.stack([self.domain.edges[G]["P"],
+                                                   self.domain.edges[G]["Q"]], axis=1),
+                                                   colors='b', linewidths=line_width))
+
+
+        ax.axis('equal')
+        ax.axis('off')
+        plt.show()
+    
+
+    def plot_field(self, u: Callable[[NDArray[Any], NDArray[Any]], NDArray[Any]],
+                   N: int = 100, figsize: Optional[tuple[int, int]] = (16, 2), real_part: bool = False):
+        x = np.linspace(-self.R, self.R, N)
+        y = np.linspace(0., self.H, N)
+        X, Y = np.meshgrid(x, y)
+        Z = u(X, Y)
+
+        if real_part:
+            Z = np.real(Z)
+
+        _, ax = plt.subplots(figsize=figsize)
+
+        ax.pcolorfast((-self.R, self.R), (0., self.H), Z)
+        plt.show()
 
 
 
