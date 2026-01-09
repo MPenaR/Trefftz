@@ -74,7 +74,7 @@ class TrefftzMesh():
         edges["region"] = -1
         cell_sets_1D = self._cell_sets
         for region in cell_sets_1D:
-            edges[cell_sets_1D[region]] = region
+            edges["region"][cell_sets_1D[region]] = region
 
         self.edges = edges
 

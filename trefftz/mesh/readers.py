@@ -139,11 +139,6 @@ def GmshReader(file_path: Path | str ) -> tuple[float_array, int_array, int_arra
     phys_names = {tag: gmsh.model.getPhysicalName(dim, tag) 
               for dim, tag in phys_groups}
 
-
-
-    
-    
-
     gmsh.finalize()
     locator = KDTreeLocator(points=points, triangles=triangles)
 
@@ -151,15 +146,15 @@ def GmshReader(file_path: Path | str ) -> tuple[float_array, int_array, int_arra
 
 
 
-def GmshArrays(model: gmsh.model ) -> tuple[float_array, int_array, int_array, int_array, CellLocator, None]:
+def GmshArrays(model: gmsh.model ) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array]]:
 
     node_tags, node_coords, node_params = model.mesh.getNodes()
     points = node_coords.reshape(-1, 3)[:, :2]  # their row-index is not valid as an ID yet
-
     # building look-up table  (tags not used receive an index -1 which is not valid)
     max_tag = node_tags.max()
     lut = np.full(max_tag + 1, -1)
     lut[node_tags] = np.arange(len(node_tags))
+
 
     _, tri_tags, tri_node_tags = model.mesh.getElements(dim=2)  # modify this part if the mesh becomes 3D or contains quads
     tri_node_tags = tri_node_tags[0].reshape((-1, 3))  # and this one
@@ -224,7 +219,7 @@ def GmshArrays(model: gmsh.model ) -> tuple[float_array, int_array, int_array, i
         dim, entities = phys_entities[tag]
         phys_nodes[tag] = np.concatenate([model.mesh.getElements(dim, e)[2] for e in entities]).reshape((-1, dim+1))
         phys_tags[tag] = np.concatenate([model.mesh.getElements(dim, e)[1][0] for e in entities])-1  # watch out later for mixing quads
-    
+
     cell_sets = {}
     for tag in phys_tags:
         dim, _ = phys_entities[tag]
