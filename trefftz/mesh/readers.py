@@ -223,10 +223,9 @@ def GmshArrays(model: gmsh.model ) -> tuple[float_array, int_array, int_array, i
     for tag in phys_entities:
         dim, entities = phys_entities[tag]
         phys_nodes[tag] = np.concatenate([model.mesh.getElements(dim, e)[2] for e in entities]).reshape((-1, dim+1))
-        phys_tags[tag] = np.concatenate([model.mesh.getElements(dim, e)[1][0] for e in entities])  # watch out later for mixing quads
+        phys_tags[tag] = np.concatenate([model.mesh.getElements(dim, e)[1][0] for e in entities])-1  # watch out later for mixing quads
     
     cell_sets = {}
-
     for tag in phys_tags:
         dim, _ = phys_entities[tag]
         if dim == 1:
@@ -248,4 +247,4 @@ def GmshArrays(model: gmsh.model ) -> tuple[float_array, int_array, int_array, i
 
     locator = KDTreeLocator(points=points, triangles=triangles)
 
-    return points, edges, triangles, edge2triangles, locator, None
+    return points, edges, triangles, edge2triangles, locator, cell_sets

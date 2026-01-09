@@ -18,8 +18,8 @@ from trefftz.mesh.readers import GmshArrays
 class Region(IntEnum):
     OMEGA = 0
     GAMMA = 1
-    SIGMA_L = 3
-    SIGMA_R = 4
+    # SIGMA_L = 3
+    # SIGMA_R = 4
     SIGMA = 2
 
 
@@ -129,8 +129,8 @@ class Waveguide2:
         domain = gmsh.model.geo.addPlaneSurface([boundary])
         gmsh.model.addPhysicalGroup(2, [domain], Region.OMEGA, "Omega")
         gmsh.model.addPhysicalGroup(1, [bottom, top], Region.GAMMA, "Gamma")
-        gmsh.model.addPhysicalGroup(1, [left], Region.SIGMA_L, "Sigma_L")
-        gmsh.model.addPhysicalGroup(1, [right], Region.SIGMA_R, "Sigma_R")
+        # gmsh.model.addPhysicalGroup(1, [left], Region.SIGMA_L, "Sigma_L")
+        # gmsh.model.addPhysicalGroup(1, [right], Region.SIGMA_R, "Sigma_R")
         gmsh.model.addPhysicalGroup(1, [left, right], Region.SIGMA, "Sigma")
         
         gmsh.model.geo.synchronize()
@@ -156,11 +156,16 @@ class Waveguide2:
         from matplotlib.collections import LineCollection
         _, ax = plt.subplots(figsize=figsize)
         # ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
+    
+        # S = self.domain._cell_sets["S"]["line"]
+        # G = self.domain._cell_sets["Gamma"]["line"]  # it allows for multidimensional subsets
+        # inner = np.where(self.domain.edges["type"] == EdgeType.INNER)[0]
 
-        S = self.domain._cell_sets["S"]["line"]
-        G = self.domain._cell_sets["Gamma"]["line"]  # it allows for multidimensional subsets
-
+        S = np.where(self.domain.edges["region"] == Region.SIGMA)[0]
+        G = np.where(self.domain.edges["region"] == Region.GAMMA)[0]  
         inner = np.where(self.domain.edges["type"] == EdgeType.INNER)[0]
+    
+
 
         ax.add_collection(LineCollection(np.stack([self.domain.edges[inner]["P"],
                                                    self.domain.edges[inner]["Q"]], axis=1),

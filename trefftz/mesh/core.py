@@ -48,7 +48,7 @@ class TrefftzMesh():
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
                  edge2triangles: int_array,
-                 locator: CellLocator, cell_sets: list[dict[int, int_array]]):
+                 locator: CellLocator, cell_sets: dict[int, int_array]):
         self._points = points
         self._edges = edges
         self._triangles = triangles
@@ -72,8 +72,8 @@ class TrefftzMesh():
         edges["flux_type"] = -1
         edges["flux_type"][edges["type"] == EdgeType.INNER] = FluxType.TRANSMISSION
         edges["region"] = -1
-        cell_sets_1D = self._cell_sets[0]
-        for region in  cell_sets_1D:
+        cell_sets_1D = self._cell_sets
+        for region in cell_sets_1D:
             edges[cell_sets_1D[region]] = region
 
         self.edges = edges
