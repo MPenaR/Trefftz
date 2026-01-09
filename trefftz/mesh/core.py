@@ -15,14 +15,6 @@ class EdgeType(IntEnum):
     INNER = 0
     BOUNDARY = 1
 
-
-class FluxType(IntEnum):
-    TRANSMISSION = 0
-    SOUNDHARD = 1
-    SOUNDSOFT = 2
-    RADIATION = 3
-
-
 DIM: Final = 2
 
 edge_dtype = [("P", np.float64, DIM),
@@ -70,7 +62,8 @@ class TrefftzMesh():
         edges["triangles"] = self._edge2triangles
         edges["type"] = (edges["triangles"][:, 1] == -1).astype(np.int8)
         edges["flux_type"] = -1
-        edges["flux_type"][edges["type"] == EdgeType.INNER] = FluxType.TRANSMISSION
+        # edges["flux_type"][edges["type"] == EdgeType.INNER] = FluxType.TRANSMISSION
+        edges["flux_type"][edges["type"] == EdgeType.INNER] = 0
         edges["region"] = -1
         cell_sets_1D = self._cell_sets
         for region in cell_sets_1D:
@@ -130,3 +123,5 @@ class TrefftzMesh():
     def from_gmsh(cls, file_path: Path | str):
         points, edges, triangles, edges2triangles, locator, cell_sets = GmshReader(file_path)
         return cls(points, edges, triangles, edges2triangles, locator, cell_sets)
+    
+            
