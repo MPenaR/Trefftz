@@ -101,7 +101,6 @@ class TrefftzMesh():
         edges["N"][edges["type"] == EdgeType.INNER] = inner_normals
 
         if np.all(self.edges["flux_type"] >= 0):
-            print('Mesh is ready to be assebled')
             self.ready_for_assemble = True
 
     def get_cell(self, p: float_array) -> int_array | int:
