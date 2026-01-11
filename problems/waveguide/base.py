@@ -1,8 +1,8 @@
 '''Module for defining a waveguide class, as it will be, I think, the most usefull'''
 from trefftz.mesh import TrefftzMesh, EdgeType
-from trefftz.mesh.from_pygmsh import Mesh_from_meshio
+# from trefftz.mesh.from_pygmsh import Mesh_from_meshio
 from typing import Optional, Callable, Any
-from pygmsh.geo import Geometry
+# from pygmsh.geo import Geometry
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
@@ -11,7 +11,9 @@ import gmsh
 
 from trefftz.mesh.readers import GmshArrays
 from problems import Problem
-
+from trefftz.dg.fluxes import FluxType
+from problems.waveguide.exact_solutions import Mode
+from trefftz.numpy_types import float_array, complex_array
 
 # from scipy.sparse import csc_matrix
 # from trefftz.numpy_types import float_array
@@ -25,11 +27,11 @@ class Region(IntEnum):
     SIGMA = 2
 
 
-class FluxType(IntEnum):  # should go in flux types or in fluxes
-    TRANSMISSION = 0
-    SOUNDHARD = 1
-    SOUNDSOFT = 2
-    RADIATION = 3
+# class FluxType(IntEnum):  # should go in flux types or in fluxes
+#     TRANSMISSION = 0
+#     SOUNDHARD = 1
+#     SOUNDSOFT = 2
+#     RADIATION = 3
 
 
 
@@ -267,7 +269,7 @@ class Waveguide(Problem):
 
         boundary_conditions_map = {
             Region.GAMMA: FluxType.SOUNDHARD,
-            Region.SIGMA: FluxType.RADIATION
+            Region.SIGMA: FluxType.RADIATING
         }
 
         return cls(mesh=mesh, boundary_conditions_map=boundary_conditions_map, verbose=verbose, R=R, H=H)
@@ -320,8 +322,14 @@ class Waveguide(Problem):
         _, ax = plt.subplots(figsize=figsize)
 
         ax.pcolorfast((-self.R, self.R), (0., self.H), Z)
+        ax.axis('equal')
         plt.show()
 
+    def plot_mode(self, n: int, k: float):
+        self.plot_field(self.mode(n, k), N=400, real_part=True)
+
+    def mode(self, n: int, k: float) -> Callable[[float_array, float_array], complex_array]:
+        return Mode(n=n, k=k, H=self.H, R=self.R)
 
 
 

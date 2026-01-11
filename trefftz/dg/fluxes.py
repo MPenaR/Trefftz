@@ -1,11 +1,11 @@
 '''Module for defining flux types'''
-from enum import IntEnum  #, auto
+from enum import IntEnum   # , auto
 
 class FluxType(IntEnum):
-    '''Types of boundary condition'''
-    Transsmision = 0  # not really a "boundary" condition
-    SoundHard = 1
-    SoundSoft = 2
-    Radiating = 3
-    Dirichlet = 4  # when homogeneous becomes Soundsoft
-    Neumann = 5    # when homogeneous becomes SoundHard
+    '''Types of fluxes'''
+    TRANSMISSION = 0  # not really a "boundary" condition
+    SOUNDHARD = 1
+    SOUNDSOFT = 2
+    RADIATING = 3
+    DIRICHLET = 4  # when homogeneous becomes Soundsoft
+    NEUMANN = 5    # when homogeneous becomes SoundHard
