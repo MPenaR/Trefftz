@@ -1,5 +1,6 @@
 '''Module for defining flux types'''
-from enum import IntEnum   # , auto
+from enum import IntEnum
+from serial_fluxes import Inner, SoundHard   # , auto
 
 class FluxType(IntEnum):
     '''Types of fluxes'''
@@ -9,3 +10,7 @@ class FluxType(IntEnum):
     RADIATING = 3
     DIRICHLET = 4  # when homogeneous becomes Soundsoft
     NEUMANN = 5    # when homogeneous becomes SoundHard
+
+
+FluxKernels = {FluxType.TRANSMISSION: Inner,
+               FluxType.SOUNDHARD: SoundHard}

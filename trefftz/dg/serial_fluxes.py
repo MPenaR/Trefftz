@@ -13,6 +13,7 @@ import numpy as np
 from numpy import dot, sinc, pi, exp, sqrt, conj
 from dataclasses import dataclass
 from trefftz.numpy_types import float_array
+from typing import Mapping
 
 
 @dataclass
@@ -29,7 +30,7 @@ class Edge:
     T: np.ndarray[tuple[int], np.dtype[np.floating]]
 
 
-def SoundHard(phi: Function, psi: Function, k: float, edge: Edge, d_1: float) -> complex:
+def SoundHard(phi: Function, psi: Function, k: float, edge: Edge, stabilizing_parameters: Mapping[str, float]) -> complex:
     r"""
     Computes the flux on a sound-hard boundary, that is:
 
@@ -64,6 +65,8 @@ def SoundHard(phi: Function, psi: Function, k: float, edge: Edge, d_1: float) ->
     
     """
 
+    d_1 = stabilizing_parameters.get("d_1", 0.5)
+
     d_m = psi.d
     d_n = phi.d
     
@@ -78,7 +81,7 @@ def SoundHard(phi: Function, psi: Function, k: float, edge: Edge, d_1: float) ->
 
 
 
-def Inner(phi : Function, psi : Function, edge : Edge, k : float, a : float, b : float) -> complex:
+def Inner(phi : Function, psi : Function, edge : Edge, k : float, stabilizing_parameters: Mapping[str, float]) -> complex:
     r"""
     Computes the flux on a inner facet with respect to the degrees
     of freedom from the same cell, that is:
@@ -108,6 +111,9 @@ def Inner(phi : Function, psi : Function, edge : Edge, k : float, a : float, b :
 
 
     """
+    a = stabilizing_parameters.get("a", 0.5)
+    b = stabilizing_parameters.get("b", 0.5)
+    
 
     d_m = psi.d
     d_n = phi.d
