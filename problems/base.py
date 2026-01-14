@@ -26,9 +26,6 @@ class Problem:
         self.verbose = verbose
         if boundary_conditions_map:
             self.set_boundary_conditions(boundary_conditions_map)
-            
-
-
 
     @abstractmethod
     def build_geometry(self):
