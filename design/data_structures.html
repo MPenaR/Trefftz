@@ -172,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -229,7 +229,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
@@ -237,6 +237,18 @@
           <section class="tex2jax_ignore mathjax_ignore" id="data-structures">
 <h1>Data Structures<a class="headerlink" href="#data-structures" title="Link to this heading">¶</a></h1>
 <p>The mesh basically exports points, edges and triangles as numpy arrays. <code class="docutils literal notranslate"><span class="pre">points</span></code> is a simple (N,2) array of dtype np.float64, however both edges and triangles are structured arrays.</p>
+<section id="process">
+<h2>Process<a class="headerlink" href="#process" title="Link to this heading">¶</a></h2>
+<p>In order to allow to reusability the code is split in several classes minimizing coupling:</p>
+<ul class="simple">
+<li><p>Domain: geometric definition, mesh, regions…
+- Waveguide: R, H
+- CleanWaveguide: a constructor
+- Unbounded: R</p></li>
+<li><p>PhysicalModel: Helmholtz, Maxwell, Lamb-waves,  sets boundary conditions, material properties, depends on a domain</p></li>
+<li></li>
+</ul>
+</section>
 </section>
 
         </article>
@@ -282,8 +294,27 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Data Structures</a><ul>
+<li><a class="reference internal" href="#process">Process</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
