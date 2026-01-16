@@ -1,6 +1,6 @@
 '''Module for defining flux types'''
 from enum import IntEnum
-from serial_fluxes import Inner, SoundHard   # , auto
+from .serial_fluxes import Inner, SoundHard   # , auto
 
 class FluxType(IntEnum):
     '''Types of fluxes'''

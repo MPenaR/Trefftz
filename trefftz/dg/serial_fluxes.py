@@ -16,10 +16,10 @@ from trefftz.numpy_types import float_array
 from typing import Mapping
 
 
-@dataclass
-class Function:
-    d: np.ndarray[tuple[int], np.dtype[np.floating]]
-    n: float
+# @dataclass
+# class Function:
+#     d: np.ndarray[tuple[int], np.dtype[np.floating]]
+#     n: float
 
 
 @dataclass
@@ -30,7 +30,7 @@ class Edge:
     T: np.ndarray[tuple[int], np.dtype[np.floating]]
 
 
-def SoundHard(phi: Function, psi: Function, k: float, edge: Edge, stabilizing_parameters: Mapping[str, float]) -> complex:
+def SoundHard(phi, psi, k: float, edge: Edge, d_1: float = 0.5) -> complex:
     r"""
     Computes the flux on a sound-hard boundary, that is:
 
@@ -65,8 +65,6 @@ def SoundHard(phi: Function, psi: Function, k: float, edge: Edge, stabilizing_pa
     
     """
 
-    d_1 = stabilizing_parameters.get("d_1", 0.5)
-
     d_m = psi.d
     d_n = phi.d
     
@@ -81,7 +79,7 @@ def SoundHard(phi: Function, psi: Function, k: float, edge: Edge, stabilizing_pa
 
 
 
-def Inner(phi : Function, psi : Function, edge : Edge, k : float, stabilizing_parameters: Mapping[str, float]) -> complex:
+def Inner(phi, psi, edge : Edge, k : float, stabilizing_parameters: Mapping[str, float]) -> complex:
     r"""
     Computes the flux on a inner facet with respect to the degrees
     of freedom from the same cell, that is:
@@ -132,7 +130,7 @@ def Inner(phi : Function, psi : Function, edge : Edge, k : float, stabilizing_pa
 
 
 
-def Radiating_local(phi : Function, psi : Function, k : float, edge : Edge, d_2 : float) -> complex:
+def Radiating_local(phi, psi, k : float, edge : Edge, d_2 : float) -> complex:
     r"""
     Computes the flux on a radiating boundary with respect to the degrees
     of freedom from the same cell, that is:

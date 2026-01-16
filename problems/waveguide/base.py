@@ -6,7 +6,8 @@ from typing import Optional, Callable, Any
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
-from enum import IntEnum
+from regions import Region
+from problems.base import Domain
 import gmsh
 
 from trefftz.mesh.readers import GmshArrays
@@ -19,12 +20,6 @@ from trefftz.numpy_types import float_array, complex_array
 # from trefftz.numpy_types import float_array
 
 
-class Region(IntEnum):
-    OMEGA = 0
-    GAMMA = 1
-    # SIGMA_L = 3
-    # SIGMA_R = 4
-    SIGMA = 2
 
 
 # class FluxType(IntEnum):  # should go in flux types or in fluxes
@@ -32,6 +27,15 @@ class Region(IntEnum):
 #     SOUNDHARD = 1
 #     SOUNDSOFT = 2
 #     RADIATION = 3
+
+
+class WaveguideDomain(Domain):
+    def __init__(self, mesh: "TrefftzMesh", regions: Region, R: float = 5., H: float = 1.):
+        self.R = R
+        self.H = H
+        self.mesh = mesh
+        self.regions = regions
+
 
 
 
@@ -223,18 +227,17 @@ class Scatterer:
 #                 print('Problem ready for assembly')
 #             self.domain.ready_for_assemble = True
 
-
 class Waveguide(Problem):
     def __init__(self, mesh: TrefftzMesh,
                  boundary_conditions_map: dict[Region, FluxType],
-                 verbose: bool = False,
+                 k: float, verbose: bool = False,
                  R: float = 5., H: float = 1.):
         self.R = R
         self.H = H
-        super().__init__(mesh, boundary_conditions_map, verbose)
+        super().__init__(mesh=mesh, boundary_conditions_map=boundary_conditions_map, verbose=verbose, k=k)
 
     @classmethod
-    def CreateClean(cls, H: float = 1., R: float = 5., lc: float = 0.3,
+    def CreateClean(cls, k: float, H: float = 1., R: float = 5., lc: float = 0.3,
                     scatterers: Optional[tuple[Scatterer]] = None, verbose: bool = False):
 
         gmsh.initialize()
@@ -272,7 +275,7 @@ class Waveguide(Problem):
             Region.SIGMA: FluxType.RADIATING
         }
 
-        return cls(mesh=mesh, boundary_conditions_map=boundary_conditions_map, verbose=verbose, R=R, H=H)
+        return cls(mesh=mesh, boundary_conditions_map=boundary_conditions_map, verbose=verbose, R=R, H=H, k=k)
 
         # self._regions = Region
     
@@ -325,12 +328,52 @@ class Waveguide(Problem):
         ax.axis('equal')
         plt.show()
 
-    def plot_mode(self, n: int, k: float):
-        self.plot_field(self.mode(n, k), N=400, real_part=True)
+    def plot_mode(self, n: int):
+        self.plot_field(self.mode(n), N=400, real_part=True)
 
-    def mode(self, n: int, k: float) -> Callable[[float_array, float_array], complex_array]:
-        return Mode(n=n, k=k, H=self.H, R=self.R)
+    def mode(self, n: int) -> Callable[[float_array, float_array], complex_array]:
+        return Mode(n=n, k=self.k, H=self.H, R=self.R)
 
+    
+def CleanWaveguide(k: float, H: float = 1., R: float = 5., lc: float = 0.3,
+                scatterers: Optional[tuple[Scatterer]] = None, verbose: bool = False):
+
+    gmsh.initialize()
+    gmsh.option.setNumber("General.Terminal", int(verbose))
+    gmsh.model.add("Waveguide")
+    p0 = gmsh.model.geo.addPoint(-R, 0., 0., lc)
+    p1 = gmsh.model.geo.addPoint( R, 0., 0., lc)
+    p2 = gmsh.model.geo.addPoint( R,  H, 0., lc)
+    p3 = gmsh.model.geo.addPoint(-R,  H, 0., lc)
+
+    bottom = gmsh.model.geo.addLine(p0, p1)
+    right  = gmsh.model.geo.addLine(p1, p2)
+    top    = gmsh.model.geo.addLine(p2, p3)
+    left   = gmsh.model.geo.addLine(p3, p0)
+
+    boundary = gmsh.model.geo.addCurveLoop([bottom, right, top, left])
+    domain = gmsh.model.geo.addPlaneSurface([boundary])
+    gmsh.model.geo.synchronize()
+
+    gmsh.model.addPhysicalGroup(2, [domain], Region.OMEGA, "Omega")
+    gmsh.model.addPhysicalGroup(1, [bottom, top], Region.GAMMA, "Gamma")
+    gmsh.model.addPhysicalGroup(1, [left, right], Region.SIGMA, "Sigma")
+    
+    gmsh.model.geo.synchronize()
+    gmsh.model.mesh.generate(2)
+    # gmsh.write('CleanWaveguide.msh')
+    # self._domain = TrefftzMesh.from_gmsh('CleanWaveguide.msh')
+    points, edges, triangles, edges2triangles, locator, cell_sets = GmshArrays(gmsh.model)
+    gmsh.finalize()
+
+    mesh = TrefftzMesh(points, edges, triangles, edges2triangles, locator, cell_sets)
+
+    boundary_conditions_map = {
+        Region.GAMMA: FluxType.SOUNDHARD,
+        Region.SIGMA: FluxType.RADIATING
+    }
+
+    return Waveguide(mesh=mesh, boundary_conditions_map=boundary_conditions_map, verbose=verbose, R=R, H=H, k=k)
 
 
 
