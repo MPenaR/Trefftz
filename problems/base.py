@@ -2,8 +2,10 @@
 from typing import TYPE_CHECKING, Optional, Callable, TypeVar, Generic
 
 if TYPE_CHECKING:
-    from trefftz.mesh import TrefftzMesh
     from trefftz.dg.functions import ComplexFunction  # consider changing it to "field"
+
+from trefftz.mesh import TrefftzMesh
+
 
 from trefftz.numpy_types import float_array, complex_array
 from trefftz.dg.fluxes import FluxType
@@ -12,29 +14,30 @@ from trefftz.dg.basis import TrefftzBasis
 from enum import IntEnum
 from abc import abstractmethod
 import numpy as np
+from typing import Protocol
+
+R = TypeVar("R", bound=IntEnum)
 
 
-# class Region(IntEnum):
-#     pass
+class Domain(Protocol[R]):
+    mesh: TrefftzMesh
+    regions: type[R]
 
-
-class Domain:
-    def __init__(self, mesh: "TrefftzMesh", regions: IntEnum):
+    def __init__(self, mesh: TrefftzMesh):
         self.mesh = mesh
-        self.regions = regions
     
-    @abstractmethod
-    def generate_Trefftzmesh(self):
-        """Produce TrefftzMesh."""
+    # @abstractmethod
+    # def generate_Trefftzmesh(self):
+    #     """Produce TrefftzMesh."""
 
 
-D = TypeVar("D", bound=Domain)
+D = TypeVar("D")
 
 
-class Problem(Generic[D]):
+class Problem:
     '''Class which manages defining domains and setting boundary conditions'''
 
-    def __init__(self, mesh: "TrefftzMesh", boundary_conditions_map: Optional[dict[Region, FluxType]] | None,
+    def __init__(self, mesh: "TrefftzMesh", boundary_conditions_map: Optional[dict[IntEnum, FluxType]] | None,
                   k: float, verbose: bool = False):
         self.domain = mesh
         self.verbose = verbose
@@ -50,7 +53,7 @@ class Problem(Generic[D]):
     def generate_Trefftzmesh(self):
         """Produce TrefftzMesh."""
 
-    def set_boundary_conditions(self, boundary_conditions_map: dict[Region, FluxType]):
+    def set_boundary_conditions(self, boundary_conditions_map: dict[IntEnum, FluxType]):
         self.boundary_conditions_map = boundary_conditions_map
         """Assign BCs into BoundaryConditionModel."""
         for region, flux in boundary_conditions_map.items():
@@ -74,16 +77,30 @@ class Problem(Generic[D]):
 
 
 class PhysicalModel:
+    def __init__(self, domain: Domain, boundary_conditions, materials):
+        self.domain = domain
+        self.boundary_conditions = boundary_conditions
+        self.materials = materials
     pass
 
 
-class Problem2(Generic[D]):
+class AbstractProblem(Generic[D, R]):
     '''Class which manages defining domains and setting boundary conditions'''
+    domain: D
+    physics: PhysicalModel
+    verbose: bool
+    regions: R
+    basis: TrefftzBasis
+    k: float
 
-    def __init__(self, domain: D, physics: PhysicalModel, basis: TrefftzBasis, verbose: bool = False):
+
+    def __init__(self, domain: D, model: PhysicalModel, basis: TrefftzBasis, regions: R, k: float, verbose: bool = False):
         self.domain = domain
+        self.physics = model  # model(domain,k, materials: dict)
         self.verbose = verbose
+        self.regions = regions
         self.basis = basis
+        self.k = k
 
     @abstractmethod
     def plot(self, figsize: Optional[tuple[int, int]] = (16, 2), line_width: Optional[int] = 1):

@@ -12,11 +12,11 @@ class TrefftzBasis:
         self.N_theta = N_theta
         self.k = k
 
-        self.N_triangles = mesh.n_triangles
-        self._N_DOF = self.N_triangles * self.N_theta
+        self.N_cells = mesh.n_triangles
+        self._N_DOF = self.N_cells * self.N_theta
 
         # global numbering: triangle-major order
-        self.T_ID_to_DOFs = np.arange(0, self.N_DOF, dtype=np.int64).reshape(self.N_triangles, self.N_theta)
+        self.T_ID_to_DOFs = np.arange(0, self.N_DOF, dtype=np.int64).reshape(self.N_cells, self.N_theta)
 
         # plane-wave directions
         thetas = np.linspace(0, 2*np.pi, N_theta, endpoint=False)

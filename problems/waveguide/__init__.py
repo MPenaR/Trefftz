@@ -1,5 +1,5 @@
 #from .geometries import CleanWaveGuide
-from .plot import plot_waveguide
-from .base import Waveguide, CleanWaveguide
+from .base import WaveguideProblem, Clean  #, Waveguide, CleanWaveguide
 
-__all__ =["CleanWaveguide", "plot_waveguide", "Waveguide"]
+__all__ =["WaveguideProblem", "Clean"]
+# __all__ =["CleanWaveguide", "plot_waveguide", "Waveguide"]

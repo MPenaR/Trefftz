@@ -2,12 +2,13 @@
 from trefftz.dg.basis import TrefftzBasis
 from typing import Any, TYPE_CHECKING
 from numpy.typing import DTypeLike
-
+from trefftz.dg.basis2 import TrefftzBasis
 if TYPE_CHECKING:
     from trefftz.mesh import TrefftzMesh
 
 from trefftz.numpy_types import complex_array, float_array
 import numpy as np
+
 
 class ComplexFunction:
     def __init__(self, domain: "TrefftzMesh",  N_theta: int, k: float) -> None:
@@ -40,8 +41,9 @@ class ComplexFunction:
 class TrefftzFunction:
     '''Numerical function belonging to the finite dimensiona broken Trefftz space'''
 
-    def __init__(self, basis: TrefftzBasis, dtype: DTypeLike = np.complex128):
+    def __init__(self, domain, basis: TrefftzBasis, dtype: DTypeLike = np.complex128):
         self.basis = basis
+        self.domain = domain
         self.coefficients = np.zeros(basis.N_DOF, dtype=dtype)
 
     def set(self, coefficients):
@@ -53,7 +55,7 @@ class TrefftzFunction:
         y = np.asarray(y)
         XY = np.column_stack([x, y])
 
-        T_IDs = self.basis.mesh.get_cell(XY)
+        T_IDs = self.domain.mesh.get_cell(XY)
         DOFs = self.basis.T_ID_to_DOFs[T_IDs, :]  # shape (Npts, Ntheta)
 
         # evaluate plane-wave basis at points

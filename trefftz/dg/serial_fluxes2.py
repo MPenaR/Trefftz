@@ -22,16 +22,7 @@ from typing import Mapping
 #     n: float
 
 
-@dataclass
-class Edge:
-    M: np.ndarray[tuple[int], np.dtype[np.floating]]
-    l: float
-    N: np.ndarray[tuple[int], np.dtype[np.floating]]
-    T: np.ndarray[tuple[int], np.dtype[np.floating]]
-
-
-
-def SoundHard(phi, psi, k: float, edge: Edge, d_1: float = 0.5) -> complex:
+def SoundHard(d_m, d_n, k: float, edge, flux_parameters: Mapping[str, float] = {"d_1": 0.5}) -> complex:
     r"""
     Computes the flux on a sound-hard boundary, that is:
 
@@ -65,22 +56,20 @@ def SoundHard(phi, psi, k: float, edge: Edge, d_1: float = 0.5) -> complex:
         The integral.
     
     """
-
-    d_m = psi.d
-    d_n = phi.d
     
-    M = edge.M
-    l = edge.l
-    N = edge.N
-    T = edge.T
+    M = edge["M"]
+    l = edge["l"]
+    N = edge["N"]
+    T = edge["T"]
+
+    d_1 = flux_parameters["d_1"]
 
     return -1j*k*l*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*exp(1j*k*dot(d_n - d_m, M)) * sinc(k*l/(2*pi)*dot(d_n-d_m, T))
     
 
 
 
-
-def Inner(phi, psi, edge : Edge, k : float, stabilizing_parameters: Mapping[str, float]) -> complex:
+def InnerEasy(d_m, d_n, k: float, edge, flux_parameters: Mapping[str, float] = {"a": 0.5, "b": 0.5}) -> complex:
     r"""
     Computes the flux on a inner facet with respect to the degrees
     of freedom from the same cell, that is:
@@ -110,28 +99,73 @@ def Inner(phi, psi, edge : Edge, k : float, stabilizing_parameters: Mapping[str,
 
 
     """
-    a = stabilizing_parameters.get("a", 0.5)
-    b = stabilizing_parameters.get("b", 0.5)
-    
 
-    d_m = psi.d
-    d_n = phi.d
+    k_m = k_n = k
 
-    k_n = k * sqrt(phi.n)
-    k_m = k * sqrt(psi.n)
+    a = flux_parameters["a"]
+    b = flux_parameters["b"]
 
     
-    M = edge.M
-    N = edge.N
-    T = edge.T
-    l = edge.l
+    M = edge["M"]
+    l = edge["l"]
+    N = edge["N"]
+    T = edge["T"]
 
     # I = -1j*l/2*(2*a*k + k_n*dot(d_n, N) + k_m*dot(d_m, N) + 2*b/k*k_n*dot(d_n, N)*k_m*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
     return -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
 
 
 
-def Radiating_local(phi, psi, k : float, edge : Edge, d_2 : float) -> complex:
+
+# def Inner(d_m, d_n, k: float, edge, flux_parameters: Mapping[str, float] = {"a": 0.5, "b": 0.5}) -> complex:
+#     r"""
+#     Computes the flux on a inner facet with respect to the degrees
+#     of freedom from the same cell, that is:
+    
+#     .. math::
+#         \int_E \left(\left(\varphi_n(\mathbf{x})+\frac{b}{ik}\nabla\varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla\psi_m(\mathbf{x})\cdot\mathbf{n}}- \left(\vphantom{\frac{1}{2}}aik\varphi_n(\mathbf{x})+\nabla\varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\psi_m(\mathbf{x})}\right) \,\mathrm{d}S_\mathbf{x}    
+
+#     Parameters
+#     ----------
+#     phi : Function
+#         Trial function.
+#     psi : Function
+#         Test function.
+#     k : float
+#         Wavenumber.
+#     edge : Edge
+#         Edge parameters.
+#     a : float
+#         Stabilyzing parameter.
+#     b : float
+#         Stabilyzing parameter.
+
+#     Returns
+#     -------
+#     I : complex
+#         The integral.
+
+
+#     """
+
+#     k_n = k * sqrt(phi.n)
+#     k_m = k * sqrt(psi.n)
+
+
+#     a = flux_parameters["a"]
+#     b = flux_parameters["b"]
+
+    
+#     M = edge["M"]
+#     l = edge["l"]
+#     N = edge["N"]
+#     T = edge["T"]
+
+#     # I = -1j*l/2*(2*a*k + k_n*dot(d_n, N) + k_m*dot(d_m, N) + 2*b/k*k_n*dot(d_n, N)*k_m*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
+#     return -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
+
+
+def Radiating_local(d_m, d_n, k: float, edge, flux_parameters: Mapping[str, float] = {"d_2": 0.5}) -> complex:
     r"""
     Computes the flux on a radiating boundary with respect to the degrees
     of freedom from the same cell, that is:
@@ -167,15 +201,12 @@ def Radiating_local(phi, psi, k : float, edge : Edge, d_2 : float) -> complex:
         The integral.
     
     """
+    d_2 = flux_parameters["d_2"]
 
-    d_n = phi.d
-    d_m = psi.d
-
-    l = edge.l
-    M = edge.M
-    N = edge.N
-    T = edge.T
-
+    M = edge["M"]
+    l = edge["l"]
+    N = edge["N"]
+    T = edge["T"]
 
     return -1j*k*l*(d_2 + dot(d_n, N))*exp(1j*k*dot(d_n - d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
 
@@ -245,6 +276,25 @@ def Radiating_local(phi, psi, k : float, edge : Edge, d_2 : float) -> complex:
 
 #     return  I1 + I2 + I3
 
+def mode_RHS(d_m, edge, k, H, d_2, t):
+    d = d_m
+    d_y = d[1]
+    N = edge["N"]
+    M = edge["M"]
+    l = edge["l"]
 
 
+    beta = np.emath.sqrt(complex(k**2 - (t*pi/H)**2))
 
+    F = 1j*k*l*exp(1j*beta*M[0])*exp(-1j*k*dot(d, M))*(dot(d, N) - d_2)*(exp( 1j*pi*t/H*M[1])*sinc(t*l/(2*H) - k*l*d_y/(2*pi)) + 
+                                                                         exp(-1j*pi*t/H*M[1])*sinc(t*l/(2*H) + k*l*d_y/(2*pi)))
+
+    if t == 0:
+        S = 2j*k*l*dot(d, N)*d_2*exp(1j*(beta*M[0]-k*dot(d, M)))*sinc(k*l/(2*pi)*d[1])
+
+    else:
+        S = 1j*k*l*dot(d, N)*d_2*exp(1j*(beta*M[0]-k*dot(d, M))) * (k/conj(sqrt(complex(k**2 - (t*pi/H)**2))) *
+                                                                        (exp( 1j*t*pi*M[1]/H)*sinc(t*l/(2*H) - k*l*d[1]/(2*pi)) + 
+                                                                         exp(-1j*t*pi*M[1]/H)*sinc(t*l/(2*H) + k*l*d[1]/(2*pi))))
+ 
+    return F + S
