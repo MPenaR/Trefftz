@@ -2,7 +2,7 @@
 from trefftz.dg.basis2 import TrefftzBasis
 from trefftz.numpy_types import complex_array
 from .base import WaveguideRegions
-from trefftz.dg.serial_fluxes2 import SoundHard, InnerEasy, Radiating_local, mode_RHS
+from trefftz.dg.serial_fluxes2 import SoundHard, InnerEasy, Radiating_local, mode_RHS, Radiating_nonlocal
 #from scipy.sparse import coo_matrix, csr_matrix, spmatrix
 from trefftz.dg.fluxes import FluxType
 from scipy.sparse import coo_array, csr_array, sparray
@@ -62,7 +62,6 @@ def SerialAssemble(edges, basis: TrefftzBasis, NtD_modes: int) -> tuple[sparray,
                         flux_function = helmholtz_fluxes[flux_type]
                         params = flux_parameters[flux_type]
                         V.append(flux_function(d_m=d_m, d_n=d_n, k=k, edge=edge, flux_parameters=params))
-                        # V.append(SoundHard(d_m=d_m, d_n=d_n, k=k, edge=edge, d_1=d_1))
 
             case WaveguideRegions.SIGMA_L | WaveguideRegions.SIGMA_R:
                 flux_type = boundary_conditions[edge["region"]]
@@ -76,7 +75,6 @@ def SerialAssemble(edges, basis: TrefftzBasis, NtD_modes: int) -> tuple[sparray,
                         flux_function = helmholtz_fluxes[flux_type]
                         params = flux_parameters[flux_type]
                         V.append(flux_function(d_m=d_m, d_n=d_n, k=k, edge=edge, flux_parameters=params))
-                        # V.append(Radiating_local(d_m=d_m, d_n=d_n, k=k, E=edge, d_2=d_2))
 
 # TRANSMISSION
 
@@ -123,6 +121,20 @@ def SerialAssemble(edges, basis: TrefftzBasis, NtD_modes: int) -> tuple[sparray,
 
 
 # NON LOCAL
+    for edge_u in edges[np.where(edges["region"]==WaveguideRegions.SIGMA_L)[0]]:
+            flux_type = boundary_conditions[edge_u["region"]]
+            T_u, _ = edge_u["triangles"]
+            for n in basis.dofs_on_element(T_u):
+                d_n = basis.global_direction(n)
+                for edge_v in edges[np.where(edges["region"]==WaveguideRegions.SIGMA_L)[0]]:
+                    T_v, _ = edge_v["triangles"]
+                    for m in basis.dofs_on_element(T_v):
+                        d_m = basis.global_direction(m)
+                        I.append(m)
+                        J.append(n)
+                        params = flux_parameters[flux_type]
+                        V.append(Radiating_nonlocal(d_m=d_m, d_n=d_n, edge_v=edge_v, edge_u=edge_u, k=k, NtD_modes=NtD_modes, flux_parameters=params))
+
 
                 # for n in basis.dofs_on_element(T):
                 #     d_n = basis.global_direction(n)

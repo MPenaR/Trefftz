@@ -211,70 +211,76 @@ def Radiating_local(d_m, d_n, k: float, edge, flux_parameters: Mapping[str, floa
     return -1j*k*l*(d_2 + dot(d_n, N))*exp(1j*k*dot(d_n - d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
 
 
-# def Radiating_nonlocal(phi : Function, psi : Function, k : float, edge_u : Edge, edge_v : Edge, d_2 : float, N_modes : int, H : float) -> complex:
-#     r"""
-#     Computes the flux on a radiating boundary with respect to the degrees
-#     of freedom from another cell, that is:
+def Radiating_nonlocal(d_n, d_m, k : float, edge_u, edge_v,
+                       NtD_modes: int, H: float = 1.0, flux_parameters: Mapping[str, float] = {"d_2": 0.5}) -> complex:
+    r"""
+    Computes the flux on a radiating boundary with respect to the degrees
+    of freedom from another cell, that is:
 
-#     TODO: it is assuming that the radiating boundary consists of a vertical segment. This should be easy to generalize.
+    TODO: it is assuming that the radiating boundary consists of a vertical segment. This should be easy to generalize.
     
-#     Parameters
-#     ----------
-#     phi : Function
-#         Trial function.
-#     psi : Function
-#         Test function.
-#     k : float
-#         Wave number.
-#     edge_u : Edge
-#         Edge of the triangle associated to the trial function.
-#     edge_v : Edge
-#         Edge of the triangle associated to the test function.
-#     d_2 : float
-#         Stabilyzing parameter.
-#     N_modes : int
-#         Number of modes for the approximation of the NtD map.
-#     H : float
-#         height of the waveguide. 
+    Parameters
+    ----------
+    phi : Function
+        Trial function.
+    psi : Function
+        Test function.
+    k : float
+        Wave number.
+    edge_u : Edge
+        Edge of the triangle associated to the trial function.
+    edge_v : Edge
+        Edge of the triangle associated to the test function.
+    d_2 : float
+        Stabilyzing parameter.
+    NtD_modes : int
+        Number of modes for the approximation of the NtD map.
+    H : float
+        height of the waveguide. 
 
-#     Returns
-#     -------
-#     I : complex
-#         The integral.
+    Returns
+    -------
+    I : complex
+        The integral.
 
     
-#     """
-#     d_n = phi.d
-#     d_m = psi.d
-     
-#     l_u = edge_u.l
-#     M_u = edge_u.M
-#     l_v = edge_v.l
-#     M_v = edge_v.M
+    """
+
+    d_2 = flux_parameters["d_2"]
+
+    M_u = edge_u["M"]
+    l_u = edge_u["l"]
+    # N = edge["N"]
+    # T = edge["T"]
+
+    M_v = edge_v["M"]
+    l_v = edge_v["l"]
+    # N = edge["N"]
+    # T = edge["T"]
 
 
-#     N = edge_u.N
-#     T = edge_u.T
+    N = edge_u["N"]
+    T = edge_u["T"]
 
-#     I1 = -1j*k*H*dot(d_n,N)*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
-#         sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k**2 / abs(sqrt(complex(k**2 - (s*pi/H)**2)))**2 * (
-#         exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
-#         exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
-#         for s in range(1,N_modes)]) )
+    I1 = -1j*k*H*dot(d_n,N)*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
+        sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k**2 / abs(sqrt(complex(k**2 - (s*pi/H)**2)))**2 * (
+        exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
+        exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
+        for s in range(1,NtD_modes)]) )
     
-#     I2 = -1j*k*H*dot(d_n,N)*(dot(d_m,N)-d_2)*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
-#         sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / sqrt(complex(k**2 - (s*pi/H)**2)) * (
-#         exp( 1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
-#         exp(-1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
-#         for s in range(1,N_modes)]) )
+    I2 = -1j*k*H*dot(d_n,N)*(dot(d_m,N)-d_2)*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
+        sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / sqrt(complex(k**2 - (s*pi/H)**2)) * (
+        exp( 1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
+        exp(-1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
+        for s in range(1,NtD_modes)]) )
     
-#     I3 = 1j*k*H*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
-#         sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / conj(sqrt(complex(k**2 - (s*pi/H)**2))) * (
-#         exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
-#         exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
-#         for s in range(1,N_modes)]) )
+    I3 = 1j*k*H*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
+        sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / conj(sqrt(complex(k**2 - (s*pi/H)**2))) * (
+        exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
+        exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
+        for s in range(1,NtD_modes)]) )
 
-#     return  I1 + I2 + I3
+    return  I1 + I2 + I3
 
 def mode_RHS(d_m, edge, k, H, d_2, t):
     d = d_m
