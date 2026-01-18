@@ -296,6 +296,9 @@
 </section>
 <section id="transmission-condition-inner-edge">
 <h2>Transmission condition (inner edge)<a class="headerlink" href="#transmission-condition-inner-edge" title="Link to this heading">¶</a></h2>
+<p>for implementation reasons, the fluxes <em>allways</em> depend on two edges and two triangles. For the transmision conditions, both edges are the same, and the two triangles are one of the for ordered pairs: <span class="math notranslate nohighlight">\((T^+,T^+)\)</span>, <span class="math notranslate nohighlight">\((T^+,T^-)\)</span>, <span class="math notranslate nohighlight">\((T^-,T^+)\)</span> and <span class="math notranslate nohighlight">\((T^-,T^-)\)</span>.</p>
+<p>For SoundHard boundary conditions both edges are the same and both triangles are the same, hence <span class="math notranslate nohighlight">\((T^+,T^+)\)</span>.</p>
+<p>Finally, for the Neumann-to-Dirichlet map we have what is refered as a non-local operator. This means that not only both triangles are, in general, different, but also both edges can be different (as long as they belong to the same radiating boundary).</p>
 </section>
 </section>
 

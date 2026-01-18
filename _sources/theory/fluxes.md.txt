@@ -68,3 +68,15 @@ The product with $\mathbf{n}$ or $\mathbf{M}$ is computed along the last axis an
 
 ## Transmission condition (inner edge)
 
+
+
+
+
+
+
+
+for implementation reasons, the fluxes _allways_ depend on two edges and two triangles. For the transmision conditions, both edges are the same, and the two triangles are one of the for ordered pairs: $(T^+,T^+)$, $(T^+,T^-)$, $(T^-,T^+)$ and $(T^-,T^-)$. 
+
+For SoundHard boundary conditions both edges are the same and both triangles are the same, hence $(T^+,T^+)$. 
+
+Finally, for the Neumann-to-Dirichlet map we have what is refered as a non-local operator. This means that not only both triangles are, in general, different, but also both edges can be different (as long as they belong to the same radiating boundary).
