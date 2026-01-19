@@ -1,7 +1,7 @@
 '''Module for defining a waveguide class, as it will be, I think, the most usefull'''
 from trefftz.mesh import TrefftzMesh, EdgeType
 # from trefftz.mesh.from_pygmsh import Mesh_from_meshio
-from typing import Optional, Callable, Any
+from typing import Optional, Callable, Any, Mapping
 # from pygmsh.geo import Geometry
 import matplotlib.pyplot as plt
 import numpy as np
@@ -500,6 +500,8 @@ class WaveguideProblem:
         self.k = k 
         self.NtD_modes = NtD_modes
         self.assembler = assembler
+        self.boundary_conditions = None
+
     
 
     def plot(self, figsize: Optional[tuple[int, int]] = (16, 2), line_width: Optional[int] = 1):
@@ -551,6 +553,10 @@ class WaveguideProblem:
         ax.axis('off')
         plt.show()
 
+    def set_boundary_conditions(self, boundary_conditions= Mapping[WaveguideRegions, FluxType]):
+        self.boundary_conditions = boundary_conditions
+
+
     def plot_field(self, u: Callable[[float_array, float_array], complex_array],
                    N: int = 100, figsize: Optional[tuple[int, int]] = (16, 2), real_part: bool = False):
         x = np.linspace(-self.domain.R, self.domain.R, N)
@@ -574,7 +580,10 @@ class WaveguideProblem:
         return WaveguideMode(n=n, k=self.k, H=self.domain.H, R=self.domain.R)
 
     def assemble(self):
-        self.A, self.b = SerialAssemble(self.domain.mesh.edges, basis=self.basis, NtD_modes=self.NtD_modes)
+        if self.boundary_conditions is None:
+            print('no boundary conditions specified, use .set_boundary_conditions')
+            return
+        self.A, self.b = SerialAssemble(self.domain.mesh.edges, basis=self.basis, NtD_modes=self.NtD_modes, boundary_conditions=self.boundary_conditions)
 
     def solve(self):  #it should create a TrefftzFunction
         dofs = spsolve(self.A, self.b)

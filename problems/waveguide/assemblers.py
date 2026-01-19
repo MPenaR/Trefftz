@@ -7,6 +7,7 @@ from trefftz.dg.serial_fluxes2 import SoundHard, InnerEasy, Radiating_local, mod
 from trefftz.dg.fluxes import FluxType
 from scipy.sparse import coo_array, csr_array, sparray
 import numpy as np
+from typing import Mapping
 
 
 d_1 = 0.5
@@ -15,11 +16,6 @@ a = 0.5
 b = 0.5
 
 
-boundary_conditions = {
-    WaveguideRegions.GAMMA: FluxType.SOUNDHARD,
-    WaveguideRegions.SIGMA_L: FluxType.RADIATING,
-    WaveguideRegions.SIGMA_R: FluxType.RADIATING
-}
 
 helmholtz_fluxes = {
     FluxType.SOUNDHARD: SoundHard,
@@ -35,10 +31,7 @@ flux_parameters = {
 }
 
 
-######### IT SHOULD CHANGE TO SPARSE ARRAYS, NOT MATRIX
-#########
-
-def SerialAssemble(edges, basis: TrefftzBasis, NtD_modes: int) -> tuple[sparray, sparray]:
+def SerialAssemble(edges, basis: TrefftzBasis, NtD_modes: int, boundary_conditions: Mapping[WaveguideRegions, FluxType]) -> tuple[sparray, sparray]:
     N_DOF = basis.N_DOF
     I = []
     J = []
