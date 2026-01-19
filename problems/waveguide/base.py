@@ -24,7 +24,7 @@ from enum import IntEnum
 from trefftz.dg.basis2 import TrefftzBasis
 from trefftz.dg.functions import TrefftzFunction
 from scipy.sparse.linalg import spsolve
-
+from .RHS_types import RSH_type
 
 class WaveguideRegions(IntEnum):
     OMEGA = 0
@@ -40,7 +40,10 @@ class WaveguideRegions(IntEnum):
 #     RADIATION = 3
 
 from trefftz.mesh.core import EdgeType
-from .assemblers import SerialAssemble
+from .assemblers import SerialAssembleMatrix, SerialAssembleRHS
+
+
+
 
 class WaveguideDomain(Domain[WaveguideRegions]):
     regions = WaveguideRegions
@@ -579,13 +582,26 @@ class WaveguideProblem:
     def mode(self, n: int) -> Callable[[float_array, float_array], complex_array]:
         return WaveguideMode(n=n, k=self.k, H=self.domain.H, R=self.domain.R)
 
-    def assemble(self):
+    def assembleMatrix(self):
         if self.boundary_conditions is None:
             print('no boundary conditions specified, use .set_boundary_conditions')
             return
-        self.A, self.b = SerialAssemble(self.domain.mesh.edges, basis=self.basis, NtD_modes=self.NtD_modes, boundary_conditions=self.boundary_conditions)
+        self.A = SerialAssembleMatrix(self.domain.mesh.edges, basis=self.basis,
+                                      NtD_modes=self.NtD_modes, boundary_conditions=self.boundary_conditions)
 
-    def solve(self):  #it should create a TrefftzFunction
+    def assembleRHS(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):
+        self.b = SerialAssembleRHS(self.domain.mesh.edges, basis=self.basis,
+                                         NtD_modes=self.NtD_modes, RHS=RHS, RHS_params=RHS_params) ## THE RHS WILL NEED THE BOUNDARY CONDITIONS
+
+
+    def assemble(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):
+        if self.boundary_conditions is None:
+            print('no boundary conditions specified, use .set_boundary_conditions')
+            return
+        self.assembleMatrix()
+        self.assembleRHS(RHS=RHS, RHS_params=RHS_params)
+
+    def solve(self):
         dofs = spsolve(self.A, self.b)
         u = TrefftzFunction(domain=self.domain, basis=self.basis, dtype=np.complex128)
         u.set(coefficients=dofs)

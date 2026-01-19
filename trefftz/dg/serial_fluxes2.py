@@ -290,7 +290,7 @@ def mode_RHS(d_m, edge, k, H, d_2, t):
     l = edge["l"]
 
 
-    beta = np.emath.sqrt(complex(k**2 - (t*pi/H)**2))
+    beta = np.emath.sqrt(k**2 - (t*pi/H)**2)
 
     F = 1j*k*l*exp(1j*beta*M[0])*exp(-1j*k*dot(d, M))*(dot(d, N) - d_2)*(exp( 1j*pi*t/H*M[1])*sinc(t*l/(2*H) - k*l*d_y/(2*pi)) + 
                                                                          exp(-1j*pi*t/H*M[1])*sinc(t*l/(2*H) + k*l*d_y/(2*pi)))
@@ -299,7 +299,7 @@ def mode_RHS(d_m, edge, k, H, d_2, t):
         S = 2j*k*l*dot(d, N)*d_2*exp(1j*(beta*M[0]-k*dot(d, M)))*sinc(k*l/(2*pi)*d[1])
 
     else:
-        S = 1j*k*l*dot(d, N)*d_2*exp(1j*(beta*M[0]-k*dot(d, M))) * (k/conj(sqrt(complex(k**2 - (t*pi/H)**2))) *
+        S = 1j*k*l*dot(d, N)*d_2*exp(1j*(beta*M[0]-k*dot(d, M))) * (k/conj(beta) *
                                                                         (exp( 1j*t*pi*M[1]/H)*sinc(t*l/(2*H) - k*l*d[1]/(2*pi)) + 
                                                                          exp(-1j*t*pi*M[1]/H)*sinc(t*l/(2*H) + k*l*d[1]/(2*pi))))
  

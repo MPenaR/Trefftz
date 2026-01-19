@@ -9,6 +9,7 @@ from scipy.sparse import coo_array, csr_array, sparray
 import numpy as np
 from typing import Mapping
 
+from .RHS_types import RSH_type
 
 d_1 = 0.5
 d_2 = 0.5
@@ -31,7 +32,7 @@ flux_parameters = {
 }
 
 
-def SerialAssemble(edges, basis: TrefftzBasis, NtD_modes: int, boundary_conditions: Mapping[WaveguideRegions, FluxType]) -> tuple[sparray, sparray]:
+def SerialAssembleMatrix(edges, basis: TrefftzBasis, NtD_modes: int, boundary_conditions: Mapping[WaveguideRegions, FluxType]) -> sparray:
     N_DOF = basis.N_DOF
     I = []
     J = []
@@ -129,73 +130,32 @@ def SerialAssemble(edges, basis: TrefftzBasis, NtD_modes: int, boundary_conditio
                         V.append(Radiating_nonlocal(d_m=d_m, d_n=d_n, edge_v=edge_v, edge_u=edge_u, k=k, NtD_modes=NtD_modes, flux_parameters=params))
 
 
-                # for n in basis.dofs_on_element(T):
-                #     d_n = basis.global_direction(n)
-                #     for E in edges[np.where(edges["region"] == edge["region"])[0]]:
-                #         K = E["triangles"][0]
-                #         for m in basis.dofs_on_element[K]:
-                #             d_m = basis.global_direction(m)
-                #             I.append(n)
-                #             J.append(n)
-                #             V.append(Sigma_nonlocal(phi, psi, E, E_other, k, H, d_2, Np=Np))   # coo is intended for assembly so automaticall sums
-
-            # case WaveguideRegions.SIGMA_L:
-            #     T = edge["triangles"][0]
-            #     for m in basis.dofs_on_element(T):
-            #         d_m = basis.global_direction(m)
-            #         for n in basis.dofs_on_element(T):
-            #             d_n = basis.global_direction(n)
-            #             I.append(m)
-            #             J.append(n)
-            #             V.append(Radiating_local(d_m=d_m, d_n=d_n, k, E, d_2))
-
-            #     for n in basis.dofs_on_element(T):
-            #         d_n = basis.global_direction(n)
-            #         for E in edges[np.where(edges["region"] == edge["region"])[0]]:
-            #             K = E["triangles"][0]
-            #             for m in basis.dofs_on_element[K]:
-            #                 d_m = basis.global_direction(m)
-            #                 I.append(n)
-            #                 J.append(n)
-            #                 V.append(Sigma_nonlocal(phi, psi, E, E_other, k, H, d_2, Np=Np))   # coo is intended for assembly so automaticall sums
-
-            # case WaveguideRegions.SIGMA_R:
-            #     T = edge["triangles"][0]
-            #     for m in basis.dofs_on_element(T):
-            #         d_m = basis.global_direction(m)
-            #         for n in basis.dofs_on_element(T):
-            #             d_n = basis.global_direction(n)
-            #             I.append(m)
-            #             J.append(n)
-            #             V.append(Radiating_local(d_m=d_m, d_n=d_n, k, E, d_2))
-
-            #     for n in basis.dofs_on_element(T):
-            #         d_n = basis.global_direction(n)
-            #         for E in edges[np.where(edges["region"] == edge["region"])[0]]:
-            #             K = E["triangles"][0]
-            #             for m in basis.dofs_on_element[K]:
-            #                 d_m = basis.global_direction(m)
-            #                 I.append(n)
-            #                 J.append(n)
-            #                 V.append(Sigma_nonlocal(phi, psi, E, E_other, k, H, d_2, Np=Np))   # coo is intended for assembly so automaticall sums
-
-
     A = csr_array(coo_array((V, (I, J)), shape=(N_DOF, N_DOF)))
 
-    # testing for mode, it that doesnt' work then apaga y vámonos
+    return A
+
+def SerialAssembleRHS(edges, basis: TrefftzBasis, NtD_modes: int, RHS: RSH_type, RHS_params: Mapping[str, int | float]) ->sparray:
+    N_DOF = basis.N_DOF
     I = []
+    J = []
     V = []
-    for edge in edges[np.where(edges["region"]==WaveguideRegions.SIGMA_L)[0]]:
-        T, _ = edge["triangles"]
-        for m in basis.dofs_on_element(T):
-            d_m = basis.global_direction(m)
-            I.append(m)
-            V.append(mode_RHS(d_m=d_m, edge=edge, k=k, H=1., d_2=0.5, t=1))
+    k = basis.k
+
+    match RHS:
+        case RSH_type.MODE:
+            t = RHS_params["t"]
+            I = []
+            V = []
+            for edge in edges[np.where(edges["region"]==WaveguideRegions.SIGMA_L)[0]]:
+                T, _ = edge["triangles"]
+                for m in basis.dofs_on_element(T):
+                    d_m = basis.global_direction(m)
+                    I.append(m)
+                    V.append(mode_RHS(d_m=d_m, edge=edge, k=k, H=1., d_2=0.5, t=t))
 
     b = coo_array((V, (I,)), shape=(N_DOF,))
 
-    return A, b
-
+    return b
 
 
 
