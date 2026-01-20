@@ -42,7 +42,7 @@ class WaveguideRegions(IntEnum):
 #     RADIATION = 3
 
 from trefftz.mesh.core import EdgeType
-from .assemblers import SerialAssembleMatrix, SerialAssembleRHS
+from .assemblers import SerialAssembleMatrix, SerialAssembleRHS, SerialAssembleMatrix2
 
 
 
@@ -591,7 +591,7 @@ class WaveguideProblem:
         if self.boundary_conditions is None:
             print('no boundary conditions specified, use .set_boundary_conditions')
             return
-        self.A = SerialAssembleMatrix(self.domain.mesh.edges, basis=self.basis,
+        self.A = SerialAssembleMatrix2(self.domain.mesh.edges, basis=self.basis,
                                       NtD_modes=self.NtD_modes, boundary_conditions=self.boundary_conditions,
                                       stabilizing_parameters=self.stabilizing_parameters)
 
