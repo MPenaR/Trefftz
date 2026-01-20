@@ -1,5 +1,33 @@
 # Fluxes
 
+# Notation:
+
+This is standard DG notation:
+
+averages:
+
+```{math}
+\left\{\left\{u\right\}\right\} = \frac{u_i + u_j}{2}
+```
+
+```{math}
+\left\{\left\{\mathbf{w}\right\}\right\} = \frac{\mathbf{w}_i + \mathbf{w}_j}{2}
+```
+jumps
+
+```{math}
+\left[\left[u\right]\right]_\mathbf{n} = \u_i\mathbf{n}_i + u_j\mathbf{n}_j
+
+```
+
+```{math}
+\left[\left[\mathtbf{w}\right]\right]_\mathbf{n} = \mathbf{w}_i\mathbf{n}_i + \mathbf{w}_j\mathbf{n}_j
+```
+
+all of those are quantities which do no take into account the orientation of the normal chosen.
+
+
+
 All along we will be using $l_E$ as the length of the edge going from $\mathbf{P}$ to $\mathbf{Q}$. Its mid point will be denoted as $\mathbf{M}_E$ and the tangent and normal as $\boldsymbol{\tau}_E$ and $\mathbf{n}_E$ respectively.
 
 The trial and test functions will be plane waves of the form:
