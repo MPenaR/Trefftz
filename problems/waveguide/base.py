@@ -4,6 +4,8 @@ from trefftz.mesh import TrefftzMesh, EdgeType
 from typing import Optional, Callable, Any, Mapping
 # from pygmsh.geo import Geometry
 import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+
 import numpy as np
 from numpy.typing import NDArray
 # from regions import Region
@@ -52,6 +54,43 @@ class WaveguideDomain(Domain[WaveguideRegions]):
         self.R = R
         self.H = H
         self.mesh = mesh
+
+    def plot(self, figsize: tuple[int, int] | None = None, line_width: Optional[int] = 1):
+
+        if figsize is None:
+            figsize = 2*int(2*self.R/self.H), 2
+
+        _, ax = plt.subplots(figsize=figsize)
+        # ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
+        regions = self.regions
+        edges = self.mesh.edges
+
+        S = np.where(edges["region"] == regions.SIGMA)[0]
+        S_L = np.where(edges["region"] == regions.SIGMA_L)[0]
+        S_R = np.where(edges["region"] == regions.SIGMA_R)[0]
+        G = np.where(edges["region"] == regions.GAMMA)[0]
+
+        inner = np.where(edges["type"] == EdgeType.INNER)[0]  #!!!!!!!!
+        ax.add_collection(LineCollection(np.stack([edges[inner]["P"],
+                                                   edges[inner]["Q"]], axis=1),
+                                                   colors='k', linewidths=line_width))
+
+        colors = {regions.GAMMA: 'b',
+                  regions.SIGMA_L: 'r',
+                  regions.SIGMA_R: 'g'}
+
+        for reg in colors.keys():
+            
+            in_reg = np.where(edges["region"] == reg)[0]
+            edges_in_reg = edges[in_reg]
+            ax.add_collection(LineCollection(np.stack([edges_in_reg["P"], edges_in_reg["Q"]], axis=1),
+                                             colors=colors[reg], linewidths=line_width))
+
+        ax.set_title('inner: black, sigma_L: red, sigma_R: green, gamma: blue')
+        ax.axis('equal')
+        ax.axis('off')
+        plt.show()
+
 
 
 
@@ -506,57 +545,6 @@ class WaveguideProblem:
         self.assembler = assembler
         self.boundary_conditions = None
         self.stabilizing_parameters = {"a": a, "b": b, "d_1": d_1, "d_2": d_2}
-
-    
-
-    def plot(self, figsize: Optional[tuple[int, int]] = (16, 2), line_width: Optional[int] = 1):
-        from matplotlib.collections import LineCollection
-        _, ax = plt.subplots(figsize=figsize)
-        # ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
-        regions = self.domain.regions
-        edges = self.domain.mesh.edges
-
-        S = np.where(edges["region"] == regions.SIGMA)[0]
-        S_L = np.where(edges["region"] == regions.SIGMA_L)[0]
-        S_R = np.where(edges["region"] == regions.SIGMA_R)[0]
-        G = np.where(edges["region"] == regions.GAMMA)[0]
-
-        inner = np.where(edges["type"] == EdgeType.INNER)[0]  #!!!!!!!!
-        ax.add_collection(LineCollection(np.stack([edges[inner]["P"],
-                                                   edges[inner]["Q"]], axis=1),
-                                                   colors='k', linewidths=line_width))
-
-        colors = {regions.GAMMA: 'b',
-                  regions.SIGMA_L: 'r',
-                  regions.SIGMA_R: 'g'}
-
-
-        # S = np.where(self.domain.mesh.edges["region"] == self.domain.regions.SIGMA)[0]
-        # ax.add_collection(LineCollection(np.stack([self.domain.mesh.edges[S]["P"],  
-        #                                            self.domain.mesh.edges[S]["Q"]], axis=1),
-        #                                            colors='r', linewidths=line_width))
-
-        for reg in colors.keys():
-            
-            in_reg = np.where(edges["region"] == reg)[0]
-            edges_in_reg = edges[in_reg]
-            ax.add_collection(LineCollection(np.stack([edges_in_reg["P"], edges_in_reg["Q"]], axis=1),
-                                             colors=colors[reg], linewidths=line_width))
-
-        # S_L = np.where(self.domain.mesh.edges["region"] == self.domain.regions.SIGMA_L)[0]
-        # S_R = np.where(self.domain.mesh.edges["region"] == self.domain.regions.SIGMA_R)[0]
-        # G = np.where(self.domain.mesh.edges["region"] == self.domain.regions.GAMMA)[0]
-
-
-
-
-        # ax.add_collection(LineCollection(np.stack([self.domain.mesh.edges[G]["P"],
-        #                                            self.domain.mesh.edges[G]["Q"]], axis=1),
-        #                                            colors='b', linewidths=line_width))
-        ax.set_title('inner: black, sigma_L: red, sigma_R: green, gamma: blue')
-        ax.axis('equal')
-        ax.axis('off')
-        plt.show()
 
     def set_boundary_conditions(self, boundary_conditions= Mapping[WaveguideRegions, FluxType]):
         self.boundary_conditions = boundary_conditions
