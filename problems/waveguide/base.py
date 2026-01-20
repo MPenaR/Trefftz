@@ -497,13 +497,15 @@ class Assemblers(IntEnum):
     serial = 1
 
 class WaveguideProblem:
-    def __init__(self, domain: WaveguideDomain, N_theta: int, k: float, NtD_modes: int, assembler: type(Assemblers)):
+    def __init__(self, domain: WaveguideDomain, N_theta: int, k: float, NtD_modes: int, assembler: type(Assemblers),
+                  a: float = 0.5, b: float = 0.5, d_1: float = 0.5, d_2: float = 0.5):
         self.domain = domain
         self.basis = TrefftzBasis(N_elements=domain.mesh.n_triangles, N_theta=N_theta, k=k)
         self.k = k 
         self.NtD_modes = NtD_modes
         self.assembler = assembler
         self.boundary_conditions = None
+        self.stabilizing_parameters = {"a": a, "b": b, "d_1": d_1, "d_2": d_2}
 
     
 
@@ -561,11 +563,14 @@ class WaveguideProblem:
 
 
     def plot_field(self, u: Callable[[float_array, float_array], complex_array],
-                   N: int = 100, figsize: Optional[tuple[int, int]] = (16, 2), real_part: bool = False):
+                   N: int = 100, figsize: Optional[tuple[int, int]] | None = None, real_part: bool = False):
         x = np.linspace(-self.domain.R, self.domain.R, N)
         y = np.linspace(0., self.domain.H, N)
         X, Y = np.meshgrid(x, y)
         Z = u(X, Y)
+
+        if figsize is None:
+            figsize = 2*int(2*self.domain.R/self.domain.H), 2
 
         if real_part:
             Z = np.real(Z)
@@ -587,11 +592,13 @@ class WaveguideProblem:
             print('no boundary conditions specified, use .set_boundary_conditions')
             return
         self.A = SerialAssembleMatrix(self.domain.mesh.edges, basis=self.basis,
-                                      NtD_modes=self.NtD_modes, boundary_conditions=self.boundary_conditions)
+                                      NtD_modes=self.NtD_modes, boundary_conditions=self.boundary_conditions,
+                                      stabilizing_parameters=self.stabilizing_parameters)
 
     def assembleRHS(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):
         self.b = SerialAssembleRHS(self.domain.mesh.edges, basis=self.basis,
-                                         NtD_modes=self.NtD_modes, RHS=RHS, RHS_params=RHS_params) ## THE RHS WILL NEED THE BOUNDARY CONDITIONS
+                                         NtD_modes=self.NtD_modes, RHS=RHS, RHS_params=RHS_params,
+                                         stabilizing_parameters=self.stabilizing_parameters) ## THE RHS WILL NEED THE BOUNDARY CONDITIONS
 
 
     def assemble(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):

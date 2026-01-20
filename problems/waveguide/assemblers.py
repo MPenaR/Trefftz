@@ -25,19 +25,25 @@ helmholtz_fluxes = {
 }
 
 
-flux_parameters = {
-    FluxType.SOUNDHARD: {"d_1": 0.5},
-    FluxType.RADIATING: {"d_2": 0.5},
-    FluxType.TRANSMISSION: {"a": 0.5, "b": 0.5},
-}
 
 
-def SerialAssembleMatrix(edges, basis: TrefftzBasis, NtD_modes: int, boundary_conditions: Mapping[WaveguideRegions, FluxType]) -> sparray:
+def SerialAssembleMatrix(edges, basis: TrefftzBasis,
+                         NtD_modes: int,
+                         boundary_conditions: Mapping[WaveguideRegions, FluxType],
+                         stabilizing_parameters: Mapping[str, float]) -> sparray:
     N_DOF = basis.N_DOF
     I = []
     J = []
     V = []
     k = basis.k
+
+    flux_parameters = {
+        FluxType.SOUNDHARD: {"d_1": stabilizing_parameters["d_1"]},
+        FluxType.RADIATING: {"d_2": stabilizing_parameters["d_2"]},
+        FluxType.TRANSMISSION: {"a": stabilizing_parameters["a"], "b": stabilizing_parameters["b"]},
+    }
+
+
 
     # LOCAL FLUXES
     # BOUNDARIES
@@ -134,12 +140,15 @@ def SerialAssembleMatrix(edges, basis: TrefftzBasis, NtD_modes: int, boundary_co
 
     return A
 
-def SerialAssembleRHS(edges, basis: TrefftzBasis, NtD_modes: int, RHS: RSH_type, RHS_params: Mapping[str, int | float]) ->sparray:
+def SerialAssembleRHS(edges, basis: TrefftzBasis, NtD_modes: int, RHS: RSH_type,
+                      RHS_params: Mapping[str, int | float], stabilizing_parameters: Mapping[str, float]) ->sparray:
     N_DOF = basis.N_DOF
     I = []
     J = []
     V = []
     k = basis.k
+
+    d_2 = stabilizing_parameters["d_2"]
 
     match RHS:
         case RSH_type.MODE:
@@ -151,7 +160,7 @@ def SerialAssembleRHS(edges, basis: TrefftzBasis, NtD_modes: int, RHS: RSH_type,
                 for m in basis.dofs_on_element(T):
                     d_m = basis.global_direction(m)
                     I.append(m)
-                    V.append(mode_RHS2(d_m=d_m, edge=edge, k=k, H=1., d_2=0.5, t=t))
+                    V.append(mode_RHS2(d_m=d_m, edge=edge, k=k, H=1., d_2=d_2, t=t))
 
     b = coo_array((V, (I,)), shape=(N_DOF,))
 
