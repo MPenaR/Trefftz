@@ -2,7 +2,9 @@
 
 # Notation:
 
-This is standard DG notation:
+This is standard DG notation. For a element-wise continuous function $u$, at an edge $E$ we define two functions:
+
+$
 
 averages:
 
@@ -16,12 +18,12 @@ averages:
 jumps
 
 ```{math}
-\left[\left[u\right]\right]_\mathbf{n} = \u_i\mathbf{n}_i + u_j\mathbf{n}_j
+\left[\left[u\right]\right]_\mathbf{n} = u_i\mathbf{n}_i + u_j\mathbf{n}_j
 
 ```
 
 ```{math}
-\left[\left[\mathtbf{w}\right]\right]_\mathbf{n} = \mathbf{w}_i\mathbf{n}_i + \mathbf{w}_j\mathbf{n}_j
+\left[\left[\mathbf{w}\right]\right]_\mathbf{n} = \mathbf{w}_i\mathbf{n}_i + \mathbf{w}_j\mathbf{n}_j
 ```
 
 all of those are quantities which do no take into account the orientation of the normal chosen.
