@@ -2,7 +2,7 @@
 from trefftz.dg.basis2 import TrefftzBasis
 from trefftz.numpy_types import complex_array
 from .base import WaveguideRegions
-from trefftz.dg.serial_fluxes2 import SoundHard, InnerEasy, Radiating_local, mode_RHS, Radiating_nonlocal, mode_RHS2
+from trefftz.dg.serial_fluxes2 import SoundHard, Inner2, Radiating_local, mode_RHS, Radiating_nonlocal, mode_RHS2
 #from scipy.sparse import coo_matrix, csr_matrix, spmatrix
 from trefftz.dg.fluxes import FluxType
 from scipy.sparse import coo_array, csr_array, sparray
@@ -21,7 +21,7 @@ b = 0.5
 helmholtz_fluxes = {
     FluxType.SOUNDHARD: SoundHard,
     FluxType.RADIATING: Radiating_local,
-    FluxType.TRANSMISSION: InnerEasy
+    FluxType.TRANSMISSION: Inner2
 }
 
 

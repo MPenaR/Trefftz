@@ -115,7 +115,47 @@ def InnerEasy(d_m, d_n, k: float, edge, flux_parameters: Mapping[str, float] = {
     # I = -1j*l/2*(2*a*k + k_n*dot(d_n, N) + k_m*dot(d_m, N) + 2*b/k*k_n*dot(d_n, N)*k_m*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
     return -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
 
+def Inner2(d_m, d_n, k: float, edge, flux_parameters: Mapping[str, float] = {"a": 0.5, "b": 0.5}) -> complex:
+    r"""
+    Computes the flux on a inner facet with respect to the degrees
+    of freedom from the same cell, that is:
+    
+    .. math::
+        \int_E \left(\left(\varphi_n(\mathbf{x})+\frac{b}{ik}\nabla\varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla\psi_m(\mathbf{x})\cdot\mathbf{n}}- \left(\vphantom{\frac{1}{2}}aik\varphi_n(\mathbf{x})+\nabla\varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\psi_m(\mathbf{x})}\right) \,\mathrm{d}S_\mathbf{x}    
 
+    Parameters
+    ----------
+    phi : Function
+        Trial function.
+    psi : Function
+        Test function.
+    k : float
+        Wavenumber.
+    edge : Edge
+        Edge parameters.
+    a : float
+        Stabilyzing parameter.
+    b : float
+        Stabilyzing parameter.
+
+    Returns
+    -------
+    I : complex
+        The integral.
+
+
+    """
+
+    a = flux_parameters["a"]
+    b = flux_parameters["b"]
+
+    
+    M = edge["M"]
+    l = edge["l"]
+    N = edge["N"]
+    T = edge["T"]
+
+    return -1j*k*l*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*exp(1j*k*dot(d_n-d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
 
 
 # def Inner(d_m, d_n, k: float, edge, flux_parameters: Mapping[str, float] = {"a": 0.5, "b": 0.5}) -> complex:
