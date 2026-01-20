@@ -361,8 +361,8 @@ def mode_RHS2(d_m, edge, k, H, d_2, t):
     if t == 0:
         I = 1/sqrt(H)*2*1j*k*l*(dot(d, N) - d_2*(1-dot(d, N)))*exp(1j*k*(M_x - dot(d, M)))*sinc(k*l/(2*pi)*dot(d, T))
     else:
-        I = sqrt(2/H)*1j*k*l*(dot(d, N) - d_2*(1-k/conj(beta)*dot(d, N)))*exp(1j*(beta*M_x - k*dot(d, M)))*( exp( 1j*t*pi*M_y/H)*sinc(k*l/(2*pi)*dot(d, T) - t*(l/(2*H)))+
-                                                                                                   exp(-1j*t*pi*M_y/H)*sinc(k*l/(2*pi)*dot(d, T) + t*(l/(2*H))))
+        I = sqrt(2/H)*1j*k*l*(dot(d, N) - d_2*(1-k/conj(beta)*dot(d, N)))*exp(1j*(beta*M_x - k*dot(d, M)))*( exp( 1j*t*pi*dot(M,T)/H)*sinc(k*l/(2*pi)*dot(d, T) - t*(l/(2*H)))+
+                                                                                                             exp(-1j*t*pi*dot(M,T)/H)*sinc(k*l/(2*pi)*dot(d, T) + t*(l/(2*H))))
     return I
     #     LOCAL = 1/sqrt(H)*2*1j*k*l*(dot(d, N) - d_2*(1-dot(d, N)))*exp(1j*k*(M_x - dot(d, M)))*sinc(k*l/(2*pi)*dot(d, T))
     #     NON_LOCAL = 1/sqrt(H)*2*1j*k*l**exp(1j*k*(M_x - dot(d, M)))*sinc(k*l/(2*pi)*dot(d, T))
