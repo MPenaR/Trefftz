@@ -34,6 +34,7 @@ class WaveguideRegions(IntEnum):
     SIGMA_L = 3
     SIGMA_R = 4
     SIGMA = 2
+    D_OMEGA = 5
 
 # class FluxType(IntEnum):  # should go in flux types or in fluxes
 #     TRANSMISSION = 0
