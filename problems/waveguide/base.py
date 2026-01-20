@@ -562,6 +562,18 @@ class WaveguideProblem:
         self.boundary_conditions = boundary_conditions
 
 
+    def plot_trefftz_function(self, u: TrefftzFunction, figsize: tuple[int, int] | None = None):
+        x = np.linspace(-self.domain.R,self.domain.R,200)
+        y = np.linspace(0.,self.domain.H, 50)
+        X, Y = np.meshgrid(x,y)
+        Z = u(X.flatten(), Y.flatten()).reshape(X.shape)
+        if figsize is None:
+            figsize = 2*int(2*self.domain.R/self.domain.H), 2
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.pcolormesh(X, Y, np.real(Z), shading='gouraud')
+        ax.axis("equal")
+        plt.show()
+
     def plot_field(self, u: Callable[[float_array, float_array], complex_array],
                    N: int = 100, figsize: Optional[tuple[int, int]] | None = None, real_part: bool = False):
         x = np.linspace(-self.domain.R, self.domain.R, N)
