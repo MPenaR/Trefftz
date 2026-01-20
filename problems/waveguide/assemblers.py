@@ -2,7 +2,7 @@
 from trefftz.dg.basis2 import TrefftzBasis
 from trefftz.numpy_types import complex_array
 from .base import WaveguideRegions
-from trefftz.dg.serial_fluxes2 import SoundHard, InnerEasy, Radiating_local, mode_RHS, Radiating_nonlocal
+from trefftz.dg.serial_fluxes2 import SoundHard, InnerEasy, Radiating_local, mode_RHS, Radiating_nonlocal, mode_RHS2
 #from scipy.sparse import coo_matrix, csr_matrix, spmatrix
 from trefftz.dg.fluxes import FluxType
 from scipy.sparse import coo_array, csr_array, sparray
@@ -151,7 +151,7 @@ def SerialAssembleRHS(edges, basis: TrefftzBasis, NtD_modes: int, RHS: RSH_type,
                 for m in basis.dofs_on_element(T):
                     d_m = basis.global_direction(m)
                     I.append(m)
-                    V.append(mode_RHS(d_m=d_m, edge=edge, k=k, H=1., d_2=0.5, t=t))
+                    V.append(mode_RHS2(d_m=d_m, edge=edge, k=k, H=1., d_2=0.5, t=t))
 
     b = coo_array((V, (I,)), shape=(N_DOF,))
 

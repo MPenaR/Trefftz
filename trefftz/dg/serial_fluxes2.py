@@ -304,3 +304,20 @@ def mode_RHS(d_m, edge, k, H, d_2, t):
                                                                          exp(-1j*t*pi*M[1]/H)*sinc(t*l/(2*H) + k*l*d[1]/(2*pi))))
  
     return F + S
+
+
+def mode_RHS2(d_m, edge, k, H, d_2, t):
+    d = d_m
+    d_x, d_y = d
+    N = edge["N"]
+    M = edge["M"]
+    M_x, M_y = M
+    T = edge["T"]
+    l = edge["l"]
+
+    beta = np.emath.sqrt(k**2 - (t*pi/H)**2)
+
+    if t == 0:
+        LOCAL = 2*1j*k*l*(dot(d, N) - d_2)*exp(1j*k*(M_x - dot(d, M)))*sinc(k*l/(2*pi)*d_y)/sqrt(H)
+        NON_LOCAL = 2*1j*k*l*d_2*dot(d, N)*exp(1j*k*(M_x - dot(d, M)))*sinc(k*l/(2*pi)*d_y)/sqrt(H)
+    return LOCAL + NON_LOCAL
