@@ -88,18 +88,19 @@ def SerialAssembleMatrix(edges, basis: TrefftzBasis,
                         I.append(m)
                         J.append(n)
                         flux_function = helmholtz_fluxes[flux_type]
-                        params = {"a": 0.5, "b": 0.5}
+                        params = flux_parameters[flux_type]
                         V.append(flux_function(d_m=d_m, d_n=d_n, k=k, edge=edge, flux_parameters=params))
+
                 for m in basis.dofs_on_element(T1):
                     d_m = basis.global_direction(m)
                     for n in basis.dofs_on_element(T2):
-                        
                         d_n = basis.global_direction(n)
                         I.append(m)
                         J.append(n)
                         flux_function = helmholtz_fluxes[flux_type]
                         params = {"a": -0.5, "b": -0.5}
                         V.append(flux_function(d_m=d_m, d_n=d_n, k=k, edge=edge, flux_parameters=params))
+
                 for m in basis.dofs_on_element(T2):
                     d_m = basis.global_direction(m)
                     for n in basis.dofs_on_element(T1):
@@ -109,6 +110,7 @@ def SerialAssembleMatrix(edges, basis: TrefftzBasis,
                         flux_function = helmholtz_fluxes[flux_type]
                         params = {"a": 0.5, "b": 0.5}
                         V.append(-flux_function(d_m=d_m, d_n=d_n, k=k, edge=edge, flux_parameters=params))
+
                 for m in basis.dofs_on_element(T2):
                     d_m = basis.global_direction(m)
                     for n in basis.dofs_on_element(T2):
@@ -126,7 +128,21 @@ def SerialAssembleMatrix(edges, basis: TrefftzBasis,
             T_u, _ = edge_u["triangles"]
             for n in basis.dofs_on_element(T_u):
                 d_n = basis.global_direction(n)
-                for edge_v in edges[np.where(edges["region"]==WaveguideRegions.SIGMA_L)[0]]:
+                for edge_v in edges[np.where(edges["region"]==edge_u["region"])[0]]:
+                    T_v, _ = edge_v["triangles"]
+                    for m in basis.dofs_on_element(T_v):
+                        d_m = basis.global_direction(m)
+                        I.append(m)
+                        J.append(n)
+                        params = flux_parameters[flux_type]
+                        V.append(Radiating_nonlocal(d_m=d_m, d_n=d_n, edge_v=edge_v, edge_u=edge_u, k=k, NtD_modes=NtD_modes, flux_parameters=params))
+
+    for edge_u in edges[np.where(edges["region"]==WaveguideRegions.SIGMA_R)[0]]:
+            flux_type = boundary_conditions[edge_u["region"]]
+            T_u, _ = edge_u["triangles"]
+            for n in basis.dofs_on_element(T_u):
+                d_n = basis.global_direction(n)
+                for edge_v in edges[np.where(edges["region"]==edge_u["region"])[0]]:
                     T_v, _ = edge_v["triangles"]
                     for m in basis.dofs_on_element(T_v):
                         d_m = basis.global_direction(m)
