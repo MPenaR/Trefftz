@@ -23,7 +23,7 @@ from trefftz.numpy_types import float_array, complex_array
 
 from problems.base import AbstractProblem
 from enum import IntEnum
-from trefftz.dg.basis2 import TrefftzBasis
+from trefftz.dg.basis2 import PlanewaveBasis, LinearlySpacedBasis
 from trefftz.dg.functions import TrefftzFunction
 from scipy.sparse.linalg import spsolve
 from .RHS_types import RSH_type
@@ -540,7 +540,10 @@ class WaveguideProblem:
     def __init__(self, domain: WaveguideDomain, N_theta: int, k: float, NtD_modes: int, assembler: type(Assemblers),
                   a: float = 0.5, b: float = 0.5, d_1: float = 0.5, d_2: float = 0.5):
         self.domain = domain
-        self.basis = TrefftzBasis(N_elements=domain.mesh.n_triangles, N_theta=N_theta, k=k)
+        self.basis = LinearlySpacedBasis(N_elements=domain.mesh.n_triangles, k=k, N_theta=N_theta)
+        
+        
+        # TrefftzBasis(N_elements=domain.mesh.n_triangles, N_theta=N_theta, k=k)
         self.k = k 
         self.NtD_modes = NtD_modes
         self.assembler = assembler

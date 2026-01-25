@@ -22,7 +22,7 @@ b = 0.5
 helmholtz_fluxes = {
     FluxType.SOUNDHARD: SoundHard,
     FluxType.RADIATING: Radiating_local,
-    FluxType.TRANSMISSION: Inner2
+    FluxType.TRANSMISSION: Inner2,
     FluxType.SOUNDSOFT: None
 }
 
