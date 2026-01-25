@@ -537,13 +537,10 @@ class Assemblers(IntEnum):
     serial = 1
 
 class WaveguideProblem:
-    def __init__(self, domain: WaveguideDomain, N_theta: int, k: float, NtD_modes: int, assembler: type(Assemblers),
+    def __init__(self, domain: WaveguideDomain, basis: PlanewaveBasis, k: float, NtD_modes: int, assembler: type(Assemblers),
                   a: float = 0.5, b: float = 0.5, d_1: float = 0.5, d_2: float = 0.5):
         self.domain = domain
-        self.basis = LinearlySpacedBasis(N_elements=domain.mesh.n_triangles, k=k, N_theta=N_theta)
-        
-        
-        # TrefftzBasis(N_elements=domain.mesh.n_triangles, N_theta=N_theta, k=k)
+        self.basis = basis
         self.k = k 
         self.NtD_modes = NtD_modes
         self.assembler = assembler
@@ -618,5 +615,19 @@ class WaveguideProblem:
         u.set(coefficients=dofs)
         return u
          
+
+def SerialProblem(domain: WaveguideDomain, N_theta: int, k: float, NtD_modes: int, assembler: type(Assemblers),
+                  a: float = 0.5, b: float = 0.5, d_1: float = 0.5, d_2: float = 0.5) -> WaveguideProblem:
+    return WaveguideProblem(domain=domain,
+                            basis=LinearlySpacedBasis(N_elements=domain.mesh.n_triangles, k=k, N_theta=N_theta),
+                            k=k,
+                            NtD_modes=NtD_modes,
+                            assembler=assembler,
+                            a=a,
+                            b=b,
+                            d_1=d_1,
+                            d_2=d_2)
+    
+
 
 ################# EASY ONE AND THEN BUILD FROM HERE
