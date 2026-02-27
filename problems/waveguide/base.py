@@ -23,10 +23,11 @@ from trefftz.numpy_types import float_array, complex_array
 
 from problems.base import AbstractProblem
 from enum import IntEnum
-from trefftz.dg.basis2 import PlanewaveBasis, LinearlySpacedBasis
+from trefftz.dg.basis import PlanewaveBasis, LinearlySpacedBasis
 from trefftz.dg.functions import TrefftzFunction
 from scipy.sparse.linalg import spsolve
 from .RHS_types import RSH_type
+
 
 class WaveguideRegions(IntEnum):
     OMEGA = 0
@@ -46,9 +47,7 @@ from trefftz.mesh.core import EdgeType
 from .assemblers import SerialAssembleMatrix, SerialAssembleRHS, SerialAssembleMatrix2
 
 
-
-
-class WaveguideDomain(Domain[WaveguideRegions]):
+class WaveguideDomain(Domain):
     regions = WaveguideRegions
 
     def __init__(self, mesh: "TrefftzMesh", R: float = 5., H: float = 1.):
@@ -616,6 +615,93 @@ class WaveguideProblem:
         return u
          
 
+
+
+class WaveguideProblem2(Problem[WaveguideDomain]):
+    def __init__(self, domain: WaveguideDomain, basis: PlanewaveBasis, k: float, NtD_modes: int, assembler: type(Assemblers),
+                  a: float = 0.5, b: float = 0.5, d_1: float = 0.5, d_2: float = 0.5):
+        self.domain = domain
+        self.basis = basis
+        self.k = k 
+        self.NtD_modes = NtD_modes
+        self.assembler = assembler
+        self.boundary_conditions = None
+        self.stabilizing_parameters = {"a": a, "b": b, "d_1": d_1, "d_2": d_2}
+
+    def set_boundary_conditions(self, boundary_conditions= Mapping[WaveguideRegions, FluxType]):
+        self.boundary_conditions = boundary_conditions
+
+
+    def plot_trefftz_function(self, u: TrefftzFunction, figsize: tuple[int, int] | None = None):
+        x = np.linspace(-self.domain.R,self.domain.R,200)
+        y = np.linspace(0.,self.domain.H, 50)
+        X, Y = np.meshgrid(x,y)
+        Z = u(X.flatten(), Y.flatten()).reshape(X.shape)
+        if figsize is None:
+            figsize = 2*int(2*self.domain.R/self.domain.H), 2
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.pcolormesh(X, Y, np.real(Z), shading='gouraud')
+        ax.axis("equal")
+        plt.show()
+
+    def plot_field(self, u: Callable[[float_array, float_array], complex_array],
+                   N: int = 100, figsize: Optional[tuple[int, int]] | None = None, real_part: bool = False):
+        x = np.linspace(-self.domain.R, self.domain.R, N)
+        y = np.linspace(0., self.domain.H, N)
+        X, Y = np.meshgrid(x, y)
+        Z = u(X, Y)
+
+        if figsize is None:
+            figsize = 2*int(2*self.domain.R/self.domain.H), 2
+
+        if real_part:
+            Z = np.real(Z)
+
+        _, ax = plt.subplots(figsize=figsize)
+
+        ax.pcolorfast((-self.domain.R, self.domain.R), (0., self.domain.H), Z)
+        ax.axis('equal')
+        plt.show()
+
+    def plot_mode(self, n: int):
+        self.plot_field(self.mode(n), N=400, real_part=True)
+
+    def mode(self, n: int) -> Callable[[float_array, float_array], complex_array]:
+        return WaveguideMode(n=n, k=self.k, H=self.domain.H, R=self.domain.R)
+
+    def assembleMatrix(self):
+        if self.boundary_conditions is None:
+            print('no boundary conditions specified, use .set_boundary_conditions')
+            return
+        self.A = SerialAssembleMatrix2(self.domain.mesh.edges, basis=self.basis,
+                                      NtD_modes=self.NtD_modes, boundary_conditions=self.boundary_conditions,
+                                      stabilizing_parameters=self.stabilizing_parameters)
+
+    def assembleRHS(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):
+        self.b = SerialAssembleRHS(self.domain.mesh.edges, basis=self.basis,
+                                         NtD_modes=self.NtD_modes, RHS=RHS, RHS_params=RHS_params,
+                                         stabilizing_parameters=self.stabilizing_parameters) ## THE RHS WILL NEED THE BOUNDARY CONDITIONS
+
+
+    def assemble(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):
+        if self.boundary_conditions is None:
+            print('no boundary conditions specified, use .set_boundary_conditions')
+            return
+        self.assembleMatrix()
+        self.assembleRHS(RHS=RHS, RHS_params=RHS_params)
+
+    def solve(self):
+        dofs = spsolve(self.A, self.b)
+        u = TrefftzFunction(domain=self.domain, basis=self.basis, dtype=np.complex128)
+        u.set(coefficients=dofs)
+        return u
+
+
+
+
+
+
+
 def SerialProblem(domain: WaveguideDomain, N_theta: int, k: float, NtD_modes: int, assembler: type(Assemblers),
                   a: float = 0.5, b: float = 0.5, d_1: float = 0.5, d_2: float = 0.5) -> WaveguideProblem:
     return WaveguideProblem(domain=domain,
@@ -627,7 +713,47 @@ def SerialProblem(domain: WaveguideDomain, N_theta: int, k: float, NtD_modes: in
                             b=b,
                             d_1=d_1,
                             d_2=d_2)
+
+
+
+def plot_field(domain: WaveguideDomain, u: Callable[[float_array, float_array], complex_array],
+                N: int = 100, figsize: Optional[tuple[int, int]] | None = None, real_part: bool = False):
+    R = domain.R
+    H = domain.H
     
+    x = np.linspace(-R, R, N)
+    y = np.linspace(0., H, N)
+    X, Y = np.meshgrid(x, y)
+    Z = u(X, Y)
+
+    if figsize is None:
+        figsize = (2*int(2*R/H), 2)
+
+    if real_part:
+        Z = np.real(Z)
+
+    _, ax = plt.subplots(figsize=figsize)
+
+    ax.pcolorfast((R, R), (0., H), Z)
+    ax.axis('equal')
+    plt.show()
+
+
+def plot_trefftz_function(u: TrefftzFunction, figsize: tuple[int, int] | None = None):
+    domain = u.domain
+    R = domain.R
+    H = domain.H
+    x = np.linspace(-R, R, 200)
+    y = np.linspace(0., H, 50)
+    X, Y = np.meshgrid(x, y)
+    Z = u(X.flatten(), Y.flatten()).reshape(X.shape)
+    if figsize is None:
+        figsize = (2*int(2*R/H), 2)
+    _, ax = plt.subplots(figsize=figsize)
+    ax.pcolormesh(X, Y, np.real(Z), shading='gouraud')
+    ax.axis("equal")
+    plt.show()
+
 
 
 ################# EASY ONE AND THEN BUILD FROM HERE

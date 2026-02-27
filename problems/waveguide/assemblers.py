@@ -1,5 +1,5 @@
 '''would be moved into dg, after making it generic but right now its waveguide-specific.'''
-from trefftz.dg.basis2 import TrefftzBasis
+from trefftz.dg.basis import TrefftzBasis
 from trefftz.numpy_types import complex_array
 from .base import WaveguideRegions
 from trefftz.dg.serial_fluxes2 import SoundHard, Inner2, Radiating_local, mode_RHS, Radiating_nonlocal, mode_RHS2

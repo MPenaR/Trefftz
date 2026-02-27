@@ -2,7 +2,7 @@
 from trefftz.dg.basis import TrefftzBasis
 from typing import Any, TYPE_CHECKING
 from numpy.typing import DTypeLike
-from trefftz.dg.basis2 import TrefftzBasis
+from trefftz.dg.basis import TrefftzBasis
 if TYPE_CHECKING:
     from trefftz.mesh import TrefftzMesh
 
