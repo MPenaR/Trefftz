@@ -3,7 +3,7 @@
 The problem cass is an abstract class or template (we will see), so I can hace more specific problems like:
 
 - Helmholtz waveguide problem
-- Helmholtz unbounded problem
+- Helmholtz free-space problem
 - Lamb plate problem
 
 All of them share some features: 
@@ -16,3 +16,5 @@ All of them share some features:
 - Error metrics are computed
 
 As such this class should be a top class that calls specific domain creators, basis, assemblers etc...
+
+This is interesting because for example, the exact solutions are something which is specific to the pair (physics + domain). The fundamental solution for the helmholtz problem in a waveguide is not the same than in free space, nor is the same for the Helmholtz equation or the Maxwell equations.
