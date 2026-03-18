@@ -9,7 +9,7 @@ from scipy.sparse import coo_array, csr_array, sparray
 import numpy as np
 from typing import Mapping
 
-from .RHS_types import RSH_type
+from .RHS_types import RHS_type
 from trefftz.mesh.core import EdgeType
 
 d_1 = 0.5
@@ -263,7 +263,7 @@ def SerialAssembleMatrix2(edges, basis: TrefftzBasis,
 
 
 
-def SerialAssembleRHS(edges, basis: TrefftzBasis, NtD_modes: int, RHS: RSH_type,
+def SerialAssembleRHS(edges, basis: TrefftzBasis, NtD_modes: int, RHS: RHS_type,
                       RHS_params: Mapping[str, int | float], stabilizing_parameters: Mapping[str, float]) ->sparray:
     N_DOF = basis.N_DOF
     I = []
@@ -274,7 +274,7 @@ def SerialAssembleRHS(edges, basis: TrefftzBasis, NtD_modes: int, RHS: RSH_type,
     d_2 = stabilizing_parameters["d_2"]
 
     match RHS:
-        case RSH_type.MODE:
+        case RHS_type.MODE:
             t = RHS_params["t"]
             I = []
             V = []

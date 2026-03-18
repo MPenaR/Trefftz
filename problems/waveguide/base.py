@@ -26,7 +26,7 @@ from enum import IntEnum
 from trefftz.dg.basis import PlanewaveBasis, LinearlySpacedBasis
 from trefftz.dg.functions import TrefftzFunction
 from scipy.sparse.linalg import spsolve
-from .RHS_types import RSH_type
+from .RHS_types import RHS_type
 
 
 class WaveguideRegions(IntEnum):
@@ -536,7 +536,7 @@ class Assemblers(IntEnum):
     serial = 1
 
 class WaveguideProblem:
-    def __init__(self, domain: WaveguideDomain, basis: PlanewaveBasis, k: float, NtD_modes: int, assembler: type(Assemblers),
+    def __init__(self, domain: WaveguideDomain, basis: PlanewaveBasis, k: float, NtD_modes: int, assembler: type(Assemblers) = None,
                   a: float = 0.5, b: float = 0.5, d_1: float = 0.5, d_2: float = 0.5):
         self.domain = domain
         self.basis = basis
@@ -595,13 +595,13 @@ class WaveguideProblem:
                                       NtD_modes=self.NtD_modes, boundary_conditions=self.boundary_conditions,
                                       stabilizing_parameters=self.stabilizing_parameters)
 
-    def assembleRHS(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):
+    def assembleRHS(self, RHS: RHS_type, RHS_params: Mapping[str, int | float]):
         self.b = SerialAssembleRHS(self.domain.mesh.edges, basis=self.basis,
                                          NtD_modes=self.NtD_modes, RHS=RHS, RHS_params=RHS_params,
                                          stabilizing_parameters=self.stabilizing_parameters) ## THE RHS WILL NEED THE BOUNDARY CONDITIONS
 
 
-    def assemble(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):
+    def assemble(self, RHS: RHS_type, RHS_params: Mapping[str, int | float]):
         if self.boundary_conditions is None:
             print('no boundary conditions specified, use .set_boundary_conditions')
             return
@@ -677,13 +677,13 @@ class WaveguideProblem:
 #                                       NtD_modes=self.NtD_modes, boundary_conditions=self.boundary_conditions,
 #                                       stabilizing_parameters=self.stabilizing_parameters)
 
-#     def assembleRHS(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):
+#     def assembleRHS(self, RHS: RHS_type, RHS_params: Mapping[str, int | float]):
 #         self.b = SerialAssembleRHS(self.domain.mesh.edges, basis=self.basis,
 #                                          NtD_modes=self.NtD_modes, RHS=RHS, RHS_params=RHS_params,
 #                                          stabilizing_parameters=self.stabilizing_parameters) ## THE RHS WILL NEED THE BOUNDARY CONDITIONS
 
 
-#     def assemble(self, RHS: RSH_type, RHS_params: Mapping[str, int | float]):
+#     def assemble(self, RHS: RHS_type, RHS_params: Mapping[str, int | float]):
 #         if self.boundary_conditions is None:
 #             print('no boundary conditions specified, use .set_boundary_conditions')
 #             return

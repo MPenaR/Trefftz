@@ -56,7 +56,7 @@ class TrefftzFunction:
         XY = np.column_stack([x, y])
 
         T_IDs = self.domain.mesh.get_cell(XY)
-        DOFs = self.basis.T_ID_to_DOFs[T_IDs, :]  # shape (Npts, Ntheta)
+        DOFs = self.basis.T_ID_to_DOFs[T_IDs, :]  # shape (Npts, Ntheta) 
 
         # evaluate plane-wave basis at points
         D = self.basis.D
