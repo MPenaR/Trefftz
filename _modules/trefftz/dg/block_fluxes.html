@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
-        <title>trefftz.dg.boundary_conditions - Trefftz 0.1.0 documentation</title>
+        <title>trefftz.dg.block_fluxes - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -230,34 +230,135 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for trefftz.dg.boundary_conditions</h1><div class="highlight"><pre>
-<span></span><span class="sd">&#39;&#39;&#39;Module for defining different boundary conditions&#39;&#39;&#39;</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>  <span class="c1">#, auto</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Any</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+          <h1>Source code for trefftz.dg.block_fluxes</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">module for implementing blocks of fluxes, i.e. matrices containing all the fluxes of the same type for a </span>
+<span class="sd">given pair of cells.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BoundaryConditionType">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.boundary_conditions.BoundaryConditionType">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BoundaryConditionType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Types of boundary condition&#39;&#39;&#39;</span>
-    <span class="n">Transsmision</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># not really a &quot;boundary&quot; condition</span>
-    <span class="n">SoundHard</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">SoundSoft</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">Radiating</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="n">Dirichlet</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># when homogeneous becomes Soundsoft</span>
-    <span class="n">Neumann</span> <span class="o">=</span> <span class="mi">5</span>    <span class="c1"># when homogeneous becomes SoundHard</span></div>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.numpy_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">complex_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">dot</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">sinc</span><span class="p">,</span> <span class="n">subtract</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">outer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+
+<div class="viewcode-block" id="Edge">
+<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.block_fluxes.Edge">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Edge</span><span class="p">:</span>
+    <span class="n">P</span><span class="p">:</span> <span class="n">float_array</span>
+    <span class="n">Q</span><span class="p">:</span> <span class="n">float_array</span>
+    <span class="n">l</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">T</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">N</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">M</span><span class="p">:</span> <span class="nb">float</span></div>
 
 
 
-<div class="viewcode-block" id="BoundaryCondition">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.boundary_conditions.BoundaryCondition">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BoundaryCondition</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<div class="viewcode-block" id="BoundaryCondition.assemble_blocks">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.boundary_conditions.BoundaryCondition.assemble_blocks">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">assemble_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
-        <span class="o">...</span></div>
-</div>
+<div class="viewcode-block" id="from_edge_to_Edge">
+<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.block_fluxes.from_edge_to_Edge">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_edge_to_Edge</span><span class="p">(</span> <span class="n">edge</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">void</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Edge</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;Q&quot;</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;l&quot;</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">])</span></div>
 
+
+
+
+<div class="viewcode-block" id="SoundHard_block">
+<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.block_fluxes.SoundHard_block">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">SoundHard_block</span><span class="p">(</span><span class="n">k</span><span class="p">:</span> <span class="nb">complex</span><span class="p">,</span> <span class="n">edge</span><span class="p">:</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">d_d</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">d_1</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">complex_array</span><span class="p">:</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the block for an edge in a sound hard boundary.</span>
+<span class="sd">    That is it computes the matrix :math:`\mathbf{M}=(M_{mn})` with:    </span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">    </span>
+<span class="sd">        M_{mn}=\boxed{(-ikl\left(1+d_{1}\mathbf{d}_{n}\cdot\mathbf{n}\right)\mathbf{d}_{m}\cdot\mathbf{n}e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\boldsymbol{\tau}\right)}</span>
+
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+
+<span class="sd">    - k : complex</span>
+<span class="sd">        Wavenumber</span>
+<span class="sd">    - edge : Edge</span>
+<span class="sd">        Edge</span>
+<span class="sd">    - d : float_array</span>
+<span class="sd">        Set of directions</span>
+<span class="sd">    - d_d : float_array</span>
+<span class="sd">        Nd x Nd x 2 &quot;Matrix&quot; of differences of directions.</span>
+<span class="sd">    - d_1 : float</span>
+<span class="sd">        Stabilyzing parameter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">l</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">l</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">N</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">M</span>
+
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">l</span><span class="o">*</span><span class="n">outer</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">d_1</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">N</span><span class="p">)))</span><span class="o">*</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_d</span><span class="p">,</span> <span class="n">M</span><span class="p">))</span><span class="o">*</span><span class="n">sinc</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">l</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_d</span><span class="p">,</span> <span class="n">T</span><span class="p">))</span></div>
+
+
+<span class="c1"># def Inner_block(k : complex, edge : Edge, d : float_array, a : float, b : float, n_A : float, n_B : float) -&gt; complex_array:</span>
+<span class="c1">#     r&quot;&quot;&quot;</span>
+<span class="c1">#     Computes the block for an inner edge.</span>
+
+<span class="c1">#     Parameters:</span>
+<span class="c1">#     -----------</span>
+
+<span class="c1">#     - k : complex</span>
+<span class="c1">#         Wavenumber</span>
+<span class="c1">#     - edge : Edge</span>
+<span class="c1">#         Edge</span>
+<span class="c1">#     - d : float_array</span>
+<span class="c1">#         Set of directions</span>
+<span class="c1">#     - a : float</span>
+<span class="c1">#         Stabilyzing parameter.    </span>
+<span class="c1">#     - b : float</span>
+<span class="c1">#         Stabilyzing parameter.    </span>
+<span class="c1"># &quot;&quot;&quot;</span>
+<span class="c1">#     l = edge.l</span>
+<span class="c1">#     N = edge.N</span>
+<span class="c1">#     M = edge.M</span>
+<span class="c1">#     T = edge.T</span>
+
+<span class="c1">#     #change later</span>
+<span class="c1">#     n_m = 1</span>
+<span class="c1">#     n_n = 1</span>
+    
+<span class="c1">#     I = -1j*k*l*(a + add.outer(sqrt(n_m)*dot(d,N),sqrt(n_n)*dot(d,N))/2 + b*outer(sqrt(n_m)*dot(d,N),sqrt(n_n)*dot(d,N))) \</span>
+<span class="c1">#     *exp(-1j*k* subtract.outer(sqrt(n_m)*dot(d,M),sqrt(n_n)*dot(d,M)))                                             \</span>
+<span class="c1">#     *sinc(l*k/(2*pi)*subtract.outer(sqrt(n_m)*dot(d,T),sqrt(n_n)*dot(d,T)))</span>
+
+<span class="c1">#     return I</span>
+
+<span class="c1"># def Radiating_local_block(k : complex, edge : Edge, d : float_array, d_d : float_array, d_2 : float) -&gt; complex_array:</span>
+<span class="c1">#     r&quot;&quot;&quot;</span>
+<span class="c1">#     Computes the same triangle block for a radiating edge.</span>
+
+<span class="c1">#     Parameters:</span>
+<span class="c1">#     -----------</span>
+
+<span class="c1">#     - k : complex</span>
+<span class="c1">#         Wavenumber</span>
+<span class="c1">#     - edge : Edge</span>
+<span class="c1">#         Edge</span>
+<span class="c1">#     - d : float_array</span>
+<span class="c1">#         Set of directions</span>
+<span class="c1">#     - d_d : float_array</span>
+<span class="c1">#         Nd x Nd x 2 &quot;Matrix&quot; of differences of directions.</span>
+<span class="c1">#     - d_2 : float</span>
+<span class="c1">#         Stabilyzing parameter.    </span>
+<span class="c1"># &quot;&quot;&quot;</span>
+
+<span class="c1">#     l = edge.l</span>
+<span class="c1">#     N = edge.N</span>
+<span class="c1">#     M = edge.M</span>
+<span class="c1">#     T = edge.T</span>
+
+
+
+<span class="c1">#     I = -1j*k*l*(d_2 + dot(d, N))*exp(1j*k*dot(d_d, M))*sinc(k*l/(2*pi)*dot(d_d, T))</span>
+<span class="c1">#     return I</span>
 </pre></div>
         </article>
       </div>

@@ -1,8 +1,7 @@
-Mesh Module
+TrefftzMesh
 ===========
 
-.. automodule:: trefftz.mesh
+.. autoclass:: trefftz.mesh.TrefftzMesh
    :members:
    :undoc-members:
    :show-inheritance:
-
