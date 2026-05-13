@@ -74,3 +74,6 @@ intersphinx_mapping = {
 
 todo_include_todos = True
 
+
+autoclass_content = "both"
+
