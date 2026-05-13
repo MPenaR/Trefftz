@@ -1,10 +1,10 @@
-from .core import Mesh
+from .core import TrefftzMesh
 import matplotlib.pyplot as plt 
 from matplotlib.collections import LineCollection
 from matplotlib.patches import Polygon
 import numpy as np
 
-def explore_edges(mesh: Mesh):
+def explore_edges(mesh: TrefftzMesh):
     fig, ax = plt.subplots()
     lw = 1
     xmin, ymin = mesh._points.min(axis=0)
@@ -95,7 +95,7 @@ def explore_edges(mesh: Mesh):
 
     plt.show()
 
-# def triangle_id_tester(mesh: Mesh):
+# def triangle_id_tester(mesh: TrefftzMesh):
 #     fig, ax = plt.subplots()
 #     xmin, xmax = np.min(mesh._points[:,0]), np.max(mesh._points[:,0]) 
 #     ymin, ymax = np.min(mesh._points[:,1]), np.max(mesh._points[:,1])

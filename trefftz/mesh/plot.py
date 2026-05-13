@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt 
-from .core import Mesh
+from .core import TrefftzMesh
 import numpy as np
 
 
-def plot_waveguide(mesh: Mesh, plot_tangents: bool = False, plot_normals: bool = False):
+def plot_waveguide(mesh: TrefftzMesh, plot_tangents: bool = False, plot_normals: bool = False):
     from matplotlib.collections import LineCollection
     _, ax = plt.subplots()
 

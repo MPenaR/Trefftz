@@ -1,6 +1,11 @@
 trefftz package
 ===============
 
+.. automodule:: trefftz
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -13,18 +18,7 @@ Subpackages
 Submodules
 ----------
 
-trefftz.numpy\_types module
----------------------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: trefftz.numpy_types
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: trefftz
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   trefftz.numpy_types
