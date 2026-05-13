@@ -11,10 +11,8 @@ Welcome to Trefftz's Documentation
    design/data_structures
    design/assembly_flow
    tutorials/quickstart
-   api/mesh
-   api/dg
-   api/boundary_conditions
-
+   api/index
+   
 Indices and tables
 ==================
 
