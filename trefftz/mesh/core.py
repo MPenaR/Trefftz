@@ -35,12 +35,73 @@ triangle_dtype = [("A", np.float64, DIM),
                   ("area", np.float64)]
 
 class TrefftzMesh():
-    '''Returns only the relevant data
-    as numpy structured-arrays for easy manipulation'''
+    """
+    Mesh container for Trefftz-based methods using NumPy structured arrays.
+
+    This class stores geometric and topological information associated with
+    a triangular mesh and converts it into structured NumPy arrays for
+    efficient vectorized computations.
+
+    The mesh contains:
+
+    - Points (vertices)
+    - Edges
+    - Triangular cells
+    - Edge-to-triangle connectivity
+    - Boundary and region information
+
+    During initialization, geometric quantities such as edge tangents,
+    normals, midpoints, lengths, and triangle areas are automatically
+    computed.
+
+    Parameters
+    ----------
+    points : float_array
+        Array of mesh vertices with shape ``(n_points, 2)``.
+
+    edges : int_array
+        Array of edge connectivity with shape ``(n_edges, 2)``.
+        Each row contains the indices of the two endpoint vertices.
+
+    triangles : int_array
+        Array of triangle connectivity with shape ``(n_triangles, 3)``.
+        Each row contains the indices of the three triangle vertices.
+
+    edge2triangles : int_array
+        Edge-to-triangle adjacency array with shape ``(n_edges, 2)``.
+        For boundary edges, the second triangle index is ``-1``.
+
+    locator : CellLocator
+        Spatial locator used to identify the mesh cell containing a point.
+
+    cell_sets : dict[int, int_array]
+        Dictionary mapping physical region identifiers to edge indices.
+
+    Attributes
+    ----------
+    edges : numpy.ndarray
+        Structured array containing edge geometric and topological data.
+
+    triangles : numpy.ndarray
+        Structured array containing triangle geometric data.
+
+    ready_for_assemble : bool
+        Indicates whether all edges have a valid flux type assigned.
+
+    Notes
+    -----
+    Boundary edge normals are automatically oriented outward with respect
+    to the adjacent triangle.
+
+    Inner edge normals are consistently oriented between neighboring cells.
+    """
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
                  edge2triangles: int_array,
                  locator: CellLocator, cell_sets: dict[int, int_array]):
+        """
+        Initialize the mesh and construct geometric data structures.
+        """
         self._points = points
         self._edges = edges
         self._triangles = triangles
@@ -51,6 +112,31 @@ class TrefftzMesh():
         self.construct_numpy_arrays()
 
     def construct_numpy_arrays(self):
+        """
+        Construct structured NumPy arrays containing mesh geometry.
+
+        This method computes and stores geometric quantities associated
+        with edges and triangles, including:
+
+        - Edge endpoints
+        - Midpoints
+        - Edge lengths
+        - Tangent vectors
+        - Normal vectors
+        - Triangle barycenters
+        - Triangle areas
+
+        Boundary normals are oriented outward, while inner edge normals
+        are consistently oriented between neighboring triangles.
+
+        Notes
+        -----
+        The method updates the following attributes:
+
+        - ``self.edges``
+        - ``self.triangles``
+        - ``self.ready_for_assemble``
+        """
         edges = np.zeros(self.n_edges, dtype=edge_dtype)
         points = self._points
         edges["P"] = points[self._edges[:, 0], :]
@@ -104,22 +190,72 @@ class TrefftzMesh():
             self.ready_for_assemble = True
 
     def get_cell(self, p: float_array) -> int_array | int:
+        """
+        Find the mesh cell containing a point.
+
+        Parameters
+        ----------
+        p : float_array
+            Query point or points coordinates.
+
+        Returns
+        -------
+        int or int_array
+            Index (or indices) of the containing cell(s).
+        """
         return self.locator.find_cell(p)
 
     @property
     def n_points(self) -> int:
+        """
+        Number of mesh vertices.
+
+        Returns
+        -------
+        int
+            Total number of points in the mesh.
+        """
         return self._points.shape[0]
 
     @property
     def n_edges(self) -> int:
+        """
+        Number of mesh edges.
+
+        Returns
+        -------
+        int
+            Total number of edges in the mesh.
+        """
         return self._edges.shape[0]
     
     @property
     def n_triangles(self) -> int:
+        """
+        Number of triangular cells.
+
+        Returns
+        -------
+        int
+            Total number of triangles in the mesh.
+        """
         return self._triangles.shape[0]
     
     @classmethod
     def from_gmsh(cls, file_path: Path | str):
+        """
+        Create a mesh from a Gmsh mesh file.
+
+        Parameters
+        ----------
+        file_path : Path or str
+            Path to the Gmsh ``.msh`` file.
+
+        Returns
+        -------
+        TrefftzMesh
+            Constructed mesh instance.
+        """
         points, edges, triangles, edges2triangles, locator, cell_sets = GmshReader(file_path)
         return cls(points, edges, triangles, edges2triangles, locator, cell_sets)
     

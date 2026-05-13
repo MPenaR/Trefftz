@@ -42,6 +42,15 @@ class PlanewaveBasis:
         '''Number of degrees of freedom'''
         return self._N_DOF
     
+    @property
+    def T_ID_to_DOFs(self):
+        '''degrees of freedon per elements (array, Nelements x N theta)'''
+        return self._T_ID_to_DOFs
+    
+    @property
+    def D(self):
+        '''array of directions (x_i, y_i)'''
+        return self._D
 
     def dofs_on_element(self, t: int):
         '''returns the global degrees of freedom belonging to element "t"'''
