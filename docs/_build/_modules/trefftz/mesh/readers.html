@@ -215,7 +215,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.plot.html">trefftz.mesh.plot module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.locators.html">trefftz.mesh.locators module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
 </ul>
 </li>
@@ -274,10 +274,6 @@
 <span class="sd">- propagation of physical boundary tags</span>
 <span class="sd">- KD-tree accelerated point-location utilities</span>
 
-<span class="sd">Classes</span>
-<span class="sd">-------</span>
-<span class="sd">KDTreeLocator</span>
-<span class="sd">    KD-tree based spatial locator for triangular meshes.</span>
 
 <span class="sd">Functions</span>
 <span class="sd">---------</span>
@@ -307,8 +303,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">CellLocator</span><span class="p">,</span> <span class="n">in_triangle</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">cKDTree</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.locators</span><span class="w"> </span><span class="kn">import</span> <span class="n">KDTreeLocator</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.numpy_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span>
@@ -324,80 +319,9 @@
     <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
 
-<div class="viewcode-block" id="KDTreeLocator">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.readers.html#trefftz.mesh.readers.KDTreeLocator">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">KDTreeLocator</span><span class="p">(</span><span class="n">CellLocator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    KD-tree based locator for triangular meshes.</span>
-
-<span class="sd">    This locator accelerates point-to-cell searches by first identifying</span>
-<span class="sd">    nearby candidate triangles using a KD-tree built from triangle</span>
-<span class="sd">    centroids and then performing exact geometric containment tests.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    points : float_array</span>
-<span class="sd">        Array of mesh vertex coordinates with shape ``(n_points, 2)``.</span>
-
-<span class="sd">    triangles : int_array</span>
-<span class="sd">        Triangle connectivity array with shape ``(n_triangles, 3)``.</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    tree : scipy.spatial.cKDTree</span>
-<span class="sd">        KD-tree built from triangle centroids.</span>
-
-<span class="sd">    radius : float</span>
-<span class="sd">        Search radius used to retrieve candidate triangles.</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    The locator is designed for efficient repeated point-location</span>
-<span class="sd">    queries in large meshes.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">triangles</span><span class="p">:</span> <span class="n">int_array</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">points</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="o">=</span> <span class="n">triangles</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">build_index</span><span class="p">()</span>
-
-<div class="viewcode-block" id="KDTreeLocator.build_index">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.readers.html#trefftz.mesh.readers.KDTreeLocator.build_index">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">build_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">]</span> <span class="o">-</span> <span class="n">centroids</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span></div>
-
-
-<div class="viewcode-block" id="KDTreeLocator.find_cell">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.readers.html#trefftz.mesh.readers.KDTreeLocator.find_cell">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">find_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">int_array</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-        <span class="n">candidates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">query_ball_point</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,):</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">in_triangle</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">[</span><span class="n">i</span><span class="p">]]):</span>
-                    <span class="k">return</span> <span class="n">i</span>
-            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
-
-        <span class="k">elif</span> <span class="n">p</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">p_</span><span class="p">,</span> <span class="n">candidates_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">candidates</span><span class="p">)):</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">candidates_</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">in_triangle</span><span class="p">(</span><span class="n">p_</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">[</span><span class="n">i</span><span class="p">]]):</span>
-                        <span class="n">indexes</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
-            <span class="k">return</span> <span class="n">indexes</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input must have shape (2,) or (M, 2)&quot;</span><span class="p">)</span></div>
-</div>
-
-
-
-
-
 <div class="viewcode-block" id="GmshReader">
 <a class="viewcode-back" href="../../../api/trefftz.mesh.readers.html#trefftz.mesh.readers.GmshReader">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">GmshReader</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">CellLocator</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">int_array</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">GmshReader</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">KDTreeLocator</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">int_array</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read a Gmsh(4.1.0.8) mesh file and extract mesh connectivity data.</span>
 
@@ -444,7 +368,7 @@
 
 <div class="viewcode-block" id="GmshArrays">
 <a class="viewcode-back" href="../../../api/trefftz.mesh.readers.html#trefftz.mesh.readers.GmshArrays">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">GmshArrays</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">CellLocator</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">int_array</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">GmshArrays</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">int_array</span><span class="p">,</span> <span class="n">KDTreeLocator</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">int_array</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract mesh arrays from a Gmsh model.</span>
 
@@ -579,7 +503,7 @@
     <span class="c1">#             cell_sets[phys_ID][key] = meshed_to_generated[cell_sets[phys_ID][key]]</span>
 
 
-    <span class="n">locator</span> <span class="o">=</span> <span class="n">KDTreeLocator</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">points</span><span class="p">,</span> <span class="n">triangles</span><span class="o">=</span><span class="n">triangles</span><span class="p">)</span>
+    <span class="c1"># locator = KDTreeLocator(points=points, triangles=triangles)</span>
 
     <span class="k">return</span> <span class="n">points</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">edge2triangles</span><span class="p">,</span> <span class="n">locator</span><span class="p">,</span> <span class="n">cell_sets</span></div>
 

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
-        <title>trefftz.mesh.plot - Trefftz 0.1.0 documentation</title>
+        <title>trefftz.mesh.locators - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -215,7 +215,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.plot.html">trefftz.mesh.plot module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.locators.html">trefftz.mesh.locators module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
 </ul>
 </li>
@@ -258,110 +258,197 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for trefftz.mesh.plot</h1><div class="highlight"><pre>
+          <h1>Source code for trefftz.mesh.locators</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Visualization utilities for Trefftz meshes and waveguide geometries.</span>
+<span class="sd">Spatial point-location utilities for triangular meshes.</span>
 
-<span class="sd">This module provides plotting tools for inspecting mesh structures,</span>
-<span class="sd">boundary partitions, and geometric orientation data associated with</span>
-<span class="sd">Trefftz discretizations.</span>
+<span class="sd">This module defines the abstract interface for mesh cell locators</span>
+<span class="sd">and provides a concrete implementation based on KD-tree acceleration.</span>
 
-<span class="sd">The visualization routines are primarily intended for:</span>
+<span class="sd">Cell locators are responsible for determining which mesh element</span>
+<span class="sd">contains a given point in space.</span>
 
-<span class="sd">- debugging mesh connectivity</span>
-<span class="sd">- validating boundary tagging</span>
-<span class="sd">- inspecting tangent and normal orientations</span>
-<span class="sd">- visualizing waveguide geometries</span>
+<span class="sd">The module provides:</span>
 
-<span class="sd">Functions</span>
-<span class="sd">---------</span>
-<span class="sd">plot_waveguide</span>
-<span class="sd">    Plot a waveguide mesh together with boundary subsets and optional</span>
-<span class="sd">    edge orientation vectors.</span>
+<span class="sd">- a generic :class:`CellLocator` protocol</span>
+<span class="sd">- a KD-tree accelerated implementation for triangular meshes</span>
+<span class="sd">- robust point-in-triangle validation using geometric predicates</span>
+
+<span class="sd">Design overview</span>
+<span class="sd">---------------</span>
+<span class="sd">The KD-tree approach is used to reduce the search space from the full</span>
+<span class="sd">set of triangles to a small set of candidates based on centroid</span>
+<span class="sd">proximity. Each candidate is then validated using an exact</span>
+<span class="sd">point-in-triangle test.</span>
 
 <span class="sd">Notes</span>
 <span class="sd">-----</span>
-<span class="sd">The plotting utilities rely on Matplotlib and are designed for</span>
-<span class="sd">interactive exploratory workflows rather than publication-quality</span>
-<span class="sd">rendering.</span>
+<span class="sd">All implementations assume two-dimensional triangular meshes.</span>
+<span class="sd">Extensions to higher dimensions or other element types may require</span>
+<span class="sd">additional locator strategies.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span> 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrefftzMesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.numpy_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">cKDTree</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">in_triangle</span>
 
 
-<div class="viewcode-block" id="plot_waveguide">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.plot.html#trefftz.mesh.plot.plot_waveguide">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">plot_waveguide</span><span class="p">(</span><span class="n">mesh</span><span class="p">:</span> <span class="n">TrefftzMesh</span><span class="p">,</span> <span class="n">plot_tangents</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">plot_normals</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="CellLocator">
+<a class="viewcode-back" href="../../../api/trefftz.mesh.locators.html#trefftz.mesh.locators.CellLocator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CellLocator</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Plot a waveguide mesh and its boundary partitions.</span>
+<span class="sd">    Protocol defining the interface for mesh cell locators.</span>
 
-<span class="sd">    The visualization distinguishes between:</span>
+<span class="sd">    Cell locators are responsible for determining which mesh cell</span>
+<span class="sd">    contains a given spatial point.</span>
 
-<span class="sd">    - inner edges</span>
-<span class="sd">    - boundary subset ``S``</span>
-<span class="sd">    - boundary subset ``Gamma``</span>
-
-<span class="sd">    using different colors.</span>
-
-<span class="sd">    Optionally, edge tangent and normal vectors can also be displayed.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    mesh : TrefftzMesh</span>
-<span class="sd">        Mesh object containing geometric and boundary information.</span>
-
-<span class="sd">    plot_tangents : bool, default=False</span>
-<span class="sd">        If ``True``, display edge tangent vectors.</span>
-
-<span class="sd">    plot_normals : bool, default=False</span>
-<span class="sd">        If ``True``, display edge normal vectors.</span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    find_cell</span>
+<span class="sd">        Return the index of the cell containing the query point(s).</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The edge coloring convention is:</span>
+<span class="sd">    Concrete implementations may rely on:</span>
 
-<span class="sd">    - black: inner edges</span>
-<span class="sd">    - red: boundary subset ``S``</span>
-<span class="sd">    - blue: boundary subset ``Gamma``</span>
-
-<span class="sd">    Tangent and normal vectors are displayed using Matplotlib quiver</span>
-<span class="sd">    plots centered at edge midpoints.</span>
+<span class="sd">    - KD-trees</span>
+<span class="sd">    - triangulation search structures</span>
+<span class="sd">    - bounding volume hierarchies</span>
+<span class="sd">    - geometric predicates</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineCollection</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<div class="viewcode-block" id="CellLocator.find_cell">
+<a class="viewcode-back" href="../../../api/trefftz.mesh.locators.html#trefftz.mesh.locators.CellLocator.find_cell">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">int_array</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the mesh cell containing one or more query points.</span>
 
-    <span class="n">lw</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="c1"># ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color=&#39;k&#39;)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        p : float_array</span>
+<span class="sd">            Query point(s).</span>
 
-    <span class="n">S</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_cell_sets</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">][</span><span class="s2">&quot;line&quot;</span><span class="p">]</span>
-    <span class="n">G</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_cell_sets</span><span class="p">[</span><span class="s2">&quot;Gamma&quot;</span><span class="p">][</span><span class="s2">&quot;line&quot;</span><span class="p">]</span>  <span class="c1"># it allows for multidimensional subsets</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int or int_array</span>
+<span class="sd">            Index (or indices) of the containing cell(s).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+</div>
 
-    <span class="n">inner</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;boundary&quot;</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">LineCollection</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">inner</span><span class="p">][</span><span class="s2">&quot;P&quot;</span><span class="p">],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">inner</span><span class="p">][</span><span class="s2">&quot;Q&quot;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> 
-                                     <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="n">lw</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">LineCollection</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">S</span><span class="p">][</span><span class="s2">&quot;P&quot;</span><span class="p">],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">S</span><span class="p">][</span><span class="s2">&quot;Q&quot;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> 
-                                     <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="n">lw</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">LineCollection</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">G</span><span class="p">][</span><span class="s2">&quot;P&quot;</span><span class="p">],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">G</span><span class="p">][</span><span class="s2">&quot;Q&quot;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> 
-                                     <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="n">lw</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">plot_tangents</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">],</span>
-                  <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">],</span>
-                  <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">],</span>
-                  <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="viewcode-block" id="KDTreeLocator">
+<a class="viewcode-back" href="../../../api/trefftz.mesh.locators.html#trefftz.mesh.locators.KDTreeLocator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">KDTreeLocator</span><span class="p">(</span><span class="n">CellLocator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    KD-tree based locator for triangular meshes.</span>
 
-    <span class="k">if</span> <span class="n">plot_normals</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">],</span>
-                  <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">],</span>
-                  <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">],</span>
-                  <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="sd">    This locator accelerates point-to-cell searches by building a</span>
+<span class="sd">    KD-tree over triangle centroids and querying nearby candidate</span>
+<span class="sd">    elements before performing exact geometric containment tests.</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points : float_array</span>
+<span class="sd">        Array of mesh vertex coordinates with shape ``(n_points, 2)``.</span>
+
+<span class="sd">    triangles : int_array</span>
+<span class="sd">        Triangle connectivity array with shape ``(n_triangles, 3)``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tree : scipy.spatial.cKDTree</span>
+<span class="sd">        KD-tree constructed from triangle centroids.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Search radius used to retrieve candidate triangles.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Candidate triangles are selected based on centroid proximity and</span>
+<span class="sd">    validated using exact point-in-triangle tests.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">triangles</span><span class="p">:</span> <span class="n">int_array</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the locator and build the spatial index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="o">=</span> <span class="n">triangles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_index</span><span class="p">()</span>
+
+<div class="viewcode-block" id="KDTreeLocator.build_index">
+<a class="viewcode-back" href="../../../api/trefftz.mesh.locators.html#trefftz.mesh.locators.KDTreeLocator.build_index">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct the KD-tree spatial index.</span>
+
+<span class="sd">        The tree is built from triangle centroids and an associated</span>
+<span class="sd">        search radius is computed to guarantee retrieval of candidate</span>
+<span class="sd">        triangles for point-location queries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">]</span> <span class="o">-</span> <span class="n">centroids</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="KDTreeLocator.find_cell">
+<a class="viewcode-back" href="../../../api/trefftz.mesh.locators.html#trefftz.mesh.locators.KDTreeLocator.find_cell">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">int_array</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the triangle containing one or more query points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        p : float_array</span>
+<span class="sd">            Query point(s).</span>
+
+<span class="sd">            Accepted shapes are:</span>
+
+<span class="sd">            - ``(2,)`` for a single point</span>
+<span class="sd">            - ``(M, 2)`` for multiple points</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int or int_array</span>
+<span class="sd">            Index (or indices) of the containing triangle(s).</span>
+
+<span class="sd">            Points outside the mesh return ``-1``.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the input array does not have shape ``(2,)`` or ``(M, 2)``.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The search is performed in two stages:</span>
+
+<span class="sd">        1. KD-tree retrieval of nearby candidate triangles</span>
+<span class="sd">        2. Exact geometric containment test using</span>
+<span class="sd">           :func:`trefftz.mesh.geometry.in_triangle`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">query_ball_point</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">in_triangle</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">[</span><span class="n">i</span><span class="p">]]):</span>
+                    <span class="k">return</span> <span class="n">i</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">elif</span> <span class="n">p</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">p_</span><span class="p">,</span> <span class="n">candidates_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">candidates</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">candidates_</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">in_triangle</span><span class="p">(</span><span class="n">p_</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">[</span><span class="n">i</span><span class="p">]]):</span>
+                        <span class="n">indexes</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">return</span> <span class="n">indexes</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input must have shape (2,) or (M, 2)&quot;</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
         </article>

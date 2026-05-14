@@ -13,10 +13,6 @@ The implementation includes:
 - propagation of physical boundary tags
 - KD-tree accelerated point-location utilities
 
-Classes
--------
-KDTreeLocator
-    KD-tree based spatial locator for triangular meshes.
 
 Functions
 ---------
@@ -46,8 +42,7 @@ searches combined with exact geometric containment tests.
 """
 
 
-from .geometry import CellLocator, in_triangle
-from scipy.spatial import cKDTree
+from .locators import KDTreeLocator
 import numpy as np
 from pathlib import Path
 from trefftz.numpy_types import float_array, int_array
@@ -63,69 +58,7 @@ except ImportError as e:
     ) from e
 
 
-class KDTreeLocator(CellLocator):
-    """
-    KD-tree based locator for triangular meshes.
-
-    This locator accelerates point-to-cell searches by first identifying
-    nearby candidate triangles using a KD-tree built from triangle
-    centroids and then performing exact geometric containment tests.
-
-    Parameters
-    ----------
-    points : float_array
-        Array of mesh vertex coordinates with shape ``(n_points, 2)``.
-
-    triangles : int_array
-        Triangle connectivity array with shape ``(n_triangles, 3)``.
-
-    Attributes
-    ----------
-    tree : scipy.spatial.cKDTree
-        KD-tree built from triangle centroids.
-
-    radius : float
-        Search radius used to retrieve candidate triangles.
-
-    Notes
-    -----
-    The locator is designed for efficient repeated point-location
-    queries in large meshes.
-    """
-    def __init__(self, points: float_array, triangles: int_array):
-        self.points = points
-        self.triangles = triangles
-        self.build_index()
-
-    def build_index(self):
-        centroids = self.points[self.triangles].mean(axis=1)
-        self.tree = cKDTree(centroids)
-        self.radius = np.max(np.linalg.norm(self.points[self.triangles] - centroids[:, np.newaxis, :], axis=-1))
-
-    def find_cell(self, p: float_array) -> int_array | int:
-        p = np.asarray(p)
-        candidates = self.tree.query_ball_point(p, self.radius)
-
-        if p.shape == (2,):
-            for i in candidates:
-                if in_triangle(p, *self.points[self.triangles[i]]):
-                    return i
-            return -1
-
-        elif p.ndim == 2 and p.shape[1] == 2:
-            indexes = np.full(p.shape[0], dtype=np.int64, fill_value=-1)
-            for j, (p_, candidates_) in enumerate(zip(p, candidates)):
-                for i in candidates_:
-                    if in_triangle(p_, *self.points[self.triangles[i]]):
-                        indexes[j] = i
-            return indexes
-        else:
-            raise ValueError("Input must have shape (2,) or (M, 2)")
-
-
-
-
-def GmshReader(file_path: Path | str) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array]]:
+def GmshReader(file_path: Path | str) -> tuple[float_array, int_array, int_array, int_array, KDTreeLocator, dict[int, int_array]]:
     """
     Read a Gmsh(4.1.0.8) mesh file and extract mesh connectivity data.
 
@@ -169,7 +102,7 @@ def GmshReader(file_path: Path | str) -> tuple[float_array, int_array, int_array
 
 
 
-def GmshArrays(model: gmsh.model) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array]]:
+def GmshArrays(model: gmsh.model) -> tuple[float_array, int_array, int_array, int_array, KDTreeLocator, dict[int, int_array]]:
     """
     Extract mesh arrays from a Gmsh model.
 
@@ -304,6 +237,6 @@ def GmshArrays(model: gmsh.model) -> tuple[float_array, int_array, int_array, in
     #             cell_sets[phys_ID][key] = meshed_to_generated[cell_sets[phys_ID][key]]
 
 
-    locator = KDTreeLocator(points=points, triangles=triangles)
+    # locator = KDTreeLocator(points=points, triangles=triangles)
 
     return points, edges, triangles, edge2triangles, locator, cell_sets

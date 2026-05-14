@@ -216,7 +216,7 @@
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.plot.html">trefftz.mesh.plot module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.locators.html">trefftz.mesh.locators module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
 </ul>
 </li>
@@ -296,7 +296,7 @@ Each row contains the indices of the two endpoint vertices.</p></li>
 Each row contains the indices of the three triangle vertices.</p></li>
 <li><p><strong>edge2triangles</strong> (<em>int_array</em>) – Edge-to-triangle adjacency array with shape <code class="docutils literal notranslate"><span class="pre">(n_edges,</span> <span class="pre">2)</span></code>.
 For boundary edges, the second triangle index is <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p></li>
-<li><p><strong>locator</strong> (<a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator" title="trefftz.mesh.geometry.CellLocator"><em>CellLocator</em></a>) – Spatial locator used to identify the mesh cell containing a point.</p></li>
+<li><p><strong>locator</strong> (<a class="reference internal" href="trefftz.mesh.locators.html#trefftz.mesh.locators.CellLocator" title="trefftz.mesh.locators.CellLocator"><em>CellLocator</em></a>) – Spatial locator used to identify the mesh cell containing a point.</p></li>
 <li><p><strong>cell_sets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>int_array</em><em>]</em>) – Dictionary mapping physical region identifiers to edge indices.</p></li>
 </ul>
 </dd>
@@ -502,15 +502,7 @@ are consistently oriented between neighboring triangles.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html#classes">Classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html#functions">Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.KDTreeLocator"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.KDTreeLocator.tree"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.tree</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.KDTreeLocator.radius"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.radius</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.KDTreeLocator.build_index"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.build_index()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.KDTreeLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.find_cell()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.Mesh_from_meshio"><code class="docutils literal notranslate"><span class="pre">Mesh_from_meshio()</span></code></a></li>
 </ul>
 </li>
@@ -528,28 +520,26 @@ are consistently oriented between neighboring triangles.</p>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.in_triangle"><code class="docutils literal notranslate"><span class="pre">in_triangle()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.triangle_area"><code class="docutils literal notranslate"><span class="pre">triangle_area()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator"><code class="docutils literal notranslate"><span class="pre">CellLocator</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">CellLocator.find_cell()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.geometry.html#id3"><code class="docutils literal notranslate"><span class="pre">CellLocator.find_cell()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="trefftz.mesh.locators.html">trefftz.mesh.locators module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.locators.html#design-overview">Design overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.locators.html#trefftz.mesh.locators.CellLocator"><code class="docutils literal notranslate"><span class="pre">CellLocator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.locators.html#trefftz.mesh.locators.CellLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">CellLocator.find_cell()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.locators.html#id0"><code class="docutils literal notranslate"><span class="pre">CellLocator.find_cell()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="trefftz.mesh.plot.html">trefftz.mesh.plot module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.plot.html#functions">Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.plot.html#trefftz.mesh.plot.plot_waveguide"><code class="docutils literal notranslate"><span class="pre">plot_waveguide()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.locators.html#trefftz.mesh.locators.KDTreeLocator"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.locators.html#trefftz.mesh.locators.KDTreeLocator.tree"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.tree</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.locators.html#trefftz.mesh.locators.KDTreeLocator.radius"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.radius</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.locators.html#trefftz.mesh.locators.KDTreeLocator.build_index"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.build_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.locators.html#trefftz.mesh.locators.KDTreeLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.find_cell()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="trefftz.mesh.readers.html">trefftz.mesh.readers module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.readers.html#classes">Classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.readers.html#functions">Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.readers.html#trefftz.mesh.readers.KDTreeLocator"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.readers.html#trefftz.mesh.readers.KDTreeLocator.tree"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.tree</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.readers.html#trefftz.mesh.readers.KDTreeLocator.radius"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.radius</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.readers.html#trefftz.mesh.readers.KDTreeLocator.build_index"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.build_index()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="trefftz.mesh.readers.html#trefftz.mesh.readers.KDTreeLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.find_cell()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.readers.html#trefftz.mesh.readers.GmshReader"><code class="docutils literal notranslate"><span class="pre">GmshReader()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="trefftz.mesh.readers.html#trefftz.mesh.readers.GmshArrays"><code class="docutils literal notranslate"><span class="pre">GmshArrays()</span></code></a></li>
 </ul>

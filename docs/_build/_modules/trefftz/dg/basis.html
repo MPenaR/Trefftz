@@ -195,8 +195,35 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">TrefftzMesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/dg.html">dg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/geometry.html">Geometry Utilities</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../api/modules.html">trefftz</a><input aria-label="Toggle navigation of trefftz" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../api/trefftz.html">trefftz package</a><input aria-label="Toggle navigation of trefftz package" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.dg.html">trefftz.dg package</a><input aria-label="Toggle navigation of trefftz.dg package" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.basis.html">trefftz.dg.basis module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.block_fluxes.html">trefftz.dg.block_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.boundary_conditions.html">trefftz.dg.boundary_conditions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.fluxes.html">trefftz.dg.fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.functions.html">trefftz.dg.functions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes.html">trefftz.dg.serial_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes2.html">trefftz.dg.serial_fluxes2 module</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.mesh.html">trefftz.mesh package</a><input aria-label="Toggle navigation of trefftz.mesh package" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.checking_utilities.html">trefftz.mesh.checking_utilities module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.core.html">trefftz.mesh.core module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.locators.html">trefftz.mesh.locators module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/trefftz.numpy_types.html">trefftz.numpy_types module</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -239,7 +266,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <div class="viewcode-block" id="PlanewaveBasis">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.basis.PlanewaveBasis">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.PlanewaveBasis">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PlanewaveBasis</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;core basis class&#39;&#39;&#39;</span>
@@ -289,14 +316,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D</span>
 
 <div class="viewcode-block" id="PlanewaveBasis.dofs_on_element">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.basis.PlanewaveBasis.dofs_on_element">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.PlanewaveBasis.dofs_on_element">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dofs_on_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the global degrees of freedom belonging to element &quot;t&quot;&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_T_ID_to_DOFs</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="p">:]</span></div>
 
         
 <div class="viewcode-block" id="PlanewaveBasis.global_direction">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.basis.PlanewaveBasis.global_direction">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.PlanewaveBasis.global_direction">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">global_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;computes the direction of planewave corresponding global index n&#39;&#39;&#39;</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">n</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_theta</span>
@@ -304,7 +331,7 @@
 
 
 <div class="viewcode-block" id="PlanewaveBasis.plot_directions">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.basis.PlanewaveBasis.plot_directions">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.PlanewaveBasis.plot_directions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_directions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
@@ -317,7 +344,7 @@
 
 
 <div class="viewcode-block" id="LinearlySpacedBasis">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.basis.LinearlySpacedBasis">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.LinearlySpacedBasis">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">LinearlySpacedBasis</span><span class="p">(</span><span class="n">N_elements</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">N_theta</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">theta_0</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlanewaveBasis</span><span class="p">:</span>
     <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">N_theta</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="n">theta_0</span>
     <span class="k">return</span> <span class="n">PlanewaveBasis</span><span class="p">(</span><span class="n">N_elements</span><span class="o">=</span><span class="n">N_elements</span><span class="p">,</span> <span class="n">thetas</span><span class="o">=</span><span class="n">thetas</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span></div>
@@ -325,7 +352,7 @@
 
 
 <div class="viewcode-block" id="TayloredBasis">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.basis.TayloredBasis">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.TayloredBasis">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">TayloredBasis</span><span class="p">(</span><span class="n">N_elements</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">H</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlanewaveBasis</span><span class="p">:</span>
 
     <span class="n">N_P</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">H</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
@@ -340,7 +367,7 @@
 
 
 <div class="viewcode-block" id="TrefftzBasis">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.basis.TrefftzBasis">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.TrefftzBasis">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TrefftzBasis</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_elements</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N_theta</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">N_theta</span> <span class="o">=</span> <span class="n">N_theta</span>
@@ -360,14 +387,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_DOF</span>
 
 <div class="viewcode-block" id="TrefftzBasis.dofs_on_element">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.basis.TrefftzBasis.dofs_on_element">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.TrefftzBasis.dofs_on_element">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dofs_on_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the global degrees of freedom belonging to element &quot;t&quot;&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">T_ID_to_DOFs</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="p">:]</span></div>
 
         
 <div class="viewcode-block" id="TrefftzBasis.global_direction">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.basis.TrefftzBasis.global_direction">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.TrefftzBasis.global_direction">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">global_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;computes the direction of planewave corresponding global index n&#39;&#39;&#39;</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">n</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_theta</span>

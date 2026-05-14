@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="trefftz.mesh.readers module" href="trefftz.mesh.readers.html"><link rel="prev" title="trefftz.mesh.geometry module" href="trefftz.mesh.geometry.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
-        <title>trefftz.mesh.plot module - Trefftz 0.1.0 documentation</title>
+        <title>trefftz.mesh.locators module - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -216,7 +216,7 @@
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
-<li class="toctree-l5 current current-page"><a class="current reference internal" href="#">trefftz.mesh.plot module</a></li>
+<li class="toctree-l5 current current-page"><a class="current reference internal" href="#">trefftz.mesh.locators module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
 </ul>
 </li>
@@ -247,7 +247,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/api/trefftz.mesh.plot.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/api/trefftz.mesh.locators.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -265,61 +265,164 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-trefftz.mesh.plot">
-<span id="trefftz-mesh-plot-module"></span><h1>trefftz.mesh.plot module<a class="headerlink" href="#module-trefftz.mesh.plot" title="Link to this heading">¶</a></h1>
-<p>Visualization utilities for Trefftz meshes and waveguide geometries.</p>
-<p>This module provides plotting tools for inspecting mesh structures,
-boundary partitions, and geometric orientation data associated with
-Trefftz discretizations.</p>
-<p>The visualization routines are primarily intended for:</p>
+          <section id="module-trefftz.mesh.locators">
+<span id="trefftz-mesh-locators-module"></span><h1>trefftz.mesh.locators module<a class="headerlink" href="#module-trefftz.mesh.locators" title="Link to this heading">¶</a></h1>
+<p>Spatial point-location utilities for triangular meshes.</p>
+<p>This module defines the abstract interface for mesh cell locators
+and provides a concrete implementation based on KD-tree acceleration.</p>
+<p>Cell locators are responsible for determining which mesh element
+contains a given point in space.</p>
+<p>The module provides:</p>
 <ul class="simple">
-<li><p>debugging mesh connectivity</p></li>
-<li><p>validating boundary tagging</p></li>
-<li><p>inspecting tangent and normal orientations</p></li>
-<li><p>visualizing waveguide geometries</p></li>
+<li><p>a generic <a class="reference internal" href="#trefftz.mesh.locators.CellLocator" title="trefftz.mesh.locators.CellLocator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CellLocator</span></code></a> protocol</p></li>
+<li><p>a KD-tree accelerated implementation for triangular meshes</p></li>
+<li><p>robust point-in-triangle validation using geometric predicates</p></li>
 </ul>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
-<dl class="simple">
-<dt>plot_waveguide</dt><dd><p>Plot a waveguide mesh together with boundary subsets and optional
-edge orientation vectors.</p>
+<section id="design-overview">
+<h2>Design overview<a class="headerlink" href="#design-overview" title="Link to this heading">¶</a></h2>
+<p>The KD-tree approach is used to reduce the search space from the full
+set of triangles to a small set of candidates based on centroid
+proximity. Each candidate is then validated using an exact
+point-in-triangle test.</p>
+<p class="rubric">Notes</p>
+<p>All implementations assume two-dimensional triangular meshes.
+Extensions to higher dimensions or other element types may require
+additional locator strategies.</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.mesh.locators.CellLocator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trefftz.mesh.locators.</span></span><span class="sig-name descname"><span class="pre">CellLocator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/locators.html#CellLocator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.locators.CellLocator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></a></p>
+<p>Protocol defining the interface for mesh cell locators.</p>
+<p>Cell locators are responsible for determining which mesh cell
+contains a given spatial point.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.mesh.locators.CellLocator.find_cell">
+<span class="sig-name descname"><span class="pre">find_cell</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/locators.html#CellLocator.find_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.locators.CellLocator.find_cell" title="Link to this definition">¶</a></dt>
+<dd><p>Return the index of the cell containing the query point(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a><em>]</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]] | <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
 </dd>
 </dl>
+</dd></dl>
+
 <p class="rubric">Notes</p>
-<p>The plotting utilities rely on Matplotlib and are designed for
-interactive exploratory workflows rather than publication-quality
-rendering.</p>
-</section>
-<dl class="py function">
-<dt class="sig sig-object py" id="trefftz.mesh.plot.plot_waveguide">
-<span class="sig-prename descclassname"><span class="pre">trefftz.mesh.plot.</span></span><span class="sig-name descname"><span class="pre">plot_waveguide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_tangents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_normals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/plot.html#plot_waveguide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.plot.plot_waveguide" title="Link to this definition">¶</a></dt>
-<dd><p>Plot a waveguide mesh and its boundary partitions.</p>
-<p>The visualization distinguishes between:</p>
+<p>Concrete implementations may rely on:</p>
 <ul class="simple">
-<li><p>inner edges</p></li>
-<li><p>boundary subset <code class="docutils literal notranslate"><span class="pre">S</span></code></p></li>
-<li><p>boundary subset <code class="docutils literal notranslate"><span class="pre">Gamma</span></code></p></li>
+<li><p>KD-trees</p></li>
+<li><p>triangulation search structures</p></li>
+<li><p>bounding volume hierarchies</p></li>
+<li><p>geometric predicates</p></li>
 </ul>
-<p>using different colors.</p>
-<p>Optionally, edge tangent and normal vectors can also be displayed.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">find_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/locators.html#CellLocator.find_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd><p>Find the mesh cell containing one or more query points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>float_array</em>) – Query point(s).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index (or indices) of the containing cell(s).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a> or int_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.mesh.locators.KDTreeLocator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trefftz.mesh.locators.</span></span><span class="sig-name descname"><span class="pre">KDTreeLocator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triangles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/locators.html#KDTreeLocator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.locators.KDTreeLocator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#trefftz.mesh.locators.CellLocator" title="trefftz.mesh.locators.CellLocator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CellLocator</span></code></a></p>
+<p>KD-tree based locator for triangular meshes.</p>
+<p>This locator accelerates point-to-cell searches by building a
+KD-tree over triangle centroids and querying nearby candidate
+elements before performing exact geometric containment tests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mesh</strong> (<a class="reference internal" href="trefftz.mesh.html#trefftz.mesh.TrefftzMesh" title="trefftz.mesh.TrefftzMesh"><em>TrefftzMesh</em></a>) – Mesh object containing geometric and boundary information.</p></li>
-<li><p><strong>plot_tangents</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, display edge tangent vectors.</p></li>
-<li><p><strong>plot_normals</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, display edge normal vectors.</p></li>
+<li><p><strong>points</strong> (<em>float_array</em>) – Array of mesh vertex coordinates with shape <code class="docutils literal notranslate"><span class="pre">(n_points,</span> <span class="pre">2)</span></code>.</p></li>
+<li><p><strong>triangles</strong> (<em>int_array</em>) – Triangle connectivity array with shape <code class="docutils literal notranslate"><span class="pre">(n_triangles,</span> <span class="pre">3)</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="trefftz.mesh.locators.KDTreeLocator.tree">
+<span class="sig-name descname"><span class="pre">tree</span></span><a class="headerlink" href="#trefftz.mesh.locators.KDTreeLocator.tree" title="Link to this definition">¶</a></dt>
+<dd><p>KD-tree constructed from triangle centroids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.cKDTree.html#scipy.spatial.cKDTree" title="(in SciPy v1.17.0)">scipy.spatial.cKDTree</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="trefftz.mesh.locators.KDTreeLocator.radius">
+<span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#trefftz.mesh.locators.KDTreeLocator.radius" title="Link to this definition">¶</a></dt>
+<dd><p>Search radius used to retrieve candidate triangles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <p class="rubric">Notes</p>
-<p>The edge coloring convention is:</p>
+<p>Candidate triangles are selected based on centroid proximity and
+validated using exact point-in-triangle tests.</p>
+<p>Initialize the locator and build the spatial index.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.mesh.locators.KDTreeLocator.build_index">
+<span class="sig-name descname"><span class="pre">build_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/locators.html#KDTreeLocator.build_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.locators.KDTreeLocator.build_index" title="Link to this definition">¶</a></dt>
+<dd><p>Construct the KD-tree spatial index.</p>
+<p>The tree is built from triangle centroids and an associated
+search radius is computed to guarantee retrieval of candidate
+triangles for point-location queries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.mesh.locators.KDTreeLocator.find_cell">
+<span class="sig-name descname"><span class="pre">find_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/locators.html#KDTreeLocator.find_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.locators.KDTreeLocator.find_cell" title="Link to this definition">¶</a></dt>
+<dd><p>Find the triangle containing one or more query points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>float_array</em>) – <p>Query point(s).</p>
+<p>Accepted shapes are:</p>
 <ul class="simple">
-<li><p>black: inner edges</p></li>
-<li><p>red: boundary subset <code class="docutils literal notranslate"><span class="pre">S</span></code></p></li>
-<li><p>blue: boundary subset <code class="docutils literal notranslate"><span class="pre">Gamma</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">(2,)</span></code> for a single point</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">2)</span></code> for multiple points</p></li>
 </ul>
-<p>Tangent and normal vectors are displayed using Matplotlib quiver
-plots centered at edge midpoints.</p>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Index (or indices) of the containing triangle(s).</p>
+<p>Points outside the mesh return <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a> or int_array</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the input array does not have shape <code class="docutils literal notranslate"><span class="pre">(2,)</span></code> or <code class="docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">2)</span></code>.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The search is performed in two stages:</p>
+<ol class="arabic simple">
+<li><p>KD-tree retrieval of nearby candidate triangles</p></li>
+<li><p>Exact geometric containment test using
+<a class="reference internal" href="geometry.html#trefftz.mesh.geometry.in_triangle" title="trefftz.mesh.geometry.in_triangle"><code class="xref py py-func docutils literal notranslate"><span class="pre">trefftz.mesh.geometry.in_triangle()</span></code></a></p></li>
+</ol>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -379,9 +482,20 @@ plots centered at edge midpoints.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">trefftz.mesh.plot module</a><ul>
-<li><a class="reference internal" href="#functions">Functions</a></li>
-<li><a class="reference internal" href="#trefftz.mesh.plot.plot_waveguide"><code class="docutils literal notranslate"><span class="pre">plot_waveguide()</span></code></a></li>
+<li><a class="reference internal" href="#">trefftz.mesh.locators module</a><ul>
+<li><a class="reference internal" href="#design-overview">Design overview</a></li>
+<li><a class="reference internal" href="#trefftz.mesh.locators.CellLocator"><code class="docutils literal notranslate"><span class="pre">CellLocator</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.mesh.locators.CellLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">CellLocator.find_cell()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">CellLocator.find_cell()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#trefftz.mesh.locators.KDTreeLocator"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.mesh.locators.KDTreeLocator.tree"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.tree</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.mesh.locators.KDTreeLocator.radius"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.radius</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.mesh.locators.KDTreeLocator.build_index"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.build_index()</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.mesh.locators.KDTreeLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.find_cell()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

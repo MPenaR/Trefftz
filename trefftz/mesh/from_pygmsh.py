@@ -13,11 +13,6 @@ The main features include:
 - point location using a KD-tree accelerated search
 - propagation of physical region markers from mesh files
 
-Classes
--------
-KDTreeLocator
-    Spatial point locator based on triangle centroid KD-tree queries.
-
 Functions
 ---------
 Mesh_from_meshio
@@ -31,17 +26,12 @@ This module is primarily intended for meshes generated through:
 - pygmsh
 - meshio-compatible formats
 
-The KD-tree locator accelerates point-to-cell queries by first selecting
-candidate triangles through centroid proximity and then performing
-exact geometric containment checks.
 """
 
 
 import numpy as np
-from .core import CellLocator, TrefftzMesh
-from scipy.spatial import cKDTree
-from trefftz.numpy_types import float_array, int_array
-from trefftz.mesh.geometry import in_triangle
+from .core import TrefftzMesh
+from .locators import KDTreeLocator
 
 try:
     from meshio import Mesh
@@ -50,109 +40,6 @@ except ImportError as e:
         "The module trefftz.mesh.from_pygmsh requires pygmsh.\n"
         "Install it with: pip install trefftz[pygmsh]"
     ) from e
-
-
-class KDTreeLocator(CellLocator):
-    """
-    KD-tree based locator for triangular meshes.
-
-    This locator accelerates point-to-cell searches by building a
-    KD-tree over triangle centroids and querying nearby candidate
-    elements before performing exact geometric containment tests.
-
-    Parameters
-    ----------
-    points : float_array
-        Array of mesh vertex coordinates with shape ``(n_points, 2)``.
-
-    triangles : int_array
-        Triangle connectivity array with shape ``(n_triangles, 3)``.
-
-    Attributes
-    ----------
-    tree : scipy.spatial.cKDTree
-        KD-tree constructed from triangle centroids.
-
-    radius : float
-        Search radius used to retrieve candidate triangles.
-
-    Notes
-    -----
-    Candidate triangles are selected based on centroid proximity and
-    validated using exact point-in-triangle tests.
-    """
-    def __init__(self, points: float_array, triangles: int_array):
-        """
-        Initialize the locator and build the spatial index.
-        """
-        self.points = points
-        self.triangles = triangles
-        self.build_index()
-
-    def build_index(self):
-        """
-        Construct the KD-tree spatial index.
-
-        The tree is built from triangle centroids and an associated
-        search radius is computed to guarantee retrieval of candidate
-        triangles for point-location queries.
-        """
-        centroids = self.points[self.triangles].mean(axis=1)
-        self.tree = cKDTree(centroids)
-        self.radius = np.max(np.linalg.norm(self.points[self.triangles] - centroids[:, np.newaxis, :], axis=-1))
-
-    def find_cell(self, p: float_array) -> int_array | int:
-        """
-        Find the triangle containing one or more query points.
-
-        Parameters
-        ----------
-        p : float_array
-            Query point(s).
-
-            Accepted shapes are:
-
-            - ``(2,)`` for a single point
-            - ``(M, 2)`` for multiple points
-
-        Returns
-        -------
-        int or int_array
-            Index (or indices) of the containing triangle(s).
-
-            Points outside the mesh return ``-1``.
-
-        Raises
-        ------
-        ValueError
-            If the input array does not have shape ``(2,)`` or ``(M, 2)``.
-
-        Notes
-        -----
-        The search is performed in two stages:
-
-        1. KD-tree retrieval of nearby candidate triangles
-        2. Exact geometric containment test using
-           :func:`trefftz.mesh.geometry.in_triangle`
-        """
-        p = np.asarray(p)
-        candidates = self.tree.query_ball_point(p, self.radius)
-
-        if p.shape == (2,):
-            for i in candidates:
-                if in_triangle(p, *self.points[self.triangles[i]]):
-                    return i
-            return -1
-
-        elif p.ndim == 2 and p.shape[1] == 2:
-            indexes = np.full(p.shape[0], dtype=np.int64, fill_value=-1)
-            for j, (p_, candidates_) in enumerate(zip(p, candidates)):
-                for i in candidates_:
-                    if in_triangle(p_, *self.points[self.triangles[i]]):
-                        indexes[j] = i
-            return indexes
-        else:
-            raise ValueError("Input must have shape (2,) or (M, 2)")
 
 
 def Mesh_from_meshio(mesh: Mesh) -> TrefftzMesh:

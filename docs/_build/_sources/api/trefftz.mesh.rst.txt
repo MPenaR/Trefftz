@@ -17,5 +17,5 @@ Submodules
    trefftz.mesh.from_matplotlib
    trefftz.mesh.from_pygmsh
    trefftz.mesh.geometry
-   trefftz.mesh.plot
+   trefftz.mesh.locators
    trefftz.mesh.readers

@@ -195,8 +195,35 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">TrefftzMesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/dg.html">dg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/geometry.html">Geometry Utilities</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../api/modules.html">trefftz</a><input aria-label="Toggle navigation of trefftz" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../api/trefftz.html">trefftz package</a><input aria-label="Toggle navigation of trefftz package" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.dg.html">trefftz.dg package</a><input aria-label="Toggle navigation of trefftz.dg package" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.basis.html">trefftz.dg.basis module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.block_fluxes.html">trefftz.dg.block_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.boundary_conditions.html">trefftz.dg.boundary_conditions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.fluxes.html">trefftz.dg.fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.functions.html">trefftz.dg.functions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes.html">trefftz.dg.serial_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes2.html">trefftz.dg.serial_fluxes2 module</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.mesh.html">trefftz.mesh package</a><input aria-label="Toggle navigation of trefftz.mesh package" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.checking_utilities.html">trefftz.mesh.checking_utilities module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.core.html">trefftz.mesh.core module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.locators.html">trefftz.mesh.locators module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/trefftz.numpy_types.html">trefftz.numpy_types module</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -245,7 +272,7 @@
 
 
 <div class="viewcode-block" id="ComplexFunction">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.functions.ComplexFunction">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.functions.html#trefftz.dg.functions.ComplexFunction">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ComplexFunction</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;TrefftzMesh&quot;</span><span class="p">,</span>  <span class="n">N_theta</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span>
@@ -257,7 +284,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thetas</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thetas</span><span class="p">)])</span>
 
 <div class="viewcode-block" id="ComplexFunction.set">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.functions.ComplexFunction.set">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.functions.html#trefftz.dg.functions.ComplexFunction.set">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">:</span> <span class="n">complex_array</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_DOF</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="o">=</span> <span class="n">coefficients</span></div>
@@ -279,7 +306,7 @@
 
 
 <div class="viewcode-block" id="TrefftzFunction">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.functions.TrefftzFunction">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.functions.html#trefftz.dg.functions.TrefftzFunction">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TrefftzFunction</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Numerical function belonging to the finite dimensiona broken Trefftz space&#39;&#39;&#39;</span>
 
@@ -289,7 +316,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">N_DOF</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TrefftzFunction.set">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.functions.TrefftzFunction.set">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.dg.functions.html#trefftz.dg.functions.TrefftzFunction.set">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">N_DOF</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">coefficients</span></div>

@@ -59,13 +59,13 @@ The module currently targets two-dimensional triangular meshes.
 from typing import Final
 import numpy as np
 from numpy.linalg import norm
-from .geometry import CellLocator
+from .locators import CellLocator
 from trefftz.numpy_types import float_array, int_array
 from .geometry import triangle_area
 from enum import IntEnum
 from pathlib import Path
 from .readers import GmshReader
-from .geometry import CellType
+#from .geometry import CellType
 
 class EdgeType(IntEnum):
     INNER = 0

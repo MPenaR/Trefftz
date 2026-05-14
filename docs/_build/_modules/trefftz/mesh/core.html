@@ -215,7 +215,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.plot.html">trefftz.mesh.plot module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.locators.html">trefftz.mesh.locators module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
 </ul>
 </li>
@@ -320,13 +320,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">CellLocator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.locators</span><span class="w"> </span><span class="kn">import</span> <span class="n">CellLocator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.numpy_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">triangle_area</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.readers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GmshReader</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">CellType</span>
+<span class="c1">#from .geometry import CellType</span>
 
 <div class="viewcode-block" id="EdgeType">
 <a class="viewcode-back" href="../../../api/trefftz.mesh.core.html#trefftz.mesh.EdgeType">[docs]</a>

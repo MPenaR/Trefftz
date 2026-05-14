@@ -37,7 +37,6 @@ entities for efficient numerical computations.
 
 from trefftz.numpy_types import float_array, int_array
 import numpy as np
-from typing import Protocol
 from enum import IntEnum
 
 
@@ -145,41 +144,3 @@ def triangle_area(A: float_array, B: float_array, C: float_array) -> int | int_a
     v = (B - A).transpose()
     det = u[0]*v[1] - u[1]*v[0]
     return 0.5*np.abs(det).transpose()
-
-
-class CellLocator(Protocol):
-    """
-    Protocol defining the interface for mesh cell locators.
-
-    Cell locators are responsible for determining which mesh cell
-    contains a given spatial point.
-
-    Methods
-    -------
-    find_cell
-        Return the index of the cell containing the query point(s).
-
-    Notes
-    -----
-    Concrete implementations may rely on:
-
-    - KD-trees
-    - triangulation search structures
-    - bounding volume hierarchies
-    - geometric predicates
-    """
-    def find_cell(self, p: float_array) -> int_array | int:
-        """
-        Find the mesh cell containing one or more query points.
-
-        Parameters
-        ----------
-        p : float_array
-            Query point(s).
-
-        Returns
-        -------
-        int or int_array
-            Index (or indices) of the containing cell(s).
-        """
-        ...

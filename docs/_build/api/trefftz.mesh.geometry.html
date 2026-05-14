@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="trefftz.mesh.plot module" href="trefftz.mesh.plot.html"><link rel="prev" title="trefftz.mesh.from_pygmsh module" href="trefftz.mesh.from_pygmsh.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="trefftz.mesh.locators module" href="trefftz.mesh.locators.html"><link rel="prev" title="trefftz.mesh.from_pygmsh module" href="trefftz.mesh.from_pygmsh.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
         <title>trefftz.mesh.geometry module - Trefftz 0.1.0 documentation</title>
@@ -216,7 +216,7 @@
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
 <li class="toctree-l5 current current-page"><a class="current reference internal" href="#">trefftz.mesh.geometry module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.plot.html">trefftz.mesh.plot module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.locators.html">trefftz.mesh.locators module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
 </ul>
 </li>
@@ -400,54 +400,6 @@ array containing the area of each triangle.</p>
 evaluation over multiple triangles.</p>
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="trefftz.mesh.geometry.CellLocator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trefftz.mesh.geometry.</span></span><span class="sig-name descname"><span class="pre">CellLocator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/geometry.html#CellLocator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.geometry.CellLocator" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></a></p>
-<p>Protocol defining the interface for mesh cell locators.</p>
-<p>Cell locators are responsible for determining which mesh cell
-contains a given spatial point.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="trefftz.mesh.geometry.CellLocator.find_cell">
-<span class="sig-name descname"><span class="pre">find_cell</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/geometry.html#CellLocator.find_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.geometry.CellLocator.find_cell" title="Link to this definition">¶</a></dt>
-<dd><p>Return the index of the cell containing the query point(s).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a><em>]</em><em>]</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]] | <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Notes</p>
-<p>Concrete implementations may rely on:</p>
-<ul class="simple">
-<li><p>KD-trees</p></li>
-<li><p>triangulation search structures</p></li>
-<li><p>bounding volume hierarchies</p></li>
-<li><p>geometric predicates</p></li>
-</ul>
-<dl class="py method">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">find_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/geometry.html#CellLocator.find_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
-<dd><p>Find the mesh cell containing one or more query points.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>p</strong> (<em>float_array</em>) – Query point(s).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Index (or indices) of the containing cell(s).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a> or int_array</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 
         </article>
@@ -455,12 +407,12 @@ contains a given spatial point.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="trefftz.mesh.plot.html">
+          <a class="next-page" href="trefftz.mesh.locators.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">trefftz.mesh.plot module</div>
+                <div class="title">trefftz.mesh.locators module</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -519,11 +471,6 @@ contains a given spatial point.</p>
 </li>
 <li><a class="reference internal" href="#trefftz.mesh.geometry.in_triangle"><code class="docutils literal notranslate"><span class="pre">in_triangle()</span></code></a></li>
 <li><a class="reference internal" href="#trefftz.mesh.geometry.triangle_area"><code class="docutils literal notranslate"><span class="pre">triangle_area()</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.mesh.geometry.CellLocator"><code class="docutils literal notranslate"><span class="pre">CellLocator</span></code></a><ul>
-<li><a class="reference internal" href="#trefftz.mesh.geometry.CellLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">CellLocator.find_cell()</span></code></a></li>
-<li><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">CellLocator.find_cell()</span></code></a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>

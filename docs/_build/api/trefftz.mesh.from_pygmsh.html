@@ -216,7 +216,7 @@
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
 <li class="toctree-l5 current current-page"><a class="current reference internal" href="#">trefftz.mesh.from_pygmsh module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.plot.html">trefftz.mesh.plot module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.locators.html">trefftz.mesh.locators module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
 </ul>
 </li>
@@ -279,13 +279,6 @@ and the internal mesh representation used throughout the Trefftz library.</p>
 <li><p>point location using a KD-tree accelerated search</p></li>
 <li><p>propagation of physical region markers from mesh files</p></li>
 </ul>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<dl class="simple">
-<dt>KDTreeLocator</dt><dd><p>Spatial point locator based on triangle centroid KD-tree queries.</p>
-</dd>
-</dl>
-</section>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <dl class="simple">
@@ -299,98 +292,7 @@ and the internal mesh representation used throughout the Trefftz library.</p>
 <li><p>pygmsh</p></li>
 <li><p>meshio-compatible formats</p></li>
 </ul>
-<p>The KD-tree locator accelerates point-to-cell queries by first selecting
-candidate triangles through centroid proximity and then performing
-exact geometric containment checks.</p>
 </section>
-<dl class="py class">
-<dt class="sig sig-object py" id="trefftz.mesh.from_pygmsh.KDTreeLocator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trefftz.mesh.from_pygmsh.</span></span><span class="sig-name descname"><span class="pre">KDTreeLocator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triangles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/from_pygmsh.html#KDTreeLocator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.from_pygmsh.KDTreeLocator" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator" title="trefftz.mesh.geometry.CellLocator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CellLocator</span></code></a></p>
-<p>KD-tree based locator for triangular meshes.</p>
-<p>This locator accelerates point-to-cell searches by building a
-KD-tree over triangle centroids and querying nearby candidate
-elements before performing exact geometric containment tests.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>points</strong> (<em>float_array</em>) – Array of mesh vertex coordinates with shape <code class="docutils literal notranslate"><span class="pre">(n_points,</span> <span class="pre">2)</span></code>.</p></li>
-<li><p><strong>triangles</strong> (<em>int_array</em>) – Triangle connectivity array with shape <code class="docutils literal notranslate"><span class="pre">(n_triangles,</span> <span class="pre">3)</span></code>.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="trefftz.mesh.from_pygmsh.KDTreeLocator.tree">
-<span class="sig-name descname"><span class="pre">tree</span></span><a class="headerlink" href="#trefftz.mesh.from_pygmsh.KDTreeLocator.tree" title="Link to this definition">¶</a></dt>
-<dd><p>KD-tree constructed from triangle centroids.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.cKDTree.html#scipy.spatial.cKDTree" title="(in SciPy v1.17.0)">scipy.spatial.cKDTree</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="trefftz.mesh.from_pygmsh.KDTreeLocator.radius">
-<span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#trefftz.mesh.from_pygmsh.KDTreeLocator.radius" title="Link to this definition">¶</a></dt>
-<dd><p>Search radius used to retrieve candidate triangles.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Notes</p>
-<p>Candidate triangles are selected based on centroid proximity and
-validated using exact point-in-triangle tests.</p>
-<p>Initialize the locator and build the spatial index.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="trefftz.mesh.from_pygmsh.KDTreeLocator.build_index">
-<span class="sig-name descname"><span class="pre">build_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/from_pygmsh.html#KDTreeLocator.build_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.from_pygmsh.KDTreeLocator.build_index" title="Link to this definition">¶</a></dt>
-<dd><p>Construct the KD-tree spatial index.</p>
-<p>The tree is built from triangle centroids and an associated
-search radius is computed to guarantee retrieval of candidate
-triangles for point-location queries.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="trefftz.mesh.from_pygmsh.KDTreeLocator.find_cell">
-<span class="sig-name descname"><span class="pre">find_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/from_pygmsh.html#KDTreeLocator.find_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.from_pygmsh.KDTreeLocator.find_cell" title="Link to this definition">¶</a></dt>
-<dd><p>Find the triangle containing one or more query points.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>p</strong> (<em>float_array</em>) – <p>Query point(s).</p>
-<p>Accepted shapes are:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">(2,)</span></code> for a single point</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">2)</span></code> for multiple points</p></li>
-</ul>
-</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>Index (or indices) of the containing triangle(s).</p>
-<p>Points outside the mesh return <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
-</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a> or int_array</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the input array does not have shape <code class="docutils literal notranslate"><span class="pre">(2,)</span></code> or <code class="docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">2)</span></code>.</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The search is performed in two stages:</p>
-<ol class="arabic simple">
-<li><p>KD-tree retrieval of nearby candidate triangles</p></li>
-<li><p>Exact geometric containment test using
-<a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.in_triangle" title="trefftz.mesh.geometry.in_triangle"><code class="xref py py-func docutils literal notranslate"><span class="pre">trefftz.mesh.geometry.in_triangle()</span></code></a></p></li>
-</ol>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="trefftz.mesh.from_pygmsh.Mesh_from_meshio">
 <span class="sig-prename descclassname"><span class="pre">trefftz.mesh.from_pygmsh.</span></span><span class="sig-name descname"><span class="pre">Mesh_from_meshio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/from_pygmsh.html#Mesh_from_meshio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.from_pygmsh.Mesh_from_meshio" title="Link to this definition">¶</a></dt>
@@ -478,15 +380,7 @@ propagated to the generated mesh representation.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">trefftz.mesh.from_pygmsh module</a><ul>
-<li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
-<li><a class="reference internal" href="#trefftz.mesh.from_pygmsh.KDTreeLocator"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator</span></code></a><ul>
-<li><a class="reference internal" href="#trefftz.mesh.from_pygmsh.KDTreeLocator.tree"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.tree</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.mesh.from_pygmsh.KDTreeLocator.radius"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.radius</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.mesh.from_pygmsh.KDTreeLocator.build_index"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.build_index()</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.mesh.from_pygmsh.KDTreeLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.find_cell()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#trefftz.mesh.from_pygmsh.Mesh_from_meshio"><code class="docutils literal notranslate"><span class="pre">Mesh_from_meshio()</span></code></a></li>
 </ul>
 </li>
