@@ -196,6 +196,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry Utilities</a></li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="modules.html">trefftz</a><input aria-label="Toggle navigation of trefftz" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="trefftz.html">trefftz package</a><input aria-label="Toggle navigation of trefftz package" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l4 has-children"><a class="reference internal" href="trefftz.dg.html">trefftz.dg package</a><input aria-label="Toggle navigation of trefftz.dg package" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -265,24 +267,85 @@
         <article role="main" id="furo-main-content">
           <section id="module-trefftz.mesh.from_matplotlib">
 <span id="trefftz-mesh-from-matplotlib-module"></span><h1>trefftz.mesh.from_matplotlib module<a class="headerlink" href="#module-trefftz.mesh.from_matplotlib" title="Link to this heading">¶</a></h1>
+<p>Utilities for constructing and querying meshes based on
+<code class="docutils literal notranslate"><span class="pre">matplotlib.tri.Triangulation</span></code>.</p>
+<p>This module provides interoperability between Matplotlib triangulations
+and the <code class="xref py py-class docutils literal notranslate"><span class="pre">TrefftzMesh</span></code> data structures used throughout the library.</p>
+<p>The main features include:</p>
+<ul class="simple">
+<li><p>conversion from Matplotlib triangulations to <code class="xref py py-class docutils literal notranslate"><span class="pre">TrefftzMesh</span></code></p></li>
+<li><p>point-to-cell location using Matplotlib’s trifinder utilities</p></li>
+<li><p>lightweight mesh initialization for visualization and prototyping</p></li>
+</ul>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>MatplotlibLocator</dt><dd><p>Cell locator wrapper around Matplotlib triangulation search tools.</p>
+</dd>
+</dl>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>Mesh_from_Matplotlib</dt><dd><p>Construct a <code class="xref py py-class docutils literal notranslate"><span class="pre">TrefftzMesh</span></code> from a
+<code class="docutils literal notranslate"><span class="pre">matplotlib.tri.Triangulation</span></code>.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This module is primarily intended for:</p>
+<ul class="simple">
+<li><p>rapid prototyping</p></li>
+<li><p>visualization workflows</p></li>
+<li><p>interoperability with Matplotlib triangulation utilities</p></li>
+</ul>
+<p>For production mesh generation and region-aware boundary handling,
+Gmsh-based workflows are generally preferred.</p>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="trefftz.mesh.from_matplotlib.MatplotlibLocator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trefftz.mesh.from_matplotlib.</span></span><span class="sig-name descname"><span class="pre">MatplotlibLocator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Tri</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/from_matplotlib.html#MatplotlibLocator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.from_matplotlib.MatplotlibLocator" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator" title="trefftz.mesh.geometry.CellLocator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CellLocator</span></code></a></p>
+<p>Cell locator based on a Matplotlib triangulation.</p>
+<p>This class wraps the triangulation search utilities provided by
+<code class="docutils literal notranslate"><span class="pre">matplotlib.tri.Triangulation</span></code> and exposes a unified interface
+compatible with <code class="xref py py-class docutils literal notranslate"><span class="pre">CellLocator</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Tri</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/tri_api.html#matplotlib.tri.Triangulation" title="(in Matplotlib v3.10.9)"><em>Triangulation</em></a>)</p>
+<dd class="field-odd"><p><strong>Tri</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/tri_api.html#matplotlib.tri.Triangulation" title="(in Matplotlib v3.10.9)"><em>matplotlib.tri.Triangulation</em></a>) – Triangulation object used for point-to-cell queries.</p>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="trefftz.mesh.from_matplotlib.MatplotlibLocator.trifinder">
+<span class="sig-name descname"><span class="pre">trifinder</span></span><a class="headerlink" href="#trefftz.mesh.from_matplotlib.MatplotlibLocator.trifinder" title="Link to this definition">¶</a></dt>
+<dd><p>Matplotlib triangle finder object returned by
+<code class="docutils literal notranslate"><span class="pre">Tri.get_trifinder()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<p>The locator uses Matplotlib’s internal spatial search algorithm
+to identify the triangle containing a given point.</p>
+<p>Initialize the locator from a triangulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="trefftz.mesh.from_matplotlib.MatplotlibLocator.find_cell">
 <span class="sig-name descname"><span class="pre">find_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/from_matplotlib.html#MatplotlibLocator.find_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.from_matplotlib.MatplotlibLocator.find_cell" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Find the triangle containing one or more points.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a><em>]</em><em>]</em>)</p>
+<dd class="field-odd"><p><strong>p</strong> (<em>float_array</em>) – Array of query points with shape <code class="docutils literal notranslate"><span class="pre">(n_points,</span> <span class="pre">2)</span></code> or
+a single point of shape <code class="docutils literal notranslate"><span class="pre">(2,)</span></code>.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]] | <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Index (or indices) of the containing triangle(s).</p>
+<p>Points outside the triangulation typically return <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a> or int_array</p>
 </dd>
 </dl>
 </dd></dl>
@@ -292,15 +355,29 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="trefftz.mesh.from_matplotlib.Mesh_from_Matplotlib">
 <span class="sig-prename descclassname"><span class="pre">trefftz.mesh.from_matplotlib.</span></span><span class="sig-name descname"><span class="pre">Mesh_from_Matplotlib</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Tri</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/from_matplotlib.html#Mesh_from_Matplotlib"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.from_matplotlib.Mesh_from_Matplotlib" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a Mesh from a Matptlotlib.tri.Triangulation</p>
+<dd><p>Construct a <code class="xref py py-class docutils literal notranslate"><span class="pre">TrefftzMesh</span></code> from a Matplotlib triangulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Tri</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/tri_api.html#matplotlib.tri.Triangulation" title="(in Matplotlib v3.10.9)"><em>Triangulation</em></a>)</p>
+<dd class="field-odd"><p><strong>Tri</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/tri_api.html#matplotlib.tri.Triangulation" title="(in Matplotlib v3.10.9)"><em>matplotlib.tri.Triangulation</em></a>) – Input triangulation containing points, edges, and triangle
+connectivity information.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="trefftz.mesh.core.html#trefftz.mesh.core.TrefftzMesh" title="trefftz.mesh.core.TrefftzMesh"><em>TrefftzMesh</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Mesh object initialized from the triangulation data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="trefftz.mesh.html#trefftz.mesh.TrefftzMesh" title="trefftz.mesh.TrefftzMesh">TrefftzMesh</a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The generated mesh includes:</p>
+<ul class="simple">
+<li><p>vertex coordinates</p></li>
+<li><p>edge connectivity</p></li>
+<li><p>triangle connectivity</p></li>
+<li><p>a point locator based on Matplotlib’s trifinder</p></li>
+</ul>
+<p>Region markers and edge-to-triangle connectivity are initialized
+as empty structures.</p>
 </dd></dl>
 
 </section>
@@ -361,7 +438,10 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">trefftz.mesh.from_matplotlib module</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#trefftz.mesh.from_matplotlib.MatplotlibLocator"><code class="docutils literal notranslate"><span class="pre">MatplotlibLocator</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.mesh.from_matplotlib.MatplotlibLocator.trifinder"><code class="docutils literal notranslate"><span class="pre">MatplotlibLocator.trifinder</span></code></a></li>
 <li><a class="reference internal" href="#trefftz.mesh.from_matplotlib.MatplotlibLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">MatplotlibLocator.find_cell()</span></code></a></li>
 </ul>
 </li>

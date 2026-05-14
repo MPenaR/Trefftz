@@ -1,4 +1,60 @@
-'''Module for importing and managing meshes'''
+"""
+Core mesh data structures and geometric representations for Trefftz methods.
+
+This module defines the primary mesh container used throughout the
+Trefftz library together with the associated structured NumPy dtypes
+used for efficient geometric and topological computations.
+
+The implementation is designed around vectorized NumPy operations and
+stores mesh entities as structured arrays containing precomputed
+geometric quantities.
+
+The module provides:
+
+- triangular mesh representations
+- edge and cell geometric data
+- edge-to-cell connectivity
+- boundary and region tagging
+- normal and tangent vector construction
+- spatial point-location support
+
+Classes
+-------
+EdgeType
+    Enumeration describing edge categories.
+
+TrefftzMesh
+    Main mesh container used by Trefftz discretizations.
+
+Constants
+---------
+DIM
+    Spatial dimension of the mesh representation.
+
+edge_dtype
+    Structured NumPy dtype describing edge data fields.
+
+triangle_dtype
+    Structured NumPy dtype describing triangle data fields.
+
+Notes
+-----
+The mesh representation is optimized for:
+
+- vectorized assembly routines
+- discontinuous Galerkin methods
+- Trefftz discretizations
+- geometric queries
+- boundary flux computations
+
+Edge normals are automatically oriented consistently:
+
+- boundary normals point outward
+- inner normals follow neighboring-cell orientation conventions
+
+The module currently targets two-dimensional triangular meshes.
+"""
+
 
 from typing import Final
 import numpy as np

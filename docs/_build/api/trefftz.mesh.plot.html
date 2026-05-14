@@ -196,6 +196,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry Utilities</a></li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="modules.html">trefftz</a><input aria-label="Toggle navigation of trefftz" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="trefftz.html">trefftz package</a><input aria-label="Toggle navigation of trefftz package" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l4 has-children"><a class="reference internal" href="trefftz.dg.html">trefftz.dg package</a><input aria-label="Toggle navigation of trefftz.dg package" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -265,18 +267,59 @@
         <article role="main" id="furo-main-content">
           <section id="module-trefftz.mesh.plot">
 <span id="trefftz-mesh-plot-module"></span><h1>trefftz.mesh.plot module<a class="headerlink" href="#module-trefftz.mesh.plot" title="Link to this heading">¶</a></h1>
+<p>Visualization utilities for Trefftz meshes and waveguide geometries.</p>
+<p>This module provides plotting tools for inspecting mesh structures,
+boundary partitions, and geometric orientation data associated with
+Trefftz discretizations.</p>
+<p>The visualization routines are primarily intended for:</p>
+<ul class="simple">
+<li><p>debugging mesh connectivity</p></li>
+<li><p>validating boundary tagging</p></li>
+<li><p>inspecting tangent and normal orientations</p></li>
+<li><p>visualizing waveguide geometries</p></li>
+</ul>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>plot_waveguide</dt><dd><p>Plot a waveguide mesh together with boundary subsets and optional
+edge orientation vectors.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The plotting utilities rely on Matplotlib and are designed for
+interactive exploratory workflows rather than publication-quality
+rendering.</p>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="trefftz.mesh.plot.plot_waveguide">
 <span class="sig-prename descclassname"><span class="pre">trefftz.mesh.plot.</span></span><span class="sig-name descname"><span class="pre">plot_waveguide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_tangents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_normals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/plot.html#plot_waveguide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.plot.plot_waveguide" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Plot a waveguide mesh and its boundary partitions.</p>
+<p>The visualization distinguishes between:</p>
+<ul class="simple">
+<li><p>inner edges</p></li>
+<li><p>boundary subset <code class="docutils literal notranslate"><span class="pre">S</span></code></p></li>
+<li><p>boundary subset <code class="docutils literal notranslate"><span class="pre">Gamma</span></code></p></li>
+</ul>
+<p>using different colors.</p>
+<p>Optionally, edge tangent and normal vectors can also be displayed.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mesh</strong> (<a class="reference internal" href="trefftz.mesh.core.html#trefftz.mesh.core.TrefftzMesh" title="trefftz.mesh.core.TrefftzMesh"><em>TrefftzMesh</em></a>)</p></li>
-<li><p><strong>plot_tangents</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>plot_normals</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>mesh</strong> (<a class="reference internal" href="trefftz.mesh.html#trefftz.mesh.TrefftzMesh" title="trefftz.mesh.TrefftzMesh"><em>TrefftzMesh</em></a>) – Mesh object containing geometric and boundary information.</p></li>
+<li><p><strong>plot_tangents</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, display edge tangent vectors.</p></li>
+<li><p><strong>plot_normals</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, display edge normal vectors.</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The edge coloring convention is:</p>
+<ul class="simple">
+<li><p>black: inner edges</p></li>
+<li><p>red: boundary subset <code class="docutils literal notranslate"><span class="pre">S</span></code></p></li>
+<li><p>blue: boundary subset <code class="docutils literal notranslate"><span class="pre">Gamma</span></code></p></li>
+</ul>
+<p>Tangent and normal vectors are displayed using Matplotlib quiver
+plots centered at edge midpoints.</p>
 </dd></dl>
 
 </section>
@@ -337,6 +380,7 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">trefftz.mesh.plot module</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#trefftz.mesh.plot.plot_waveguide"><code class="docutils literal notranslate"><span class="pre">plot_waveguide()</span></code></a></li>
 </ul>
 </li>

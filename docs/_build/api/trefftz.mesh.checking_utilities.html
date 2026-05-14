@@ -196,6 +196,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry Utilities</a></li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="modules.html">trefftz</a><input aria-label="Toggle navigation of trefftz" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="trefftz.html">trefftz package</a><input aria-label="Toggle navigation of trefftz package" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l4 has-children"><a class="reference internal" href="trefftz.dg.html">trefftz.dg package</a><input aria-label="Toggle navigation of trefftz.dg package" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -268,11 +270,40 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="trefftz.mesh.checking_utilities.explore_edges">
 <span class="sig-prename descclassname"><span class="pre">trefftz.mesh.checking_utilities.</span></span><span class="sig-name descname"><span class="pre">explore_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/checking_utilities.html#explore_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.checking_utilities.explore_edges" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Interactive visualization tool for inspecting mesh edges.</p>
+<p>This function displays the mesh together with edge normals and allows
+interactive navigation through edges using keyboard controls.</p>
+<p>For the currently selected edge:</p>
+<ul class="simple">
+<li><p>The edge is highlighted in blue.</p></li>
+<li><p>Adjacent triangles are highlighted:</p>
+<ul>
+<li><p>red for the first neighboring triangle</p></li>
+<li><p>green for the second neighboring triangle (inner edges only)</p></li>
+</ul>
+</li>
+<li><p>Edge normals are displayed using quiver arrows.</p></li>
+</ul>
+<p>Navigation is controlled through keyboard events:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Up</span></code> arrow: move to the next edge</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Down</span></code> arrow: move to the previous edge</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Escape</span></code>: close the visualization window</p></li>
+</ul>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>mesh</strong> (<a class="reference internal" href="trefftz.mesh.core.html#trefftz.mesh.core.TrefftzMesh" title="trefftz.mesh.core.TrefftzMesh"><em>TrefftzMesh</em></a>)</p>
+<dd class="field-odd"><p><strong>mesh</strong> (<a class="reference internal" href="trefftz.mesh.html#trefftz.mesh.TrefftzMesh" title="trefftz.mesh.TrefftzMesh"><em>TrefftzMesh</em></a>) – Mesh object containing geometric and topological edge information.</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>This utility is primarily intended for debugging and validating:</p>
+<ul class="simple">
+<li><p>edge orientations</p></li>
+<li><p>boundary detection</p></li>
+<li><p>normal vector directions</p></li>
+<li><p>edge-to-triangle connectivity</p></li>
+</ul>
+<p>The visualization relies on Matplotlib interactive backends.</p>
 </dd></dl>
 
 </section>

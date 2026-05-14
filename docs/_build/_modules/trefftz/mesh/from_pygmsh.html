@@ -195,8 +195,35 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">TrefftzMesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/dg.html">dg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/geometry.html">Geometry Utilities</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../api/modules.html">trefftz</a><input aria-label="Toggle navigation of trefftz" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../api/trefftz.html">trefftz package</a><input aria-label="Toggle navigation of trefftz package" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.dg.html">trefftz.dg package</a><input aria-label="Toggle navigation of trefftz.dg package" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.basis.html">trefftz.dg.basis module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.block_fluxes.html">trefftz.dg.block_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.boundary_conditions.html">trefftz.dg.boundary_conditions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.fluxes.html">trefftz.dg.fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.functions.html">trefftz.dg.functions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes.html">trefftz.dg.serial_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes2.html">trefftz.dg.serial_fluxes2 module</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.mesh.html">trefftz.mesh package</a><input aria-label="Toggle navigation of trefftz.mesh package" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.checking_utilities.html">trefftz.mesh.checking_utilities module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.core.html">trefftz.mesh.core module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.plot.html">trefftz.mesh.plot module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/trefftz.numpy_types.html">trefftz.numpy_types module</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -232,7 +259,46 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for trefftz.mesh.from_pygmsh</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utilities for constructing :class:`TrefftzMesh` objects from</span>
+<span class="sd">``meshio`` meshes.</span>
+
+<span class="sd">This module provides interoperability between ``meshio`` mesh objects</span>
+<span class="sd">and the internal mesh representation used throughout the Trefftz library.</span>
+
+<span class="sd">The main features include:</span>
+
+<span class="sd">- conversion from ``meshio.Mesh`` to :class:`TrefftzMesh`</span>
+<span class="sd">- edge reconstruction from triangle connectivity</span>
+<span class="sd">- edge-to-triangle adjacency computation</span>
+<span class="sd">- point location using a KD-tree accelerated search</span>
+<span class="sd">- propagation of physical region markers from mesh files</span>
+
+<span class="sd">Classes</span>
+<span class="sd">-------</span>
+<span class="sd">KDTreeLocator</span>
+<span class="sd">    Spatial point locator based on triangle centroid KD-tree queries.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">Mesh_from_meshio</span>
+<span class="sd">    Construct a :class:`TrefftzMesh` from a ``meshio.Mesh`` object.</span>
+
+<span class="sd">Notes</span>
+<span class="sd">-----</span>
+<span class="sd">This module is primarily intended for meshes generated through:</span>
+
+<span class="sd">- Gmsh</span>
+<span class="sd">- pygmsh</span>
+<span class="sd">- meshio-compatible formats</span>
+
+<span class="sd">The KD-tree locator accelerates point-to-cell queries by first selecting</span>
+<span class="sd">candidate triangles through centroid proximity and then performing</span>
+<span class="sd">exact geometric containment checks.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">CellLocator</span><span class="p">,</span> <span class="n">TrefftzMesh</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">cKDTree</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.numpy_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span>
@@ -248,24 +314,95 @@
 
 
 <div class="viewcode-block" id="KDTreeLocator">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.html#trefftz.mesh.from_pygmsh.KDTreeLocator">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.KDTreeLocator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KDTreeLocator</span><span class="p">(</span><span class="n">CellLocator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    KD-tree based locator for triangular meshes.</span>
+
+<span class="sd">    This locator accelerates point-to-cell searches by building a</span>
+<span class="sd">    KD-tree over triangle centroids and querying nearby candidate</span>
+<span class="sd">    elements before performing exact geometric containment tests.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points : float_array</span>
+<span class="sd">        Array of mesh vertex coordinates with shape ``(n_points, 2)``.</span>
+
+<span class="sd">    triangles : int_array</span>
+<span class="sd">        Triangle connectivity array with shape ``(n_triangles, 3)``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tree : scipy.spatial.cKDTree</span>
+<span class="sd">        KD-tree constructed from triangle centroids.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Search radius used to retrieve candidate triangles.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Candidate triangles are selected based on centroid proximity and</span>
+<span class="sd">    validated using exact point-in-triangle tests.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">triangles</span><span class="p">:</span> <span class="n">int_array</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the locator and build the spatial index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">points</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="o">=</span> <span class="n">triangles</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">build_index</span><span class="p">()</span>
 
 <div class="viewcode-block" id="KDTreeLocator.build_index">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.html#trefftz.mesh.from_pygmsh.KDTreeLocator.build_index">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.KDTreeLocator.build_index">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct the KD-tree spatial index.</span>
+
+<span class="sd">        The tree is built from triangle centroids and an associated</span>
+<span class="sd">        search radius is computed to guarantee retrieval of candidate</span>
+<span class="sd">        triangles for point-location queries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">]</span> <span class="o">-</span> <span class="n">centroids</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="KDTreeLocator.find_cell">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.html#trefftz.mesh.from_pygmsh.KDTreeLocator.find_cell">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.KDTreeLocator.find_cell">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">find_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">int_array</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the triangle containing one or more query points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        p : float_array</span>
+<span class="sd">            Query point(s).</span>
+
+<span class="sd">            Accepted shapes are:</span>
+
+<span class="sd">            - ``(2,)`` for a single point</span>
+<span class="sd">            - ``(M, 2)`` for multiple points</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int or int_array</span>
+<span class="sd">            Index (or indices) of the containing triangle(s).</span>
+
+<span class="sd">            Points outside the mesh return ``-1``.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the input array does not have shape ``(2,)`` or ``(M, 2)``.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The search is performed in two stages:</span>
+
+<span class="sd">        1. KD-tree retrieval of nearby candidate triangles</span>
+<span class="sd">        2. Exact geometric containment test using</span>
+<span class="sd">           :func:`trefftz.mesh.geometry.in_triangle`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
         <span class="n">candidates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">query_ball_point</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
 
@@ -289,9 +426,35 @@
 
 
 <div class="viewcode-block" id="Mesh_from_meshio">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.html#trefftz.mesh.from_pygmsh.Mesh_from_meshio">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.from_pygmsh.html#trefftz.mesh.from_pygmsh.Mesh_from_meshio">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Mesh_from_meshio</span><span class="p">(</span><span class="n">mesh</span><span class="p">:</span> <span class="n">Mesh</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrefftzMesh</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns a Mesh from a meshio object&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a :class:`TrefftzMesh` from a ``meshio.Mesh`` object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mesh : meshio.Mesh</span>
+<span class="sd">        Input mesh containing points, triangular cells, and optional</span>
+<span class="sd">        physical region markers.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    TrefftzMesh</span>
+<span class="sd">        Mesh object initialized from the meshio data structures.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function performs the following operations:</span>
+
+<span class="sd">    - extracts 2D point coordinates</span>
+<span class="sd">    - reconstructs unique mesh edges from triangle connectivity</span>
+<span class="sd">    - computes edge-to-triangle adjacency relations</span>
+<span class="sd">    - maps boundary entities to generated edge indices</span>
+<span class="sd">    - initializes a KD-tree based spatial locator</span>
+
+<span class="sd">    Physical region markers stored in ``mesh.cell_sets_dict`` are</span>
+<span class="sd">    propagated to the generated mesh representation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">points</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">meshed_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">cells_dict</span><span class="p">[</span><span class="s2">&quot;line&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">triangles</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">cells_dict</span><span class="p">[</span><span class="s2">&quot;triangle&quot;</span><span class="p">]</span>

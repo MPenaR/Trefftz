@@ -1,5 +1,51 @@
-'''Mesh readers from different file formats.
-'''
+"""
+Mesh readers and conversion utilities for Gmsh-generated meshes.
+
+This module provides tools for importing meshes generated with Gmsh and
+converting them into the internal :class:`TrefftzMesh` representation
+used throughout the Trefftz library.
+
+The implementation includes:
+
+- parsing of Gmsh ``.msh`` files
+- extraction of nodes, edges, and triangular cells
+- construction of edge-to-triangle adjacency relations
+- propagation of physical boundary tags
+- KD-tree accelerated point-location utilities
+
+Classes
+-------
+KDTreeLocator
+    KD-tree based spatial locator for triangular meshes.
+
+Functions
+---------
+GmshReader
+    Read a Gmsh mesh file and construct the associated mesh arrays.
+
+GmshArrays
+    Extract mesh arrays directly from an initialized Gmsh model.
+
+Notes
+-----
+The current implementation targets:
+
+- two-dimensional meshes
+- triangular elements
+- Gmsh version 4.x formats
+
+Physical groups defined in Gmsh are propagated into the mesh
+``cell_sets`` structure and may be used for:
+
+- boundary condition assignment
+- region tagging
+- flux specification
+
+Point-location queries are accelerated using centroid-based KD-tree
+searches combined with exact geometric containment tests.
+"""
+
+
 from .geometry import CellLocator, in_triangle
 from scipy.spatial import cKDTree
 import numpy as np
@@ -18,6 +64,34 @@ except ImportError as e:
 
 
 class KDTreeLocator(CellLocator):
+    """
+    KD-tree based locator for triangular meshes.
+
+    This locator accelerates point-to-cell searches by first identifying
+    nearby candidate triangles using a KD-tree built from triangle
+    centroids and then performing exact geometric containment tests.
+
+    Parameters
+    ----------
+    points : float_array
+        Array of mesh vertex coordinates with shape ``(n_points, 2)``.
+
+    triangles : int_array
+        Triangle connectivity array with shape ``(n_triangles, 3)``.
+
+    Attributes
+    ----------
+    tree : scipy.spatial.cKDTree
+        KD-tree built from triangle centroids.
+
+    radius : float
+        Search radius used to retrieve candidate triangles.
+
+    Notes
+    -----
+    The locator is designed for efficient repeated point-location
+    queries in large meshes.
+    """
     def __init__(self, points: float_array, triangles: int_array):
         self.points = points
         self.triangles = triangles
@@ -52,8 +126,37 @@ class KDTreeLocator(CellLocator):
 
 
 def GmshReader(file_path: Path | str) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array]]:
-    '''Gmsh reader for version 4.1.0.8'''
+    """
+    Read a Gmsh(4.1.0.8) mesh file and extract mesh connectivity data.
 
+    Parameters
+    ----------
+    file_path : Path or str
+        Path to a Gmsh ``.msh`` file.
+
+    Returns
+    -------
+    tuple
+        Tuple containing:
+
+        - mesh vertex coordinates
+        - edge connectivity
+        - triangle connectivity
+        - edge-to-triangle adjacency
+        - spatial locator
+        - physical-region cell sets
+
+    Raises
+    ------
+    ValueError
+        If the provided file does not have a ``.msh`` extension.
+
+    Notes
+    -----
+    This function initializes the Gmsh API, loads the mesh file,
+    extracts the mesh arrays using :func:`GmshArrays`, and finalizes
+    the Gmsh session automatically.
+    """
     file_path = Path(file_path)
     if file_path.suffix != ".msh":
         raise ValueError(f'The Gmsh Reader should be used on a GMSH generated .msh file and was called on "{file_path}" instead.')
@@ -67,7 +170,48 @@ def GmshReader(file_path: Path | str) -> tuple[float_array, int_array, int_array
 
 
 def GmshArrays(model: gmsh.model) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array]]:
+    """
+    Extract mesh arrays from a Gmsh model.
 
+    Parameters
+    ----------
+    model : gmsh.model
+        Initialized Gmsh model containing mesh entities and physical
+        groups.
+
+    Returns
+    -------
+    tuple
+        Tuple containing:
+
+        - mesh vertex coordinates
+        - edge connectivity
+        - triangle connectivity
+        - edge-to-triangle adjacency
+        - spatial locator
+        - physical-region cell sets
+
+    Notes
+    -----
+    The extraction process includes:
+
+    - node renumbering into compact NumPy indexing
+    - edge reconstruction from triangle connectivity
+    - edge uniqueness filtering
+    - edge-to-triangle adjacency computation
+    - physical boundary mapping
+    - KD-tree locator construction
+
+    Physical groups of dimension one are propagated into the resulting
+    ``cell_sets`` dictionary and may be used for boundary-condition
+    assignment.
+
+    The current implementation assumes:
+
+    - two-dimensional meshes
+    - triangular elements
+    - manifold edge connectivity
+    """
     node_tags, node_coords, node_params = model.mesh.getNodes()
     points = node_coords.reshape(-1, 3)[:, :2]  # their row-index is not valid as an ID yet
     # building look-up table  (tags not used receive an index -1 which is not valid)

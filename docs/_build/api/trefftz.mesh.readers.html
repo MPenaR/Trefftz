@@ -196,6 +196,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry Utilities</a></li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="modules.html">trefftz</a><input aria-label="Toggle navigation of trefftz" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="trefftz.html">trefftz package</a><input aria-label="Toggle navigation of trefftz package" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l4 has-children"><a class="reference internal" href="trefftz.dg.html">trefftz.dg package</a><input aria-label="Toggle navigation of trefftz.dg package" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -265,19 +267,91 @@
         <article role="main" id="furo-main-content">
           <section id="module-trefftz.mesh.readers">
 <span id="trefftz-mesh-readers-module"></span><h1>trefftz.mesh.readers module<a class="headerlink" href="#module-trefftz.mesh.readers" title="Link to this heading">¶</a></h1>
-<p>Mesh readers from different file formats.</p>
+<p>Mesh readers and conversion utilities for Gmsh-generated meshes.</p>
+<p>This module provides tools for importing meshes generated with Gmsh and
+converting them into the internal <code class="xref py py-class docutils literal notranslate"><span class="pre">TrefftzMesh</span></code> representation
+used throughout the Trefftz library.</p>
+<p>The implementation includes:</p>
+<ul class="simple">
+<li><p>parsing of Gmsh <code class="docutils literal notranslate"><span class="pre">.msh</span></code> files</p></li>
+<li><p>extraction of nodes, edges, and triangular cells</p></li>
+<li><p>construction of edge-to-triangle adjacency relations</p></li>
+<li><p>propagation of physical boundary tags</p></li>
+<li><p>KD-tree accelerated point-location utilities</p></li>
+</ul>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>KDTreeLocator</dt><dd><p>KD-tree based spatial locator for triangular meshes.</p>
+</dd>
+</dl>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>GmshReader</dt><dd><p>Read a Gmsh mesh file and construct the associated mesh arrays.</p>
+</dd>
+<dt>GmshArrays</dt><dd><p>Extract mesh arrays directly from an initialized Gmsh model.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The current implementation targets:</p>
+<ul class="simple">
+<li><p>two-dimensional meshes</p></li>
+<li><p>triangular elements</p></li>
+<li><p>Gmsh version 4.x formats</p></li>
+</ul>
+<p>Physical groups defined in Gmsh are propagated into the mesh
+<code class="docutils literal notranslate"><span class="pre">cell_sets</span></code> structure and may be used for:</p>
+<ul class="simple">
+<li><p>boundary condition assignment</p></li>
+<li><p>region tagging</p></li>
+<li><p>flux specification</p></li>
+</ul>
+<p>Point-location queries are accelerated using centroid-based KD-tree
+searches combined with exact geometric containment tests.</p>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="trefftz.mesh.readers.KDTreeLocator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trefftz.mesh.readers.</span></span><span class="sig-name descname"><span class="pre">KDTreeLocator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triangles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/readers.html#KDTreeLocator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.readers.KDTreeLocator" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator" title="trefftz.mesh.geometry.CellLocator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CellLocator</span></code></a></p>
+<p>KD-tree based locator for triangular meshes.</p>
+<p>This locator accelerates point-to-cell searches by first identifying
+nearby candidate triangles using a KD-tree built from triangle
+centroids and then performing exact geometric containment tests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a><em>]</em><em>]</em>)</p></li>
-<li><p><strong>triangles</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>points</strong> (<em>float_array</em>) – Array of mesh vertex coordinates with shape <code class="docutils literal notranslate"><span class="pre">(n_points,</span> <span class="pre">2)</span></code>.</p></li>
+<li><p><strong>triangles</strong> (<em>int_array</em>) – Triangle connectivity array with shape <code class="docutils literal notranslate"><span class="pre">(n_triangles,</span> <span class="pre">3)</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="trefftz.mesh.readers.KDTreeLocator.tree">
+<span class="sig-name descname"><span class="pre">tree</span></span><a class="headerlink" href="#trefftz.mesh.readers.KDTreeLocator.tree" title="Link to this definition">¶</a></dt>
+<dd><p>KD-tree built from triangle centroids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.cKDTree.html#scipy.spatial.cKDTree" title="(in SciPy v1.17.0)">scipy.spatial.cKDTree</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="trefftz.mesh.readers.KDTreeLocator.radius">
+<span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#trefftz.mesh.readers.KDTreeLocator.radius" title="Link to this definition">¶</a></dt>
+<dd><p>Search radius used to retrieve candidate triangles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<p>The locator is designed for efficient repeated point-location
+queries in large meshes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="trefftz.mesh.readers.KDTreeLocator.build_index">
 <span class="sig-name descname"><span class="pre">build_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/readers.html#KDTreeLocator.build_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.readers.KDTreeLocator.build_index" title="Link to this definition">¶</a></dt>
@@ -286,12 +360,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="trefftz.mesh.readers.KDTreeLocator.find_cell">
 <span class="sig-name descname"><span class="pre">find_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/readers.html#KDTreeLocator.find_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.readers.KDTreeLocator.find_cell" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Find the mesh cell containing one or more query points.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a><em>]</em><em>]</em>)</p>
+<dd class="field-odd"><p><strong>p</strong> (<em>float_array</em>) – Query point(s).</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]] | <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index (or indices) of the containing cell(s).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a> or int_array</p>
 </dd>
 </dl>
 </dd></dl>
@@ -301,28 +379,80 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="trefftz.mesh.readers.GmshReader">
 <span class="sig-prename descclassname"><span class="pre">trefftz.mesh.readers.</span></span><span class="sig-name descname"><span class="pre">GmshReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/readers.html#GmshReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.readers.GmshReader" title="Link to this definition">¶</a></dt>
-<dd><p>Gmsh reader for version 4.1.0.8</p>
+<dd><p>Read a Gmsh(4.1.0.8) mesh file and extract mesh connectivity data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>Path</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Path to a Gmsh <code class="docutils literal notranslate"><span class="pre">.msh</span></code> file.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a>]], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]], <a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator" title="trefftz.mesh.geometry.CellLocator"><em>CellLocator</em></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]]]]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Tuple containing:</p>
+<ul class="simple">
+<li><p>mesh vertex coordinates</p></li>
+<li><p>edge connectivity</p></li>
+<li><p>triangle connectivity</p></li>
+<li><p>edge-to-triangle adjacency</p></li>
+<li><p>spatial locator</p></li>
+<li><p>physical-region cell sets</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the provided file does not have a <code class="docutils literal notranslate"><span class="pre">.msh</span></code> extension.</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>This function initializes the Gmsh API, loads the mesh file,
+extracts the mesh arrays using <a class="reference internal" href="#trefftz.mesh.readers.GmshArrays" title="trefftz.mesh.readers.GmshArrays"><code class="xref py py-func docutils literal notranslate"><span class="pre">GmshArrays()</span></code></a>, and finalizes
+the Gmsh session automatically.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="trefftz.mesh.readers.GmshArrays">
 <span class="sig-prename descclassname"><span class="pre">trefftz.mesh.readers.</span></span><span class="sig-name descname"><span class="pre">GmshArrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/mesh/readers.html#GmshArrays"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.mesh.readers.GmshArrays" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Extract mesh arrays from a Gmsh model.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>model</strong> (<em>model</em>)</p>
+<dd class="field-odd"><p><strong>model</strong> (<em>gmsh.model</em>) – Initialized Gmsh model containing mesh entities and physical
+groups.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a>]], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]], <a class="reference internal" href="trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator" title="trefftz.mesh.geometry.CellLocator"><em>CellLocator</em></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, …], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.integer" title="(in NumPy v2.4)"><em>integer</em></a>]]]]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Tuple containing:</p>
+<ul class="simple">
+<li><p>mesh vertex coordinates</p></li>
+<li><p>edge connectivity</p></li>
+<li><p>triangle connectivity</p></li>
+<li><p>edge-to-triangle adjacency</p></li>
+<li><p>spatial locator</p></li>
+<li><p>physical-region cell sets</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The extraction process includes:</p>
+<ul class="simple">
+<li><p>node renumbering into compact NumPy indexing</p></li>
+<li><p>edge reconstruction from triangle connectivity</p></li>
+<li><p>edge uniqueness filtering</p></li>
+<li><p>edge-to-triangle adjacency computation</p></li>
+<li><p>physical boundary mapping</p></li>
+<li><p>KD-tree locator construction</p></li>
+</ul>
+<p>Physical groups of dimension one are propagated into the resulting
+<code class="docutils literal notranslate"><span class="pre">cell_sets</span></code> dictionary and may be used for boundary-condition
+assignment.</p>
+<p>The current implementation assumes:</p>
+<ul class="simple">
+<li><p>two-dimensional meshes</p></li>
+<li><p>triangular elements</p></li>
+<li><p>manifold edge connectivity</p></li>
+</ul>
 </dd></dl>
 
 </section>
@@ -383,7 +513,11 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">trefftz.mesh.readers module</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#trefftz.mesh.readers.KDTreeLocator"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.mesh.readers.KDTreeLocator.tree"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.tree</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.mesh.readers.KDTreeLocator.radius"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.radius</span></code></a></li>
 <li><a class="reference internal" href="#trefftz.mesh.readers.KDTreeLocator.build_index"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.build_index()</span></code></a></li>
 <li><a class="reference internal" href="#trefftz.mesh.readers.KDTreeLocator.find_cell"><code class="docutils literal notranslate"><span class="pre">KDTreeLocator.find_cell()</span></code></a></li>
 </ul>

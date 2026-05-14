@@ -195,7 +195,35 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">TrefftzMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/geometry.html">Geometry Utilities</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../api/modules.html">trefftz</a><input aria-label="Toggle navigation of trefftz" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../api/trefftz.html">trefftz package</a><input aria-label="Toggle navigation of trefftz package" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.dg.html">trefftz.dg package</a><input aria-label="Toggle navigation of trefftz.dg package" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.basis.html">trefftz.dg.basis module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.block_fluxes.html">trefftz.dg.block_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.boundary_conditions.html">trefftz.dg.boundary_conditions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.fluxes.html">trefftz.dg.fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.functions.html">trefftz.dg.functions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes.html">trefftz.dg.serial_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes2.html">trefftz.dg.serial_fluxes2 module</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.mesh.html">trefftz.mesh package</a><input aria-label="Toggle navigation of trefftz.mesh package" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.checking_utilities.html">trefftz.mesh.checking_utilities module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.core.html">trefftz.mesh.core module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.plot.html">trefftz.mesh.plot module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/trefftz.numpy_types.html">trefftz.numpy_types module</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -231,21 +259,100 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for trefftz.mesh.from_matplotlib</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utilities for constructing and querying meshes based on</span>
+<span class="sd">``matplotlib.tri.Triangulation``.</span>
+
+<span class="sd">This module provides interoperability between Matplotlib triangulations</span>
+<span class="sd">and the :class:`TrefftzMesh` data structures used throughout the library.</span>
+
+<span class="sd">The main features include:</span>
+
+<span class="sd">- conversion from Matplotlib triangulations to :class:`TrefftzMesh`</span>
+<span class="sd">- point-to-cell location using Matplotlib&#39;s trifinder utilities</span>
+<span class="sd">- lightweight mesh initialization for visualization and prototyping</span>
+
+<span class="sd">Classes</span>
+<span class="sd">-------</span>
+<span class="sd">MatplotlibLocator</span>
+<span class="sd">    Cell locator wrapper around Matplotlib triangulation search tools.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">Mesh_from_Matplotlib</span>
+<span class="sd">    Construct a :class:`TrefftzMesh` from a</span>
+<span class="sd">    ``matplotlib.tri.Triangulation``.</span>
+
+<span class="sd">Notes</span>
+<span class="sd">-----</span>
+<span class="sd">This module is primarily intended for:</span>
+
+<span class="sd">- rapid prototyping</span>
+<span class="sd">- visualization workflows</span>
+<span class="sd">- interoperability with Matplotlib triangulation utilities</span>
+
+<span class="sd">For production mesh generation and region-aware boundary handling,</span>
+<span class="sd">Gmsh-based workflows are generally preferred.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.tri</span><span class="w"> </span><span class="kn">import</span> <span class="n">Triangulation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.numpy_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">CellLocator</span><span class="p">,</span> <span class="n">TrefftzMesh</span>
 
 
 <div class="viewcode-block" id="MatplotlibLocator">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.html#trefftz.mesh.from_matplotlib.MatplotlibLocator">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.from_matplotlib.html#trefftz.mesh.from_matplotlib.MatplotlibLocator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MatplotlibLocator</span><span class="p">(</span><span class="n">CellLocator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cell locator based on a Matplotlib triangulation.</span>
+
+<span class="sd">    This class wraps the triangulation search utilities provided by</span>
+<span class="sd">    ``matplotlib.tri.Triangulation`` and exposes a unified interface</span>
+<span class="sd">    compatible with :class:`CellLocator`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Tri : matplotlib.tri.Triangulation</span>
+<span class="sd">        Triangulation object used for point-to-cell queries.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trifinder : callable</span>
+<span class="sd">        Matplotlib triangle finder object returned by</span>
+<span class="sd">        ``Tri.get_trifinder()``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The locator uses Matplotlib&#39;s internal spatial search algorithm</span>
+<span class="sd">    to identify the triangle containing a given point.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Tri</span><span class="p">:</span> <span class="n">Triangulation</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the locator from a triangulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trifinder</span> <span class="o">=</span> <span class="n">Tri</span><span class="o">.</span><span class="n">get_trifinder</span><span class="p">()</span>
     
 <div class="viewcode-block" id="MatplotlibLocator.find_cell">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.html#trefftz.mesh.from_matplotlib.MatplotlibLocator.find_cell">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.from_matplotlib.html#trefftz.mesh.from_matplotlib.MatplotlibLocator.find_cell">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">find_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">int_array</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the triangle containing one or more points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        p : float_array</span>
+<span class="sd">            Array of query points with shape ``(n_points, 2)`` or</span>
+<span class="sd">            a single point of shape ``(2,)``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int or int_array</span>
+<span class="sd">            Index (or indices) of the containing triangle(s).</span>
+
+<span class="sd">            Points outside the triangulation typically return ``-1``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trifinder</span><span class="p">(</span><span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">)</span></div>
 </div>
@@ -253,9 +360,34 @@
     
 
 <div class="viewcode-block" id="Mesh_from_Matplotlib">
-<a class="viewcode-back" href="../../../api/trefftz.mesh.html#trefftz.mesh.from_matplotlib.Mesh_from_Matplotlib">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.from_matplotlib.html#trefftz.mesh.from_matplotlib.Mesh_from_Matplotlib">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Mesh_from_Matplotlib</span><span class="p">(</span><span class="n">Tri</span><span class="p">:</span> <span class="n">Triangulation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrefftzMesh</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns a Mesh from a Matptlotlib.tri.Triangulation&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a :class:`TrefftzMesh` from a Matplotlib triangulation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Tri : matplotlib.tri.Triangulation</span>
+<span class="sd">        Input triangulation containing points, edges, and triangle</span>
+<span class="sd">        connectivity information.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    TrefftzMesh</span>
+<span class="sd">        Mesh object initialized from the triangulation data.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The generated mesh includes:</span>
+
+<span class="sd">    - vertex coordinates</span>
+<span class="sd">    - edge connectivity</span>
+<span class="sd">    - triangle connectivity</span>
+<span class="sd">    - a point locator based on Matplotlib&#39;s trifinder</span>
+
+<span class="sd">    Region markers and edge-to-triangle connectivity are initialized</span>
+<span class="sd">    as empty structures.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">Tri</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">Tri</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
     <span class="n">edges</span> <span class="o">=</span> <span class="n">Tri</span><span class="o">.</span><span class="n">edges</span>
     <span class="n">triangles</span> <span class="o">=</span> <span class="n">Tri</span><span class="o">.</span><span class="n">triangles</span>

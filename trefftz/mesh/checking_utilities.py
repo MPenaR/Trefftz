@@ -5,6 +5,44 @@ from matplotlib.patches import Polygon
 import numpy as np
 
 def explore_edges(mesh: TrefftzMesh):
+    """
+    Interactive visualization tool for inspecting mesh edges.
+
+    This function displays the mesh together with edge normals and allows
+    interactive navigation through edges using keyboard controls.
+
+    For the currently selected edge:
+
+    - The edge is highlighted in blue.
+    - Adjacent triangles are highlighted:
+      
+      - red for the first neighboring triangle
+      - green for the second neighboring triangle (inner edges only)
+
+    - Edge normals are displayed using quiver arrows.
+
+    Navigation is controlled through keyboard events:
+
+    - ``Up`` arrow: move to the next edge
+    - ``Down`` arrow: move to the previous edge
+    - ``Escape``: close the visualization window
+
+    Parameters
+    ----------
+    mesh : TrefftzMesh
+        Mesh object containing geometric and topological edge information.
+
+    Notes
+    -----
+    This utility is primarily intended for debugging and validating:
+
+    - edge orientations
+    - boundary detection
+    - normal vector directions
+    - edge-to-triangle connectivity
+
+    The visualization relies on Matplotlib interactive backends.
+    """
     fig, ax = plt.subplots()
     lw = 1
     xmin, ymin = mesh._points.min(axis=0)

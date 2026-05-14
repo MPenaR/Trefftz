@@ -195,9 +195,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../design/data_structures.html">Data Structures</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">Mesh Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html#trefftzmesh">TrefftzMesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/dg.html">dg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/geometry.html">Geometry Utilities</a></li>
 </ul>
 </li>
 </ul>
@@ -233,9 +232,41 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for trefftz.mesh.geometry</h1><div class="highlight"><pre>
-<span></span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Module for functions that compute geometric quantities or relations.</span>
-<span class="sd">&#39;&#39;&#39;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Geometric utilities and spatial-query interfaces for mesh operations.</span>
+
+<span class="sd">This module provides foundational geometric tools used throughout the</span>
+<span class="sd">Trefftz library, including:</span>
+
+<span class="sd">- geometric predicates</span>
+<span class="sd">- triangle area computations</span>
+<span class="sd">- mesh cell type definitions</span>
+<span class="sd">- interfaces for spatial point-location algorithms</span>
+
+<span class="sd">The utilities are designed to support vectorized NumPy-based workflows.</span>
+
+<span class="sd">Classes</span>
+<span class="sd">-------</span>
+<span class="sd">CellType</span>
+<span class="sd">    Enumeration of supported mesh cell types.</span>
+
+<span class="sd">CellLocator</span>
+<span class="sd">    Protocol defining the interface for point-to-cell location</span>
+<span class="sd">    algorithms.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">in_triangle</span>
+<span class="sd">    Test whether a point lies inside a triangle.</span>
+
+<span class="sd">triangle_area</span>
+<span class="sd">    Compute the area of one or multiple triangles.</span>
+
+<span class="sd">Notes</span>
+<span class="sd">-----</span>
+<span class="sd">Most functions support vectorized operations over multiple geometric</span>
+<span class="sd">entities for efficient numerical computations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.numpy_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">int_array</span>
@@ -245,8 +276,28 @@
 
 
 <div class="viewcode-block" id="CellType">
-<a class="viewcode-back" href="../../../api/geometry.html#trefftz.mesh.geometry.CellType">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellType">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CellType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enumeration of supported mesh cell types.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    POINT</span>
+<span class="sd">        Zero-dimensional cell.</span>
+
+<span class="sd">    SEGMENT</span>
+<span class="sd">        One-dimensional line segment.</span>
+
+<span class="sd">    TRIANGLE</span>
+<span class="sd">        Two-dimensional triangular cell.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The current implementation primarily targets triangular meshes,</span>
+<span class="sd">    although the enumeration may be extended to support additional</span>
+<span class="sd">    element types such as quadrilaterals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">POINT</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">SEGMENT</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">TRIANGLE</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># consider modifying it later for quad</span></div>
@@ -254,26 +305,38 @@
 
 
 <div class="viewcode-block" id="in_triangle">
-<a class="viewcode-back" href="../../../api/geometry.html#trefftz.mesh.geometry.in_triangle">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.geometry.html#trefftz.mesh.geometry.in_triangle">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">in_triangle</span><span class="p">(</span><span class="n">P</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">B</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">C</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Checks if a point is inside a given triangle.</span>
+<span class="sd">    Check whether a point lies inside a triangle.</span>
+
+<span class="sd">    The test is performed using barycentric coordinates computed from</span>
+<span class="sd">    the triangle vertices.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    P : (2,) float_array</span>
-<span class="sd">        point to check.</span>
+<span class="sd">        Point to test.</span>
+
 <span class="sd">    A : (2,) float_array</span>
-<span class="sd">        Vertex A of triangle ABC.</span>
+<span class="sd">        First vertex of the triangle.</span>
+
 <span class="sd">    B : (2,) float_array</span>
-<span class="sd">        Vertex B of triangle ABC.</span>
+<span class="sd">        Second vertex of the triangle.</span>
+
 <span class="sd">    C : (2,) float_array</span>
-<span class="sd">        Vertex C of triangle ABC.</span>
+<span class="sd">        Third vertex of the triangle.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bool</span>
-<span class="sd">        True if the point P is inside triangle ABC.</span>
+<span class="sd">        ``True`` if the point lies inside or on the boundary of the</span>
+<span class="sd">        triangle, otherwise ``False``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    A small numerical tolerance is used to improve robustness for points</span>
+<span class="sd">    located near triangle boundaries.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">AC</span> <span class="o">=</span> <span class="n">C</span> <span class="o">-</span> <span class="n">A</span>
     <span class="n">AB</span> <span class="o">=</span> <span class="n">B</span> <span class="o">-</span> <span class="n">A</span>
@@ -287,26 +350,38 @@
 
 
 <div class="viewcode-block" id="triangle_area">
-<a class="viewcode-back" href="../../../api/geometry.html#trefftz.mesh.geometry.triangle_area">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.geometry.html#trefftz.mesh.geometry.triangle_area">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">triangle_area</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">B</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">C</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">int_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Computes the area of a triangle</span>
-
-<span class="sd">    If several triangles are passed it computes their areas in a vectorized manner.</span>
+<span class="sd">    Compute the area of one or multiple triangles.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    A : (2,) float_array</span>
-<span class="sd">        Vertex A of triangle ABC.</span>
-<span class="sd">    B : (2,) float_array</span>
-<span class="sd">        Vertex B of triangle ABC.</span>
-<span class="sd">    C : (2,) float_array</span>
-<span class="sd">        Vertex C of triangle ABC.</span>
+<span class="sd">    A : float_array</span>
+<span class="sd">        First triangle vertex or array of vertices.</span>
+
+<span class="sd">    B : float_array</span>
+<span class="sd">        Second triangle vertex or array of vertices.</span>
+
+<span class="sd">    C : float_array</span>
+<span class="sd">        Third triangle vertex or array of vertices.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    float</span>
-<span class="sd">        Surface area of the triangle ABC.</span>
+<span class="sd">    float or float_array</span>
+<span class="sd">        Triangle area(s).</span>
+
+<span class="sd">        If vectorized inputs are provided, the returned value is an</span>
+<span class="sd">        array containing the area of each triangle.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The area is computed from the determinant of the edge vectors:</span>
+
+<span class="sd">    :contentReference[oaicite:0]{index=0}</span>
+
+<span class="sd">    The implementation supports vectorized NumPy operations for efficient</span>
+<span class="sd">    evaluation over multiple triangles.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="n">C</span> <span class="o">-</span> <span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
     <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">B</span> <span class="o">-</span> <span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
@@ -316,12 +391,44 @@
 
 
 <div class="viewcode-block" id="CellLocator">
-<a class="viewcode-back" href="../../../api/geometry.html#trefftz.mesh.geometry.CellLocator">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CellLocator</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Protocol for cell locators&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Protocol defining the interface for mesh cell locators.</span>
+
+<span class="sd">    Cell locators are responsible for determining which mesh cell</span>
+<span class="sd">    contains a given spatial point.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    find_cell</span>
+<span class="sd">        Return the index of the cell containing the query point(s).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Concrete implementations may rely on:</span>
+
+<span class="sd">    - KD-trees</span>
+<span class="sd">    - triangulation search structures</span>
+<span class="sd">    - bounding volume hierarchies</span>
+<span class="sd">    - geometric predicates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="CellLocator.find_cell">
-<a class="viewcode-back" href="../../../api/geometry.html#trefftz.mesh.geometry.CellLocator.find_cell">[docs]</a>
+<a class="viewcode-back" href="../../../api/trefftz.mesh.geometry.html#trefftz.mesh.geometry.CellLocator.find_cell">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">find_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">float_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">int_array</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the mesh cell containing one or more query points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        p : float_array</span>
+<span class="sd">            Query point(s).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int or int_array</span>
+<span class="sd">            Index (or indices) of the containing cell(s).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div>
 </div>
 
