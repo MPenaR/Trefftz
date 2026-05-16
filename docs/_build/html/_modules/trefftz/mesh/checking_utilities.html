@@ -1,0 +1,486 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+        <title>trefftz.mesh.checking_utilities - Trefftz 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">Trefftz 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  <span class="sidebar-brand-text">Trefftz 0.1.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../theory/fluxes.html">Fluxes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../theory/fluxes.html#notation">Notation:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../design/data_structures.html">Data Structures</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/geometry.html">Geometry Utilities</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../api/modules.html">trefftz</a><input aria-label="Toggle navigation of trefftz" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../api/trefftz.html">trefftz package</a><input aria-label="Toggle navigation of trefftz package" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.dg.html">trefftz.dg package</a><input aria-label="Toggle navigation of trefftz.dg package" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.basis.html">trefftz.dg.basis module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.block_fluxes.html">trefftz.dg.block_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.boundary_conditions.html">trefftz.dg.boundary_conditions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.fluxes.html">trefftz.dg.fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.functions.html">trefftz.dg.functions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes.html">trefftz.dg.serial_fluxes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.dg.serial_fluxes2.html">trefftz.dg.serial_fluxes2 module</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../api/trefftz.mesh.html">trefftz.mesh package</a><input aria-label="Toggle navigation of trefftz.mesh package" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.checking_utilities.html">trefftz.mesh.checking_utilities module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.core.html">trefftz.mesh.core module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_matplotlib.html">trefftz.mesh.from_matplotlib module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.from_pygmsh.html">trefftz.mesh.from_pygmsh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.geometry.html">trefftz.mesh.geometry module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.locators.html">trefftz.mesh.locators module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/trefftz.mesh.readers.html">trefftz.mesh.readers module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/trefftz.numpy_types.html">trefftz.numpy_types module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for trefftz.mesh.checking_utilities</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrefftzMesh</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineCollection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polygon</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<div class="viewcode-block" id="explore_edges">
+<a class="viewcode-back" href="../../../api/trefftz.mesh.checking_utilities.html#trefftz.mesh.checking_utilities.explore_edges">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">explore_edges</span><span class="p">(</span><span class="n">mesh</span><span class="p">:</span> <span class="n">TrefftzMesh</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interactive visualization tool for inspecting mesh edges.</span>
+
+<span class="sd">    This function displays the mesh together with edge normals and allows</span>
+<span class="sd">    interactive navigation through edges using keyboard controls.</span>
+
+<span class="sd">    For the currently selected edge:</span>
+
+<span class="sd">    - The edge is highlighted in blue.</span>
+<span class="sd">    - Adjacent triangles are highlighted:</span>
+<span class="sd">      </span>
+<span class="sd">      - red for the first neighboring triangle</span>
+<span class="sd">      - green for the second neighboring triangle (inner edges only)</span>
+
+<span class="sd">    - Edge normals are displayed using quiver arrows.</span>
+
+<span class="sd">    Navigation is controlled through keyboard events:</span>
+
+<span class="sd">    - ``Up`` arrow: move to the next edge</span>
+<span class="sd">    - ``Down`` arrow: move to the previous edge</span>
+<span class="sd">    - ``Escape``: close the visualization window</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mesh : TrefftzMesh</span>
+<span class="sd">        Mesh object containing geometric and topological edge information.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This utility is primarily intended for debugging and validating:</span>
+
+<span class="sd">    - edge orientations</span>
+<span class="sd">    - boundary detection</span>
+<span class="sd">    - normal vector directions</span>
+<span class="sd">    - edge-to-triangle connectivity</span>
+
+<span class="sd">    The visualization relies on Matplotlib interactive backends.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">lw</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">N_E</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">n_edges</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">LineCollection</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;Q&quot;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> 
+                                      <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="n">lw</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+    <span class="n">e</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">edge</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">]</span>
+    <span class="n">px</span><span class="p">,</span> <span class="n">py</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span>
+    <span class="n">qx</span><span class="p">,</span> <span class="n">qy</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;Q&quot;</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">px</span><span class="p">,</span> <span class="n">qx</span><span class="p">],</span> <span class="p">[</span><span class="n">py</span><span class="p">,</span> <span class="n">qy</span><span class="p">],</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">lw</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;boundary&quot;</span><span class="p">]:</span>
+        <span class="n">triangle</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_triangles</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;triangles&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">Polygon</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">]),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">triangle</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_triangles</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;triangles&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">Polygon</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">]),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+
+        <span class="n">triangle</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_triangles</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;triangles&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">Polygon</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">]),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+
+    <span class="n">plot_normals</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">plot_normals</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">],</span>
+                  <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_plot</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw_idle</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">ax</span><span class="o">.</span><span class="n">patches</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ax</span><span class="o">.</span><span class="n">patches</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+        <span class="n">edge</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">]</span>
+        <span class="n">px</span><span class="p">,</span> <span class="n">py</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span>
+        <span class="n">qx</span><span class="p">,</span> <span class="n">qy</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;Q&quot;</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">px</span><span class="p">,</span> <span class="n">qx</span><span class="p">],</span> <span class="p">[</span><span class="n">py</span><span class="p">,</span> <span class="n">qy</span><span class="p">],</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">lw</span> <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Edge number: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">, boundary: </span><span class="si">{</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;boundary&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;boundary&quot;</span><span class="p">]:</span>
+            <span class="n">triangle</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_triangles</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;triangles&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">Polygon</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">]),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">triangle</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_triangles</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;triangles&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">Polygon</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">]),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+
+            <span class="n">triangle</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_triangles</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;triangles&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_points</span><span class="p">[</span><span class="n">triangle</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">Polygon</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">]),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw_idle</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_key</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">e</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;up&quot;</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">N_E</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">e</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">update_plot</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;down&quot;</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">e</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">update_plot</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;escape&quot;</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s2">&quot;key_press_event&quot;</span><span class="p">,</span> <span class="n">on_key</span><span class="p">)</span>
+    <span class="n">update_plot</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<span class="c1"># def triangle_id_tester(mesh: TrefftzMesh):</span>
+<span class="c1">#     fig, ax = plt.subplots()</span>
+<span class="c1">#     xmin, xmax = np.min(mesh._points[:,0]), np.max(mesh._points[:,0]) </span>
+<span class="c1">#     ymin, ymax = np.min(mesh._points[:,1]), np.max(mesh._points[:,1])</span>
+<span class="c1">#     N = 200</span>
+<span class="c1">#     x = np.linspace(xmin,xmax,N)</span>
+<span class="c1">#     y = np.linspace(ymin,ymax,N)</span>
+<span class="c1">#     X, Y = np.meshgrid(x,y)</span>
+<span class="c1">#     xy = np.column_stack([X.flatten(), Y.flatten()])</span>
+<span class="c1">#     Z = mesh.get_cell(xy).reshape(X.shape).astype(float)</span>
+<span class="c1">#     Z[Z==-1] = np.nan</span>
+<span class="c1">#     pc = ax.pcolormesh(X,Y,Z)</span>
+<span class="c1">#     lw = 2</span>
+<span class="c1">#     ax.triplot(Triangulation(x=mesh._points[:,0], y=mesh._points[:,1], triangles=mesh._triangles),linewidth=lw, color=&#39;k&#39;)</span>
+<span class="c1">#     for e_ID in mesh.boundary_edges_list:</span>
+<span class="c1">#         P, Q = mesh._edges[e_ID]</span>
+<span class="c1">#         p_x, p_y = mesh._points[P, :]</span>
+<span class="c1">#         q_x, q_y = mesh._points[Q, :]</span>
+<span class="c1">#         ax.plot([p_x,q_x],[p_y,q_y],&#39;r&#39;,linewidth=lw)</span>
+<span class="c1">#     fig.colorbar(mappable=pc)</span>
+<span class="c1">#     ax.axis(&#39;equal&#39;)</span>
+<span class="c1">#     def hover_text(x, y):</span>
+<span class="c1">#         return f&#39;ID = {mesh.get_cell([x, y])}&#39;</span>
+<span class="c1">#     annot = ax.annotate(</span>
+<span class="c1">#         &quot;&quot;,</span>
+<span class="c1">#         xy=(0, 0),</span>
+<span class="c1">#         xytext=(10, 10),</span>
+<span class="c1">#         textcoords=&quot;offset points&quot;,</span>
+<span class="c1">#         bbox=dict(boxstyle=&quot;round&quot;, fc=&quot;w&quot;),</span>
+<span class="c1">#         arrowprops=dict(arrowstyle=&quot;-&gt;&quot;),</span>
+<span class="c1">#     )</span>
+<span class="c1">#     annot.set_visible(False)</span>
+<span class="c1">#     annot.arrowprops = None</span>
+<span class="c1">#     def on_move(event):</span>
+<span class="c1">#         if event.inaxes != ax:</span>
+<span class="c1">#             annot.set_visible(False)</span>
+<span class="c1">#             fig.canvas.draw_idle()</span>
+<span class="c1">#             return</span>
+<span class="c1">#         xdata, ydata = event.xdata, event.ydata</span>
+<span class="c1">#         # Update annotation</span>
+<span class="c1">#         annot.xy = (xdata, ydata)</span>
+<span class="c1">#         annot.set_text(hover_text(xdata, ydata))</span>
+<span class="c1">#         annot.set_visible(True)</span>
+<span class="c1">#         fig.canvas.draw_idle()</span>
+
+<span class="c1">#     # Connect event</span>
+<span class="c1">#     fig.canvas.mpl_connect(&quot;motion_notify_event&quot;, on_move)</span>
+<span class="c1">#     plt.show()</span>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Manuel Pena
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
