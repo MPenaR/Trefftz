@@ -171,6 +171,10 @@ class TrefftzMesh(Generic[Regions]):
         self.ready_for_assemble = False
         self.construct_numpy_arrays()
 
+    @property
+    def regions(self) -> type[Regions]:
+        return self._regions
+
     def construct_numpy_arrays(self):
         """
         Construct structured NumPy arrays containing mesh geometry.

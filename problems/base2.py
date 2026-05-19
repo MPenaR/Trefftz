@@ -50,14 +50,12 @@ class Problem(Generic[Regions]):
                  mesh: TrefftzMesh[Regions],
                  wavenumber: float,
                  basis: PlanewaveBasis,
-                 regions: type[Regions],
                  boundary_conditions: Mapping[Regions, BoundaryCondition],
                  u: ExactSolution | None = None ):
         
         self.mesh = mesh
         self.k = wavenumber
         self.basis = basis
-        self.regions = regions
         self.boundary_conditions = boundary_conditions
         self.u = u
 
@@ -65,17 +63,18 @@ class Problem(Generic[Regions]):
     def N_DOF(self):
         return self.basis.N_DOF
 
-    def asseble_LHS(self):
-        A = coo_array((self.N_DOF, self.N_DOF), np.complex128)
+    def assemble_LHS(self):
+        # A = coo_array((self.N_DOF, self.N_DOF), np.complex128)
         pass
-        # for region in self.regions:
+        for region in self.mesh.regions:
+            print(region)
         #     A += self.boundary_conditions[region].assemble_LHS(k = self.k, edges = edges[region], self.N_DOF)
         # self.A = A
     
-    def asseble_RHS(self):
-        b = coo_array((self.N_DOF), np.complex128)
-        pass
-        # for region in self.regions:
+    def assemble_RHS(self):
+        # b = coo_array((self.N_DOF), np.complex128)
+        for region in self.mesh.regions:
+            print(region)
         #     b += self.boundary_conditions[region].assemble_RHS(k = self.k, edges = edges[region], self.N_DOF)
         # self.b = b
     
