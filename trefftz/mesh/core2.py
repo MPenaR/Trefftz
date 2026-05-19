@@ -56,7 +56,7 @@ The module currently targets two-dimensional triangular meshes.
 """
 
 
-from typing import Final
+from typing import Final, TypeVar, Generic
 import numpy as np
 from numpy.linalg import norm
 from .locators import CellLocator
@@ -66,6 +66,9 @@ from enum import IntEnum
 from pathlib import Path
 from .readers import GmshReader
 #from .geometry import CellType
+from enum import IntEnum
+
+Regions = TypeVar("Regions", bound=IntEnum)
 
 class EdgeType(IntEnum):
     INNER = 0
@@ -90,7 +93,7 @@ triangle_dtype = [("A", np.float64, DIM),
                   ("M", np.float64, DIM),
                   ("area", np.float64)]
 
-class TrefftzMesh():
+class TrefftzMesh(Generic[Regions]):
     """
     Mesh container for Trefftz-based methods using NumPy structured arrays.
 
@@ -153,7 +156,7 @@ class TrefftzMesh():
     """
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
-                 edge2triangles: int_array,
+                 regions: type[Regions], edge2triangles: int_array,
                  locator: CellLocator, cell_sets: dict[int, int_array]):
         """
         Initialize the mesh and construct geometric data structures.
@@ -163,6 +166,7 @@ class TrefftzMesh():
         self._triangles = triangles
         self.locator = locator
         self._cell_sets = cell_sets
+        self._regions = regions
         self._edge2triangles = edge2triangles
         self.ready_for_assemble = False
         self.construct_numpy_arrays()
