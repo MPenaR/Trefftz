@@ -98,7 +98,7 @@ class PlanewaveBasis:
     :contentReference[oaicite:2]{index=2}
     """
 
-    k: float
+    k: float #not really sure if k should be an attribute. 
     _N_theta: int
     _N_DOF: int
     _N_elements: int
@@ -116,6 +116,7 @@ class PlanewaveBasis:
 
         # plane-wave directions
         self._D = np.column_stack([np.cos(thetas), np.sin(thetas)])
+        self._D_D = self._D[:, None, :] - self._D[None, :, :]
 
     @property
     def N_theta(self):
@@ -139,8 +140,19 @@ class PlanewaveBasis:
     
     @property
     def D(self):
-        '''array of directions (x_i, y_i)'''
+        '''Ntheta x 2, array of directions D = (d_ij) with:
+          d_i1 = cos(theta_i)
+          d_i2 = sin(theta_i) '''
         return self._D
+
+    @property
+    def D_D(self):
+        '''N_theta x N_theta x 2 array of differences of directions:
+         
+          (D_D)_ijk = D_ik - D_jk
+           
+        Very useful in many fluxes. '''
+        return self._D_D
 
     def dofs_on_element(self, t: int):
         '''returns the global degrees of freedom belonging to element "t"'''

@@ -1,4 +1,4 @@
-from trefftz.mesh import TrefftzMesh, Regions
+from trefftz.mesh import TrefftzMesh, BoundaryRegions
 from trefftz.dg.basis import PlanewaveBasis
 from typing import Protocol, TypeVar, Any, Generic
 from collections.abc import Mapping
@@ -45,12 +45,14 @@ class WaveguideDtN:
 class ExactSolution:
     pass
 
-class Problem(Generic[Regions]):
+class BCType(Enum):
+    pass
+class Problem(Generic[BoundaryRegions]):
     def __init__(self,
-                 mesh: TrefftzMesh[Regions],
+                 mesh: TrefftzMesh[BoundaryRegions],
                  wavenumber: float,
                  basis: PlanewaveBasis,
-                 boundary_conditions: Mapping[Regions, BoundaryCondition],
+                 boundary_conditions: Mapping[BoundaryRegions, BoundaryCondition],
                  u: ExactSolution | None = None ):
         
         self.mesh = mesh
@@ -58,31 +60,58 @@ class Problem(Generic[Regions]):
         self.basis = basis
         self.boundary_conditions = boundary_conditions
         self.u = u
+        self.A: sparray | None = None
+        self.b: sparray | None = None
 
     @property
     def N_DOF(self):
         return self.basis.N_DOF
+    
+    @property
+    def assembled(self) -> bool:
+        return self.A is not None and self.b is not None
 
     def assemble_LHS(self):
-        # A = coo_array((self.N_DOF, self.N_DOF), np.complex128)
-        pass
-        for region in self.mesh.regions:
-            print(region)
+        A = coo_array((self.N_DOF, self.N_DOF), np.complex128)
+
+
+        # Assembly of the local operators
+        data = []
+        rows = []
+        cols = []
+        ## Interior fluxes
+        for edge in self.mesh.interior_edges:
+            pass 
+        
+        ## Boundary conditions
+        for region in self.mesh.boundary_regions:
+            for edge in self.mesh.edges_on_region(region):
+                pass
+
+
         #     A += self.boundary_conditions[region].assemble_LHS(k = self.k, edges = edges[region], self.N_DOF)
-        # self.A = A
+        
+        # Assembly of the non-local ones
+        A_local = coo_array((data, (rows, cols)), shape=(3, 3))
+
+        
+        self.A = A_local + A_nonlocal
     
     def assemble_RHS(self):
-        # b = coo_array((self.N_DOF), np.complex128)
-        for region in self.mesh.regions:
+        b = coo_array((self.N_DOF), np.complex128)
+        for region in self.mesh.boundary_regions:
             print(region)
         #     b += self.boundary_conditions[region].assemble_RHS(k = self.k, edges = edges[region], self.N_DOF)
-        # self.b = b
+        self.b = b
     
     def assemble(self):
-        self.asseble_RHS()
-        self.asseble_LHS()
+        self.assemble_RHS()
+        self.assemble_LHS()
 
     def solve(self):
-        u_h = spsolve(A=self.A, b=self.b)
+        if self.assembled:
+            u_h = spsolve(A=self.A, b=self.b)
+        else:
+            print("Problem not fully assembled yet.")
         self.u_h = u_h
 

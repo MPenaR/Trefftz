@@ -68,11 +68,8 @@ from .readers import GmshReader
 #from .geometry import CellType
 from enum import IntEnum
 
-Regions = TypeVar("Regions", bound=IntEnum)
-
-class EdgeType(IntEnum):
-    INNER = 0
-    BOUNDARY = 1
+BoundaryRegions = TypeVar("BoundaryRegions", bound=IntEnum)
+InteriorRegions = TypeVar("InteriorRegions", bound=IntEnum)
 
 DIM: Final = 2
 
@@ -82,8 +79,7 @@ edge_dtype = [("P", np.float64, DIM),
               ("N", np.float64, DIM),
               ("M", np.float64, DIM),
               ("l", float),
-              ("type", np.int8),
-              ("flux_type", np.int8),
+              ("on_boundary", np.bool),
               ("region", np.int8),
               ("triangles", np.int32, 2)]
 
@@ -93,7 +89,7 @@ triangle_dtype = [("A", np.float64, DIM),
                   ("M", np.float64, DIM),
                   ("area", np.float64)]
 
-class TrefftzMesh(Generic[Regions]):
+class TrefftzMesh(Generic[BoundaryRegions]):
     """
     Mesh container for Trefftz-based methods using NumPy structured arrays.
 
@@ -156,8 +152,8 @@ class TrefftzMesh(Generic[Regions]):
     """
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
-                 regions: type[Regions], edge2triangles: int_array,
-                 locator: CellLocator, cell_sets: dict[int, int_array]):
+                 boundary_regions: type[BoundaryRegions], edge2triangles: int_array,
+                 locator: CellLocator, cell_sets: dict[BoundaryRegions, int_array]):
         """
         Initialize the mesh and construct geometric data structures.
         """
@@ -166,14 +162,25 @@ class TrefftzMesh(Generic[Regions]):
         self._triangles = triangles
         self.locator = locator
         self._cell_sets = cell_sets
-        self._regions = regions
+        self._boundary_regions = boundary_regions
         self._edge2triangles = edge2triangles
-        self.ready_for_assemble = False
         self.construct_numpy_arrays()
 
     @property
-    def regions(self) -> type[Regions]:
-        return self._regions
+    def boundary_edges(self):
+        return self.edges[self.edges["on_boundary"]]
+
+    @property
+    def interior_edges(self):
+        return self.edges[~self.edges["on_boundary"]]
+
+
+    def edges_on_region(self, region: BoundaryRegions):
+        return self.edges[self.edges["region"] == region]
+
+    @property
+    def boundary_regions(self) -> type[BoundaryRegions]:
+        return self._boundary_regions
 
     def construct_numpy_arrays(self):
         """
@@ -210,10 +217,7 @@ class TrefftzMesh(Generic[Regions]):
         edges["T"] = 1/edges["l"][:, np.newaxis]*(edges["Q"] - edges["P"])
         edges["N"] = np.column_stack([edges["T"][:, 1], -edges["T"][:, 0]])
         edges["triangles"] = self._edge2triangles
-        edges["type"] = (edges["triangles"][:, 1] == -1).astype(np.int8)
-        edges["flux_type"] = -1
-        # edges["flux_type"][edges["type"] == EdgeType.INNER] = FluxType.TRANSMISSION
-        edges["flux_type"][edges["type"] == EdgeType.INNER] = 0
+        edges["boundary"] = (edges["triangles"][:, 1] == -1)
         edges["region"] = -1
         cell_sets_1D = self._cell_sets
         for region in cell_sets_1D:
@@ -232,26 +236,23 @@ class TrefftzMesh(Generic[Regions]):
         self.triangles = triangles
 
         # orienting boundary normals
-        boundary_edges = edges[edges["type"] == EdgeType.BOUNDARY]
+        boundary_edges = edges[edges["boundary"]]
         boundary_triangles = triangles[boundary_edges["triangles"][:, 0]]
         baricenters = boundary_triangles["M"]
         midpoints = boundary_edges["M"]
         boundary_normals = np.sign(np.vecdot(midpoints-baricenters, boundary_edges["N"]))[:, np.newaxis]*boundary_edges["N"]
-        edges["N"][edges["type"] == EdgeType.BOUNDARY] = boundary_normals
+        edges["N"][edges["boundary"]] = boundary_normals
 
         # orienting inner normals (i don't think it should matter)
 
-        inner_edges = edges[edges["type"] == EdgeType.INNER]
+        inner_edges = edges[~edges["boundary"]]
         inner_triangles = triangles[inner_edges["triangles"]]
         bar_plus = inner_triangles[:, 0]["M"]
         bar_minus = inner_triangles[:, 1]["M"]
         
         #midpoints = boundary_edges["M"]
         inner_normals = np.sign(np.vecdot(bar_minus-bar_plus, inner_edges["N"]))[:, np.newaxis]*inner_edges["N"]
-        edges["N"][edges["type"] == EdgeType.INNER] = inner_normals
-
-        if np.all(self.edges["flux_type"] >= 0):
-            self.ready_for_assemble = True
+        edges["N"][~edges["boundary"]] = inner_normals
 
     def get_cell(self, p: float_array) -> int_array | int:
         """
@@ -321,4 +322,4 @@ class TrefftzMesh(Generic[Regions]):
             Constructed mesh instance.
         """
         points, edges, triangles, edges2triangles, locator, cell_sets = GmshReader(file_path)
-        return cls(points, edges, triangles, edges2triangles, locator, cell_sets)
+        return cls(points, edges, triangles, edges2triangles, locator, cell_sets) ## boundary_regions missing
