@@ -70,9 +70,11 @@ class SerialAssembler(Assembler):
         rows: list[int] = []
         cols: list[int] = []
         data: list[complex] = []
-        for edge in p.mesh.boundary_edges:
-            bc = p.boundary_conditions[edge["region"]]
-            kernel = SerialKernels[bc]
+        
+        # interior edges
+        for edge in p.mesh.interior_edges:
+            kernel = p.numerics.interior_kernel
+            T1, T2 = edge["triangles"]
             for i in range(p.basis.N_theta):
                 for j in range(p.basis.N_theta):
                     d_phi = p.basis.D[j]
@@ -81,6 +83,38 @@ class SerialAssembler(Assembler):
                     rows.append(row)
                     cols.append(col)
                     data.append(value)
+
+        # boundary conditions implemented as local operators
+        for region in p.mesh.boundary_regions:
+            bc = p.boundary_conditions[region]
+            kernel = SerialKernels[bc]
+            for edge in p.mesh.edges_on_region(region):
+                T, _ = edge["triangles"]
+                for i in p.basis.dofs_on_element(T):
+                    for j in p.basis.dofs_on_element(T):
+                        d_psi = p.basis.global_direction(i)
+                        d_phi = p.basis.global_direction(j)
+                        value = kernel.flux_data(edge, d_phi, d_psi, p.k)
+                        rows.append(i)
+                        cols.append(j)
+                        data.append(value)
+
+        # boundary conditions implemented as non-local operators
+        for region in p.mesh.boundary_regions:
+            bc = p.boundary_conditions[region]
+            kernel = SerialKernels[bc]
+            for edge in p.mesh.edges_on_region(region):
+                for i in range(p.basis.N_theta):
+                    for j in range(p.basis.N_theta):
+                        d_phi = p.basis.D[j]
+                        d_psi = p.basis.D[i]
+                        row, col, value = kernel.flux_data(edge, d_phi, d_psi, p.k)
+                        rows.append(row)
+                        cols.append(col)
+                        data.append(value)
+
+
+        
         A = coo_array((data, (rows, cols)), shape=(p.N_DOF, p.N_DOF))
         return A.tocsr()
     
