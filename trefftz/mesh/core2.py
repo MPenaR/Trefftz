@@ -217,7 +217,7 @@ class TrefftzMesh(Generic[BoundaryRegions]):
         edges["T"] = 1/edges["l"][:, np.newaxis]*(edges["Q"] - edges["P"])
         edges["N"] = np.column_stack([edges["T"][:, 1], -edges["T"][:, 0]])
         edges["triangles"] = self._edge2triangles
-        edges["boundary"] = (edges["triangles"][:, 1] == -1)
+        edges["on_boundary"] = (edges["triangles"][:, 1] == -1)
         edges["region"] = -1
         cell_sets_1D = self._cell_sets
         for region in cell_sets_1D:
@@ -236,23 +236,23 @@ class TrefftzMesh(Generic[BoundaryRegions]):
         self.triangles = triangles
 
         # orienting boundary normals
-        boundary_edges = edges[edges["boundary"]]
+        boundary_edges = edges[edges["on_boundary"]]
         boundary_triangles = triangles[boundary_edges["triangles"][:, 0]]
         baricenters = boundary_triangles["M"]
         midpoints = boundary_edges["M"]
         boundary_normals = np.sign(np.vecdot(midpoints-baricenters, boundary_edges["N"]))[:, np.newaxis]*boundary_edges["N"]
-        edges["N"][edges["boundary"]] = boundary_normals
+        edges["N"][edges["on_boundary"]] = boundary_normals
 
         # orienting inner normals (i don't think it should matter)
 
-        inner_edges = edges[~edges["boundary"]]
+        inner_edges = edges[~edges["on_boundary"]]
         inner_triangles = triangles[inner_edges["triangles"]]
         bar_plus = inner_triangles[:, 0]["M"]
         bar_minus = inner_triangles[:, 1]["M"]
         
         #midpoints = boundary_edges["M"]
         inner_normals = np.sign(np.vecdot(bar_minus-bar_plus, inner_edges["N"]))[:, np.newaxis]*inner_edges["N"]
-        edges["N"][~edges["boundary"]] = inner_normals
+        edges["N"][~edges["on_boundary"]] = inner_normals
 
     def get_cell(self, p: float_array) -> int_array | int:
         """

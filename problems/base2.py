@@ -21,15 +21,13 @@ class BoundaryCondition(Protocol):
         ...
 
 class SoundHardBC:
-    def __init__(self, d_1: float):
-        self.d_1 = d_1 # stabilizing parameter
     
-    def assemble_LSH(self, k: float, edge) -> tuple[complex_array, int_array, int_array]:
+    def assemble_LHS(self, k: float, edge) -> tuple[complex_array, int_array, int_array]:
         pass
         # for edge in edges:
         #     A[] = SoundHard_block(k = k, edge = edge, d = d, d_d = dd, d_1 = self.d_1)
 
-    def assemble_RSH(self, k: float, edge) -> tuple[complex_array, int_array]:
+    def assemble_RHS(self, k: float, edge) -> tuple[complex_array, int_array]:
         pass
         # for edge in edges:
         #     b[] = SoundHard_block(k = k, edge = edge, d = d, d_d = dd, d_1 = self.d_1)
@@ -40,6 +38,17 @@ class RadiatingBC:
 
     def assemble_RHS(self, k: float, edges: NDArray[Any]) -> tuple[np.complex128, int]:
         ...
+
+class DtNBC:
+    def __init__(self, truncating_radius: float):
+        self.truncating_radius = truncating_radius
+
+    def assemble_LHS(self, k: float, edges: NDArray[Any]) -> tuple[np.complex128, int, int]:
+        ...
+
+    def assemble_RHS(self, k: float, edges: NDArray[Any]) -> tuple[np.complex128, int]:
+        ...
+    
 
 
 class CircularDtN:
@@ -56,25 +65,24 @@ class BCType(Enum):
 
 class Assembler(Protocol):
 
-    def assemble_LSH(self, p: "Problem[BoundaryRegions]") -> sparray:
+    def assemble_LHS(self, p: "Problem[BoundaryRegions]") -> sparray:
         ...
 
-    def assemble_RHS(self, p: "Problem[BoundaryRegions]") -> NDArray[Any]
-        ...
+    # def assemble_RHS(self, p: "Problem[BoundaryRegions]") -> NDArray[Any]
+    #     ...
     
+
+# not a good protocol right now, it should expect k, eps_1 and eps_2, or neither of them as they belong to the basis    
 class TransmissionKernel(Protocol):
-    def LHS( self, edge, d_phi, d_psi, k_1: float, k_2: float) -> complex:
+    def LHS( self, edge, d_phi, d_psi, k: float) -> complex:
         ...
 
 class LocalKernel(Protocol):
     def LHS( self, edge, d_phi, d_psi, k: float) -> complex:
         ...
 class NonLocalKernel(Protocol):
-    def LHS( self, edge_1, edge_2, d_phi, d_psi, k_1: float, k_2: float) -> complex:
+    def LHS( self, edge_1, edge_2, d_phi, d_psi, k: float) -> complex:
         ...
-
-
-# in reality k_1 and k_2 would belong to phi and psi so it would only require edge1 and edge2
 
 class SerialAssembler(Assembler):
 
@@ -130,7 +138,7 @@ class SerialAssembler(Assembler):
         # boundary conditions implemented as local operators
         for region in p.regions_local_kernel:
             bc = p.boundary_conditions[region]
-            kernel = p.numerics.local_boundary_kernels[bc]
+            kernel = p.numerics.local_boundary_kernels[type(bc)]
             for edge in p.mesh.edges_on_region(region):
                 T, _ = edge["triangles"]
                 for i in p.basis.dofs_on_element(T):
@@ -145,18 +153,18 @@ class SerialAssembler(Assembler):
         # boundary conditions implemented as non-local operators
         for region in p.regions_nonlocal_kernel:
             bc = p.boundary_conditions[region]
-            kernel = p.numerics.nonlocal_boundary_kernels[bc]
+            kernel = p.numerics.nonlocal_boundary_kernels[type(bc)]
             for edge_1 in p.mesh.edges_on_region(region):
                 T_1, _ = edge_1["triangles"]
                 for edge_2 in p.mesh.edges_on_region(region):
                     T_2, _ = edge_2["triangles"]
-                    for i in range(p.basis.dofs_on_element(T1)):
-                        for j in range(p.basis.dofs_on_element(T2)):
+                    for i in range(p.basis.dofs_on_element(T_1)):
+                        for j in range(p.basis.dofs_on_element(T_2)):
                             d_phi = p.basis.D[j]
                             d_psi = p.basis.D[i]
-                            row, col, value = kernel.LHS(edge, d_phi, d_psi, p.k)
-                            rows.append(row)
-                            cols.append(col)
+                            value = kernel.LHS(edge_1, edge_2, d_phi, d_psi, p.k)
+                            rows.append(i)
+                            cols.append(j)
                             data.append(value)
         
         A = coo_array((data, (rows, cols)), shape=(p.N_DOF, p.N_DOF))
@@ -270,7 +278,8 @@ class Problem(Generic[BoundaryRegions]):
     #     self.b = b
 
     def assemble_RHS(self):
-        self.A = self.assembler.assemble_RHS(self)
+        pass
+        # self.A = self.assembler.assemble_RHS(self)
 
     def assemble_LHS(self):
         self.b = self.assembler.assemble_LHS(self)
@@ -282,51 +291,10 @@ class Problem(Generic[BoundaryRegions]):
     def solve(self):
         if self.assembled:
             u_h = spsolve(A=self.A, b=self.b)
+            self.u_h = u_h
         else:
             print("Problem not fully assembled yet.")
-        self.u_h = u_h
 
-
-class SoundHardKernel:
-    '''Serial SoundHard kernel'''
-    def __init__(self, d_1: float):
-        self.d_1 = d_1
-    
-    def LSH(self, edge, d_phi, d_psi, k: float) -> complex:
-        d_1 = self.d_1
-        d_m = d_psi
-        d_n = d_phi
-
-        M = edge.M
-        l = edge.l
-        N = edge.N
-        T = edge.T
-
-        return -1j*k*l*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*exp(1j*k*dot(d_n - d_m, M)) * sinc(k*l/(2*pi)*dot(d_n-d_m, T))
-    
-class UltraWeakKernel:
-    '''Transmission kernel fro the UWVF'''
-    def __init__(self, a: float, b: float):
-        self.a = a 
-        self.b = b
-    
-    def LSH(self, edge, d_phi, d_psi, k_1: float, k_2: float) -> complex:
-        a = self.a 
-        b = self.b
-        d_m = d_psi
-        d_n = d_phi
-
-        k_n = k_1 
-        k_m = k_2
-
-
-        M = edge.M
-        N = edge.N
-        T = edge.T
-        l = edge.l
-
-        # I = -1j*l/2*(2*a*k + k_n*dot(d_n, N) + k_m*dot(d_m, N) + 2*b/k*k_n*dot(d_n, N)*k_m*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
-        return -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
     
 
 

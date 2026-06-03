@@ -104,6 +104,7 @@ class PlanewaveBasis:
     _N_elements: int
     _T_ID_to_DOFs: int_array
     _D: float_array
+    _D_D: float_array
         
     def __init__(self, N_elements: int, thetas: float_array, k: float) -> None:
         self._N_theta = len(thetas)
