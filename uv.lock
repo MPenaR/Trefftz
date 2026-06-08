@@ -2959,6 +2959,8 @@ dependencies = [
     { name = "numpy", version = "2.3.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.16.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy-stubs", version = "1.15.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "scipy-stubs", version = "1.16.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
 
 [package.optional-dependencies]
@@ -2991,6 +2993,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.2.6" },
     { name = "pygmsh", marker = "extra == 'pygmsh'", specifier = ">=7.1.17" },
     { name = "scipy", specifier = ">=1.15.3" },
+    { name = "scipy-stubs", specifier = ">=1.15.3.0" },
 ]
 provides-extras = ["pygmsh", "gmsh"]
 
