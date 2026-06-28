@@ -307,7 +307,8 @@ class TrefftzMesh(Generic[BoundaryRegions]):
         return self._triangles.shape[0]
     
     @classmethod
-    def from_gmsh(cls, file_path: Path | str):
+    def from_msh(cls, file_path: Path | str):
+        from .readers.gmsh import GmshReader
         """
         Create a mesh from a Gmsh mesh file.
 
@@ -322,4 +323,23 @@ class TrefftzMesh(Generic[BoundaryRegions]):
             Constructed mesh instance.
         """
         points, edges, triangles, edges2triangles, locator, cell_sets = GmshReader(file_path)
+        return cls(points, edges, triangles, edges2triangles, locator, cell_sets) ## boundary_regions missing
+    
+    @classmethod
+    def from_ngsolve(cls, file_path: Path | str):
+        from .readers.ngsolve import NGsolveReader
+        """
+        Create a mesh from a Gmsh mesh file.
+
+        Parameters
+        ----------
+        file_path : Path or str
+            Path to the Gmsh ``.msh`` file.
+
+        Returns
+        -------
+        TrefftzMesh
+            Constructed mesh instance.
+        """
+        points, edges, triangles, edges2triangles, locator, cell_sets = NGsolveReader(file_path)
         return cls(points, edges, triangles, edges2triangles, locator, cell_sets) ## boundary_regions missing

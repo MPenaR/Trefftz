@@ -5,8 +5,9 @@ from collections.abc import Mapping
 from scipy.sparse.linalg import spsolve
 from scipy.sparse import coo_array# , csr_array, csc_array
 from dataclasses import dataclass
-from trefftz.numpy_types import complex_array
+from trefftz.numpy_types import complex_array, float_array, int_array
 import numpy as np
+from trefftz.dg.serial_kernels import Edge
 
 
 class BoundaryCondition(Protocol):
@@ -45,20 +46,37 @@ class Assembler(Protocol):
     # def assemble_RHS(self, p: "Problem[BoundaryRegions]") -> NDArray[Any]
     #     ...
     
+    
+
 
 # not a good protocol right now, it should expect k, eps_1 and eps_2, or neither of them as they belong to the basis    
-class TransmissionKernel(Protocol):
-    def LHS( self, edge, d_phi, d_psi, k: float) -> complex:
+class SerialTransmissionKernel(Protocol):
+    def LHS( self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         ...
 
-class LocalKernel(Protocol):
-    def LHS( self, edge, d_phi, d_psi, k: float) -> complex:
+class SerialLocalKernel(Protocol):
+    def LHS( self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         ...
-class NonLocalKernel(Protocol):
-    def LHS( self, edge_1, edge_2, d_phi, d_psi, k: float) -> complex:
+class SerialNonLocalKernel(Protocol):
+    def LHS( self, edge_1: Edge, edge_2:Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         ...
 
 class SerialAssembler(Assembler):
+
+    def assemble_local_bc(self, p: "Problem[BoundaryRegions]", region: BoundaryRegions, rows: list[int], cols: list[int], values: list[complex]):
+        bc = p.boundary_conditions[region]
+        local_kernel = p.numerics.local_boundary_kernels[type(bc)]
+        for edge in p.mesh.edges_on_region(region):
+            T, _ = edge["triangles"]
+            for i in p.basis.dofs_on_element(T):
+                for j in p.basis.dofs_on_element(T):
+                    d_psi = p.basis.global_direction(i)
+                    d_phi = p.basis.global_direction(j)
+                    value = local_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
+                    rows.append(i)
+                    cols.append(j)
+                    values.append(value)
+
 
     def assemble_LHS(self, p: "Problem[BoundaryRegions]") -> coo_array:
         rows: list[int] = []
@@ -75,7 +93,7 @@ class SerialAssembler(Assembler):
                 for j in p.basis.dofs_on_element(T1):
                     d_phi = p.basis.global_direction(j)
                     d_psi = p.basis.global_direction(i)
-                    val = interior_kernel.LHS(edge, d_phi, d_psi, p.k)
+                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
                     rows.append(i)
                     cols.append(j)
                     values.append(val)
@@ -84,7 +102,7 @@ class SerialAssembler(Assembler):
                 for j in p.basis.dofs_on_element(T2):
                     d_phi = p.basis.global_direction(j)
                     d_psi = p.basis.global_direction(i)
-                    val = interior_kernel.LHS(edge, d_phi, d_psi, p.k)
+                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
                     rows.append(i)
                     cols.append(j)
                     values.append(val)
@@ -93,7 +111,7 @@ class SerialAssembler(Assembler):
                 for j in p.basis.dofs_on_element(T1):
                     d_phi = p.basis.global_direction(j)
                     d_psi = p.basis.global_direction(i)
-                    val = interior_kernel.LHS(edge, d_phi, d_psi, p.k)
+                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
                     rows.append(i)
                     cols.append(j)
                     values.append(val)
@@ -102,7 +120,7 @@ class SerialAssembler(Assembler):
                 for j in p.basis.dofs_on_element(T2):
                     d_phi = p.basis.global_direction(j)
                     d_psi = p.basis.global_direction(i)
-                    val = interior_kernel.LHS(edge, d_phi, d_psi, p.k)
+                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
                     rows.append(i)
                     cols.append(j)
                     values.append(val)
@@ -111,18 +129,23 @@ class SerialAssembler(Assembler):
 
         # boundary conditions implemented as local operators
         for region in p.regions_local_kernel:
-            bc = p.boundary_conditions[region]
-            local_kernel = p.numerics.local_boundary_kernels[type(bc)]
-            for edge in p.mesh.edges_on_region(region):
-                T, _ = edge["triangles"]
-                for i in p.basis.dofs_on_element(T):
-                    for j in p.basis.dofs_on_element(T):
-                        d_psi = p.basis.global_direction(i)
-                        d_phi = p.basis.global_direction(j)
-                        value = local_kernel.LHS(edge, d_phi, d_psi, p.k)
-                        rows.append(i)
-                        cols.append(j)
-                        values.append(value)
+            self.assemble_local_bc(p, region, rows, cols, values)
+
+
+    
+        # for region in p.regions_local_kernel:
+        #     bc = p.boundary_conditions[region]
+        #     local_kernel = p.numerics.local_boundary_kernels[type(bc)]
+        #     for edge in p.mesh.edges_on_region(region):
+        #         T, _ = edge["triangles"]
+        #         for i in p.basis.dofs_on_element(T):
+        #             for j in p.basis.dofs_on_element(T):
+        #                 d_psi = p.basis.global_direction(i)
+        #                 d_phi = p.basis.global_direction(j)
+        #                 value = local_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
+        #                 rows.append(i)
+        #                 cols.append(j)
+        #                 values.append(value)
 
         # boundary conditions implemented as non-local operators
         for region in p.regions_nonlocal_kernel:
@@ -136,12 +159,14 @@ class SerialAssembler(Assembler):
                         for j in p.basis.dofs_on_element(T_2):
                             d_phi = p.basis.global_direction(j)
                             d_psi = p.basis.global_direction(i)
-                            value = non_local_kernel.LHS(edge_1, edge_2, d_phi, d_psi, p.k)
+                            value = non_local_kernel.LHS(Edge(edge_1["M"], edge_1["l"], edge_1["N"], edge_1["T"]),
+                                                         Edge(edge_2["M"], edge_2["l"], edge_2["N"], edge_2["T"]),
+                                                         d_phi, d_psi, p.k)
                             rows.append(i)
                             cols.append(j)
                             values.append(value)
 
-        return coo_array((values, (rows, cols)), shape=(p.N_DOF, p.N_DOF))
+        return coo_array(( np.asarray(values), ( np.asarray(rows), np.asarray(cols))), shape=(p.N_DOF, p.N_DOF))
     
     def assemble_RHS(self, p: "Problem[BoundaryRegions]") -> complex_array:
         rows: list[int] = []
@@ -178,10 +203,10 @@ class SerialAssembler(Assembler):
         np.add.at(b, rows, values)
         return b
 @dataclass
-class Numerics:
-    interior_kernel: TransmissionKernel
-    local_boundary_kernels: Mapping[type[BoundaryCondition], LocalKernel]
-    nonlocal_boundary_kernels: Mapping[type[BoundaryCondition], NonLocalKernel]
+class SerialNumerics:
+    interior_kernel: SerialTransmissionKernel
+    local_boundary_kernels: Mapping[type[BoundaryCondition], SerialLocalKernel]
+    nonlocal_boundary_kernels: Mapping[type[BoundaryCondition], SerialNonLocalKernel]
 
 class Problem(Generic[BoundaryRegions]):
     def __init__(self,
@@ -189,7 +214,7 @@ class Problem(Generic[BoundaryRegions]):
                  wavenumber: float,
                  basis: PlanewaveBasis,
                  boundary_conditions: Mapping[BoundaryRegions, BoundaryCondition],
-                 numerics: Numerics,
+                 numerics: SerialNumerics,
                  assembler: Assembler = SerialAssembler(),
                  u: ExactSolution | None = None ):
         

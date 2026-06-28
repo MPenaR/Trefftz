@@ -1,5 +1,13 @@
 from numpy import dot, exp, sinc, pi, conj
 from numpy.lib.scimath import sqrt
+from typing import NamedTuple
+from trefftz.numpy_types import float_array
+
+class Edge(NamedTuple):
+    M: float_array
+    l: float_array
+    N: float_array
+    T: float_array
 
 
 class SoundHardKernel:
@@ -7,15 +15,15 @@ class SoundHardKernel:
     def __init__(self, d_1: float):
         self.d_1 = d_1
     
-    def LHS(self, edge, d_phi, d_psi, k: float) -> complex:
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         d_1 = self.d_1
         d_m = d_psi
         d_n = d_phi
 
-        M = edge["M"]
-        l = edge["l"]
-        N = edge["N"]
-        T = edge["T"]
+        M = edge.M
+        l = edge.l
+        N = edge.N
+        T = edge.T
 
         return -1j*k*l*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*exp(1j*k*dot(d_n - d_m, M)) * sinc(k*l/(2*pi)*dot(d_n-d_m, T))
 
@@ -26,7 +34,7 @@ class UltraWeakKernel:
         self.a = a 
         self.b = b
     
-    def LHS(self, edge, d_phi, d_psi, k: float) -> complex:
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         a = self.a 
         b = self.b
         d_m = d_psi
@@ -35,10 +43,10 @@ class UltraWeakKernel:
         k_n = k 
         k_m = k
 
-        M = edge["M"]
-        l = edge["l"]
-        N = edge["N"]
-        T = edge["T"]
+        M = edge.M
+        l = edge.l
+        N = edge.N
+        T = edge.T
 
         # I = -1j*l/2*(2*a*k + k_n*dot(d_n, N) + k_m*dot(d_m, N) + 2*b/k*k_n*dot(d_n, N)*k_m*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
         return -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
@@ -48,7 +56,7 @@ class NtDLocal:
         self.R = R
         self.d_2 = d_2
     
-    def LHS(self, edge, d_phi, d_psi, k: float) -> complex:
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         r"""
         Computes the flux on a radiating boundary with respect to the degrees
         of freedom from the same cell, that is:
@@ -89,10 +97,10 @@ class NtDLocal:
         d_m = d_psi
 
 
-        M = edge["M"]
-        l = edge["l"]
-        N = edge["N"]
-        T = edge["T"]
+        M = edge.M
+        l = edge.l
+        N = edge.N
+        T = edge.T
 
         return -1j*k*l*(d_2 + dot(d_n, N))*exp(1j*k*dot(d_n - d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
 
@@ -104,7 +112,7 @@ class WaveguideNtD_nonlocal:
         self.M = M 
         self.H = H
 
-    def LHS(self, edge_1, edge_2, d_phi, d_psi, k : float) -> complex:
+    def LHS(self, edge_1: Edge, edge_2:Edge, d_phi: float_array, d_psi: float_array, k : float) -> complex:
         r"""
         Computes the flux on a radiating boundary with respect to the degrees
         of freedom from another cell, that is:
@@ -142,15 +150,15 @@ class WaveguideNtD_nonlocal:
         H = self.H
         M = self.M
 
-        M_u = edge_1["M"]
-        l_u = edge_1["l"]
+        M_u = edge_1.M
+        l_u = edge_1.l
 
-        M_v = edge_2["M"]
-        l_v = edge_2["l"]
+        M_v = edge_2.M
+        l_v = edge_2.l
 
 
-        N = edge_1["N"]
-        T = edge_1["T"]
+        N = edge_1.N
+        # T = edge_1.T
 
         d_n = d_phi
         d_m = d_psi
