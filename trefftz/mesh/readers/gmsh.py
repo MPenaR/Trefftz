@@ -42,12 +42,10 @@ searches combined with exact geometric containment tests.
 """
 
 
-from .locators import KDTreeLocator
+from trefftz.mesh.locators import KDTreeLocator
 import numpy as np
 from pathlib import Path
 from trefftz.numpy_types import float_array, int_array
-import gmsh 
-
 
 try:
     import gmsh

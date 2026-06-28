@@ -64,7 +64,6 @@ from trefftz.numpy_types import float_array, int_array
 from .geometry import triangle_area
 from enum import IntEnum
 from pathlib import Path
-from .readers import GmshReader
 #from .geometry import CellType
 from enum import IntEnum
 
@@ -310,7 +309,7 @@ class TrefftzMesh(Generic[BoundaryRegions]):
     def from_msh(cls, file_path: Path | str):
         from .readers.gmsh import GmshReader
         """
-        Create a mesh from a Gmsh mesh file.
+        Create a mesh from a Gmsh .mesh file.
 
         Parameters
         ----------
@@ -324,7 +323,27 @@ class TrefftzMesh(Generic[BoundaryRegions]):
         """
         points, edges, triangles, edges2triangles, locator, cell_sets = GmshReader(file_path)
         return cls(points, edges, triangles, edges2triangles, locator, cell_sets) ## boundary_regions missing
-    
+
+    @classmethod
+    def from_gmsh(cls, model, boundary_regions: type[BoundaryRegions]) -> "TrefftzMesh[BoundaryRegions]":
+        from .readers.gmsh import GmshArrays
+        """
+        Create a mesh from a Gmsh model object.
+
+        Parameters
+        ----------
+        file_path : Path or str
+            Path to the Gmsh ``.msh`` file.
+
+        Returns
+        -------
+        TrefftzMesh
+            Constructed mesh instance.
+        """
+        points, edges, triangles, edges2triangles, locator, cell_sets = GmshArrays(model)
+        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets) ## boundary_regions missing
+
+
     @classmethod
     def from_ngsolve(cls, file_path: Path | str):
         from .readers.ngsolve import NGsolveReader
