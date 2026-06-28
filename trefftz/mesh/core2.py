@@ -88,7 +88,7 @@ triangle_dtype = [("A", np.float64, DIM),
                   ("M", np.float64, DIM),
                   ("area", np.float64)]
 
-class TrefftzMesh(Generic[BoundaryRegions]):
+class TrefftzMesh[BoundaryRegions]:
     """
     Mesh container for Trefftz-based methods using NumPy structured arrays.
 
@@ -306,7 +306,7 @@ class TrefftzMesh(Generic[BoundaryRegions]):
         return self._triangles.shape[0]
     
     @classmethod
-    def from_msh(cls, file_path: Path | str):
+    def from_msh(cls, file_path: Path | str, boundary_regions: type[BoundaryRegions]) -> "TrefftzMesh[BoundaryRegions]":
         from .readers.gmsh import GmshReader
         """
         Create a mesh from a Gmsh .mesh file.
@@ -322,7 +322,7 @@ class TrefftzMesh(Generic[BoundaryRegions]):
             Constructed mesh instance.
         """
         points, edges, triangles, edges2triangles, locator, cell_sets = GmshReader(file_path)
-        return cls(points, edges, triangles, edges2triangles, locator, cell_sets) ## boundary_regions missing
+        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets) 
 
     @classmethod
     def from_gmsh(cls, model, boundary_regions: type[BoundaryRegions]) -> "TrefftzMesh[BoundaryRegions]":
@@ -341,7 +341,7 @@ class TrefftzMesh(Generic[BoundaryRegions]):
             Constructed mesh instance.
         """
         points, edges, triangles, edges2triangles, locator, cell_sets = GmshArrays(model)
-        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets) ## boundary_regions missing
+        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets) 
 
 
     @classmethod

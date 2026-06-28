@@ -102,7 +102,7 @@ def GmshReader(file_path: Path | str) -> tuple[float_array, int_array, int_array
 
 
 
-def GmshArrays(model: type[gmsh.model]) -> tuple[float_array, int_array, int_array, int_array, KDTreeLocator, dict[int, int_array]]:
+def NGsolve(model: type[gmsh.model]) -> tuple[float_array, int_array, int_array, int_array, KDTreeLocator, dict[int, int_array]]:
     """
     Extract mesh arrays from a Gmsh model.
 
