@@ -56,7 +56,7 @@ The module currently targets two-dimensional triangular meshes.
 """
 
 
-from typing import Final, TypeVar, Generic
+from typing import Final, TypeVar
 import numpy as np
 from numpy.linalg import norm
 from .locators import CellLocator
@@ -64,8 +64,8 @@ from trefftz.numpy_types import float_array, int_array
 from .geometry import triangle_area
 from enum import IntEnum
 from pathlib import Path
-#from .geometry import CellType
-from enum import IntEnum
+# from .geometry import CellType
+
 
 BoundaryRegions = TypeVar("BoundaryRegions", bound=IntEnum)
 InteriorRegions = TypeVar("InteriorRegions", bound=IntEnum)
@@ -87,6 +87,7 @@ triangle_dtype = [("A", np.float64, DIM),
                   ("C", np.float64, DIM),
                   ("M", np.float64, DIM),
                   ("area", np.float64)]
+
 
 class TrefftzMesh[BoundaryRegions]:
     """
@@ -173,7 +174,6 @@ class TrefftzMesh[BoundaryRegions]:
     def interior_edges(self):
         return self.edges[~self.edges["on_boundary"]]
 
-
     def edges_on_region(self, region: BoundaryRegions):
         return self.edges[self.edges["region"] == region]
 
@@ -231,7 +231,7 @@ class TrefftzMesh[BoundaryRegions]:
         triangles["M"] = 1/3*(triangles["A"] + triangles["B"] + triangles["C"])
         triangles["area"] = triangle_area(A=triangles["A"],
                                           B=triangles["B"],
-                                          C=triangles["C"])        
+                                          C=triangles["C"])
         self.triangles = triangles
 
         # orienting boundary normals
@@ -248,8 +248,8 @@ class TrefftzMesh[BoundaryRegions]:
         inner_triangles = triangles[inner_edges["triangles"]]
         bar_plus = inner_triangles[:, 0]["M"]
         bar_minus = inner_triangles[:, 1]["M"]
-        
-        #midpoints = boundary_edges["M"]
+
+        # midpoints = boundary_edges["M"]
         inner_normals = np.sign(np.vecdot(bar_minus-bar_plus, inner_edges["N"]))[:, np.newaxis]*inner_edges["N"]
         edges["N"][~edges["on_boundary"]] = inner_normals
 
@@ -322,7 +322,7 @@ class TrefftzMesh[BoundaryRegions]:
             Constructed mesh instance.
         """
         points, edges, triangles, edges2triangles, locator, cell_sets = GmshReader(file_path)
-        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets) 
+        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets)
 
     @classmethod
     def from_gmsh(cls, model, boundary_regions: type[BoundaryRegions]) -> "TrefftzMesh[BoundaryRegions]":
@@ -341,11 +341,11 @@ class TrefftzMesh[BoundaryRegions]:
             Constructed mesh instance.
         """
         points, edges, triangles, edges2triangles, locator, cell_sets = GmshArrays(model)
-        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets) 
+        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets)
 
 
     @classmethod
-    def from_ngsolve(cls, file_path: Path | str):
+    def from_ngsolve(cls, mesh, boundary_regions: type[BoundaryRegions]) -> "TrefftzMesh[BoundaryRegions]":
         from .readers.ngsolve import NGsolveReader
         """
         Create a mesh from a Gmsh mesh file.
@@ -360,5 +360,5 @@ class TrefftzMesh[BoundaryRegions]:
         TrefftzMesh
             Constructed mesh instance.
         """
-        points, edges, triangles, edges2triangles, locator, cell_sets = NGsolveReader(file_path)
-        return cls(points, edges, triangles, edges2triangles, locator, cell_sets) ## boundary_regions missing
+        points, edges, triangles, edges2triangles, locator, cell_sets = NGsolveReader(mesh)
+        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets)

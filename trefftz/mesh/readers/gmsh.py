@@ -226,15 +226,4 @@ def GmshArrays(model: type[gmsh.model]) -> tuple[float_array, int_array, int_arr
         #     etype, etags, enodes = model.mesh.getElements(dim, e)
         #     print(f'{enodes=}')
 
-    
-    # cell_sets = mesh.cell_sets_dict
-
-    # for phys_ID in cell_sets.keys():
-    #     for key in cell_sets[phys_ID].keys():
-    #         if key == "line":
-    #             cell_sets[phys_ID][key] = meshed_to_generated[cell_sets[phys_ID][key]]
-
-
-    # locator = KDTreeLocator(points=points, triangles=triangles)
-
     return points, edges, triangles, edge2triangles, locator, cell_sets
