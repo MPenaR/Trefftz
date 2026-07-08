@@ -1,10 +1,15 @@
-from .core import TrefftzMesh
+import matplotlib.axes
+from .core2 import TrefftzMesh
 import matplotlib.pyplot as plt 
 from matplotlib.collections import LineCollection
 from matplotlib.patches import Polygon
 import numpy as np
+import matplotlib
+from typing import Any
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
 
-def explore_edges(mesh: TrefftzMesh):
+def explore_edges(mesh: TrefftzMesh[Any], figax: tuple[Axes, Figure] | None = None):
     """
     Interactive visualization tool for inspecting mesh edges.
 
@@ -43,7 +48,11 @@ def explore_edges(mesh: TrefftzMesh):
 
     The visualization relies on Matplotlib interactive backends.
     """
-    fig, ax = plt.subplots()
+    if figax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig, ax = figax
+    
     lw = 1
     xmin, ymin = mesh._points.min(axis=0)
     xmax, ymax = mesh._points.max(axis=0)
@@ -62,7 +71,7 @@ def explore_edges(mesh: TrefftzMesh):
     px, py = edge["P"]
     qx, qy = edge["Q"]
     ax.plot([px, qx], [py, qy], "b", linewidth=2*lw )
-    if edge["boundary"]:
+    if edge["on_boundary"]:
         triangle = mesh._triangles[edge["triangles"][0]]
         A, B, C = mesh._points[triangle[0]], mesh._points[triangle[1]], mesh._points[triangle[2]]
         ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r', alpha=alpha))
@@ -97,8 +106,8 @@ def explore_edges(mesh: TrefftzMesh):
         px, py = edge["P"]
         qx, qy = edge["Q"]
         ax.plot([px, qx], [py, qy], "b", linewidth=2*lw )
-        ax.set_title(f'Edge number: {e}, boundary: {edge["boundary"]}')
-        if edge["boundary"]:
+        ax.set_title(f'Edge number: {e}, boundary: {edge["on_boundary"]}')
+        if edge["on_boundary"]:
             triangle = mesh._triangles[edge["triangles"][0]]
             A, B, C = mesh._points[triangle[0]], mesh._points[triangle[1]], mesh._points[triangle[2]]
             ax.add_patch(Polygon(np.vstack([A,B,C]), facecolor='r', alpha=alpha))

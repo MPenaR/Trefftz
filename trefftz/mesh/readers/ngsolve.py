@@ -41,7 +41,7 @@ Point-location queries are accelerated using centroid-based KD-tree
 searches combined with exact geometric containment tests.
 """
 
-
+from enum import StrEnum
 from trefftz.mesh.locators import CellLocator
 import numpy as np
 # from pathlib import Path
@@ -70,7 +70,7 @@ class NGsolveLocator:
         return self._elem_to_faces[nr]
 
 
-def NGsolveReader(mesh: ngsolve.comp.Mesh) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array]]:
+def NGsolveReader(mesh: ngsolve.comp.Mesh, boundary_regions: StrEnum) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array]]:
     """
     Extract mesh arrays from a Gmsh model.
 
@@ -121,5 +121,10 @@ def NGsolveReader(mesh: ngsolve.comp.Mesh) -> tuple[float_array, int_array, int_
     edge2triangles = np.array([(E.faces[0].nr, E.faces[1].nr if len(E.faces) > 1 else -1) for E in mesh.edges])
 
     locator = NGsolveLocator(mesh)
+    # cell_sets: dict[boundary_regions, int_array] = {}
     cell_sets = {}
+
+    for reg in boundary_regions:
+        mask = mesh.Boundaries("left").Mask()
+        cell_sets[reg] = [ el.edges[0].nr for el in mesh.Elements(ngsolve.BND) if mask[el.index]]
     return points, edges, triangles, edge2triangles, locator, cell_sets

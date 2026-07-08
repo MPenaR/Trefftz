@@ -66,7 +66,7 @@ class SerialAssembler(Assembler):
     def assemble_local_bc(self, p: "Problem[BoundaryRegions]", region: BoundaryRegions, rows: list[int], cols: list[int], values: list[complex]):
         bc = p.boundary_conditions[region]
         local_kernel = p.numerics.local_boundary_kernels[type(bc)]
-        for edge in p.mesh.edges_on_region(region):
+        for edge in p.mesh.edges_on(region):
             T, _ = edge["triangles"]
             for i in p.basis.dofs_on_element(T):
                 for j in p.basis.dofs_on_element(T):
@@ -151,9 +151,9 @@ class SerialAssembler(Assembler):
         for region in p.regions_nonlocal_kernel:
             bc = p.boundary_conditions[region]
             non_local_kernel = p.numerics.nonlocal_boundary_kernels[type(bc)]
-            for edge_1 in p.mesh.edges_on_region(region):
+            for edge_1 in p.mesh.edges_on(region):
                 T_1, _ = edge_1["triangles"]
-                for edge_2 in p.mesh.edges_on_region(region):
+                for edge_2 in p.mesh.edges_on(region):
                     T_2, _ = edge_2["triangles"]
                     for i in p.basis.dofs_on_element(T_1):
                         for j in p.basis.dofs_on_element(T_2):
@@ -178,7 +178,8 @@ class SerialAssembler(Assembler):
             if bc.data is None:
                 continue
             local_kernel = p.numerics.local_boundary_kernels[type(bc)]
-            for edge in p.mesh.edges_on_region(region):
+            # for edge in p.mesh.edges_on_region(region):
+            for edge in p.mesh.edges_on(region):
                 T, _ = edge["triangles"]
                 for i in p.basis.dofs_on_element(T):
                     d_psi = p.basis.global_direction(i)
@@ -192,7 +193,7 @@ class SerialAssembler(Assembler):
             if bc.data is None:
                 continue
             non_local_kernel = p.numerics.nonlocal_boundary_kernels[type(bc)]
-            for edge_1 in p.mesh.edges_on_region(region):
+            for edge_1 in p.mesh.edges_on(region):
                 T_1, _ = edge_1["triangles"]
                 for i in p.basis.dofs_on_element(T_1):
                     d_psi = p.basis.global_direction(i)

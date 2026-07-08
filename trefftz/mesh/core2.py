@@ -62,13 +62,13 @@ from numpy.linalg import norm
 from .locators import CellLocator
 from trefftz.numpy_types import float_array, int_array
 from .geometry import triangle_area
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 from pathlib import Path
 # from .geometry import CellType
 
 
-BoundaryRegions = TypeVar("BoundaryRegions", bound=IntEnum)
-InteriorRegions = TypeVar("InteriorRegions", bound=IntEnum)
+BoundaryRegions = TypeVar("BoundaryRegions", IntEnum, StrEnum)
+InteriorRegions = TypeVar("InteriorRegions", IntEnum, StrEnum)
 
 DIM: Final = 2
 
@@ -165,6 +165,7 @@ class TrefftzMesh[BoundaryRegions]:
         self._boundary_regions = boundary_regions
         self._edge2triangles = edge2triangles
         self.construct_numpy_arrays()
+        self._edges_on = cell_sets
 
     @property
     def boundary_edges(self):
@@ -174,8 +175,12 @@ class TrefftzMesh[BoundaryRegions]:
     def interior_edges(self):
         return self.edges[~self.edges["on_boundary"]]
 
-    def edges_on_region(self, region: BoundaryRegions):
-        return self.edges[self.edges["region"] == region]
+    # def edges_on_region(self, region: BoundaryRegions):
+    #     return self.edges[self.edges["region"] == region]
+
+    def edges_on(self, region: BoundaryRegions):
+        return self.edges[self._edges_on[region]]
+
 
     @property
     def boundary_regions(self) -> type[BoundaryRegions]:
@@ -218,9 +223,9 @@ class TrefftzMesh[BoundaryRegions]:
         edges["triangles"] = self._edge2triangles
         edges["on_boundary"] = (edges["triangles"][:, 1] == -1)
         edges["region"] = -1
-        cell_sets_1D = self._cell_sets
-        for region in cell_sets_1D:
-            edges["region"][cell_sets_1D[region]] = region
+        # cell_sets_1D = self._cell_sets
+        # for region in cell_sets_1D:
+        #     edges["region"][cell_sets_1D[region]] = region
 
         self.edges = edges
 
@@ -360,5 +365,5 @@ class TrefftzMesh[BoundaryRegions]:
         TrefftzMesh
             Constructed mesh instance.
         """
-        points, edges, triangles, edges2triangles, locator, cell_sets = NGsolveReader(mesh)
+        points, edges, triangles, edges2triangles, locator, cell_sets = NGsolveReader(mesh, boundary_regions)
         return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets)
