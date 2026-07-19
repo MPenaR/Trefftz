@@ -27,12 +27,12 @@ class SoundHardKernel:
 
         return -1j*k*l*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*exp(1j*k*dot(d_n - d_m, M)) * sinc(k*l/(2*pi)*dot(d_n-d_m, T))
     
-    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex
+    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
         pass
 
 
 class UltraWeakKernel:
-    '''Transmission kernel fro the UWVF'''
+    '''Transmission kernel for the UWVF'''
     def __init__(self, a: float, b: float):
         self.a = a 
         self.b = b
@@ -55,8 +55,10 @@ class UltraWeakKernel:
         return -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
 
 class NtDLocal:
-    def __init__(self, R: float, d_2: float):
+    def __init__(self, R: float, d_2: float, n: int, H: float):
         self.R = R
+        self.mode_n = n
+        self.H = H
         self.d_2 = d_2
     
     def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
@@ -107,8 +109,29 @@ class NtDLocal:
 
         return -1j*k*l*(d_2 + dot(d_n, N))*exp(1j*k*dot(d_n - d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
 
-    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex
-        pass
+    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
+
+        t = self.mode_n
+        d = d_psi
+        d_2 = self.d_2
+        H = self.H
+        
+        M = edge.M
+        l = edge.l
+        N = edge.N
+        T = edge.T
+
+        M_x, _ = M  # I dont like it, it still assumes horizontal waveguide
+
+        beta = sqrt(k**2 - (t*pi/H)**2)
+
+        if t == 0:
+            I = 2*1j*k*l*(dot(d, N) - d_2*(1-dot(d, N)))*exp(1j*k*(M_x - dot(d, M)))*sinc(k*l/(2*pi)*dot(d, T))
+        else:
+            I = 1j*k*l*(dot(d, N) - d_2*(1-k/conj(beta)*dot(d, N)))*exp(1j*(beta*M_x - k*dot(d, M)))*( exp( 1j*t*pi*dot(M,T)/H)*sinc(k*l/(2*pi)*dot(d, T) - t*(l/(2*H)))+
+                                                                                                       exp(-1j*t*pi*dot(M,T)/H)*sinc(k*l/(2*pi)*dot(d, T) + t*(l/(2*H))))
+        return I
+
 
 
 
@@ -189,7 +212,3 @@ class WaveguideNtD_nonlocal:
             for s in range(1, M)]) )
 
         return  I1 + I2 + I3
-    
-    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex
-        pass
-
