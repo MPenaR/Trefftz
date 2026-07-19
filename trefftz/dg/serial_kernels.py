@@ -26,6 +26,9 @@ class SoundHardKernel:
         T = edge.T
 
         return -1j*k*l*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*exp(1j*k*dot(d_n - d_m, M)) * sinc(k*l/(2*pi)*dot(d_n-d_m, T))
+    
+    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex
+        pass
 
 
 class UltraWeakKernel:
@@ -103,6 +106,10 @@ class NtDLocal:
         T = edge.T
 
         return -1j*k*l*(d_2 + dot(d_n, N))*exp(1j*k*dot(d_n - d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
+
+    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex
+        pass
+
 
 
 class WaveguideNtD_nonlocal:
@@ -182,3 +189,7 @@ class WaveguideNtD_nonlocal:
             for s in range(1, M)]) )
 
         return  I1 + I2 + I3
+    
+    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex
+        pass
+

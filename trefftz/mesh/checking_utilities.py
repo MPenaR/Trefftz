@@ -9,7 +9,7 @@ from typing import Any
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-def explore_edges(mesh: TrefftzMesh[Any], figax: tuple[Axes, Figure] | None = None):
+def explore_edges(mesh: TrefftzMesh[Any], figax: tuple[Figure, Axes] | None = None):
     """
     Interactive visualization tool for inspecting mesh edges.
 

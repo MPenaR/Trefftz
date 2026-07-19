@@ -1,9 +1,9 @@
 from trefftz.mesh import TrefftzMesh, BoundaryRegions
 from trefftz.dg.basis import PlanewaveBasis
-from typing import Protocol, Generic, Optional
+from typing import Protocol, Generic, Optional, Any
 from collections.abc import Mapping
 from scipy.sparse.linalg import spsolve
-from scipy.sparse import coo_array# , csr_array, csc_array
+from scipy.sparse import coo_array  # , csr_array, csc_array
 from dataclasses import dataclass
 from trefftz.numpy_types import complex_array, float_array, int_array
 import numpy as np
@@ -11,31 +11,46 @@ from trefftz.dg.serial_kernels import Edge
 
 
 class BoundaryCondition(Protocol):
-    data: Optional[object]
+    data: Optional[Any]
+
+
+class NeumannBC:
+    def __init__(self, data: Any | None = None):
+        self.data = data
+
+
+# class SoundHardBC:
+#     def __init__(self, data: object | None = None):
+#         self.data = data
 
 
 class SoundHardBC:
-    def __init__(self, data: object | None = None):
-        self.data = data
+    def __init__(self):
+        self.data = None
+
+
 
 class RadiatingBC:
     def __init__(self, data: object | None = None):
         self.data = data
 
+
 class NtDBC:
     def __init__(self, truncating_radius: float, data: object | None = None):
         self.truncating_radius = truncating_radius
         self.data = data
-    
 
 
 class CircularNtD:
     ...
 
+
 class WaveguideNtD:
     ...
+
+
 class ExactSolution:
-    pass
+    ...
 
 
 class Assembler(Protocol):
@@ -45,21 +60,28 @@ class Assembler(Protocol):
 
     # def assemble_RHS(self, p: "Problem[BoundaryRegions]") -> NDArray[Any]
     #     ...
-    
-    
 
 
-# not a good protocol right now, it should expect k, eps_1 and eps_2, or neither of them as they belong to the basis    
 class SerialTransmissionKernel(Protocol):
-    def LHS( self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         ...
+
 
 class SerialLocalKernel(Protocol):
-    def LHS( self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         ...
+
+    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
+        ...
+
+
 class SerialNonLocalKernel(Protocol):
-    def LHS( self, edge_1: Edge, edge_2:Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge_1: Edge, edge_2: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         ...
+
+    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
+        ...
+
 
 class SerialAssembler(Assembler):
 
@@ -77,12 +99,11 @@ class SerialAssembler(Assembler):
                     cols.append(j)
                     values.append(value)
 
-
     def assemble_LHS(self, p: "Problem[BoundaryRegions]") -> coo_array:
         rows: list[int] = []
         cols: list[int] = []
         values: list[complex] = []
-        
+
         # interior edges
         for edge in p.mesh.interior_edges:
             interior_kernel = p.numerics.interior_kernel
@@ -125,14 +146,10 @@ class SerialAssembler(Assembler):
                     cols.append(j)
                     values.append(val)
 
-
-
         # boundary conditions implemented as local operators
         for region in p.regions_local_kernel:
             self.assemble_local_bc(p, region, rows, cols, values)
 
-
-    
         # for region in p.regions_local_kernel:
         #     bc = p.boundary_conditions[region]
         #     local_kernel = p.numerics.local_boundary_kernels[type(bc)]
@@ -166,48 +183,49 @@ class SerialAssembler(Assembler):
                             cols.append(j)
                             values.append(value)
 
-        return coo_array(( np.asarray(values), ( np.asarray(rows), np.asarray(cols))), shape=(p.N_DOF, p.N_DOF))
-    
+        return coo_array((np.asarray(values), (np.asarray(rows), np.asarray(cols))), shape=(p.N_DOF, p.N_DOF))
+
     def assemble_RHS(self, p: "Problem[BoundaryRegions]") -> complex_array:
         rows: list[int] = []
         values: list[complex] = []
-        
-        # boundary conditions implemented as local operators
-        for region in p.regions_local_kernel:
-            bc = p.boundary_conditions[region]
-            if bc.data is None:
-                continue
-            local_kernel = p.numerics.local_boundary_kernels[type(bc)]
-            # for edge in p.mesh.edges_on_region(region):
-            for edge in p.mesh.edges_on(region):
-                T, _ = edge["triangles"]
-                for i in p.basis.dofs_on_element(T):
-                    d_psi = p.basis.global_direction(i)
-                    value = local_kernel.RHS(edge, d_psi, p.k)
-                    rows.append(i)
-                    values.append(value)
+        for region in p.regions_RHS_term:
 
-        # boundary conditions implemented as non-local operators
-        for region in p.regions_nonlocal_kernel:
-            bc = p.boundary_conditions[region]
-            if bc.data is None:
-                continue
-            non_local_kernel = p.numerics.nonlocal_boundary_kernels[type(bc)]
-            for edge_1 in p.mesh.edges_on(region):
-                T_1, _ = edge_1["triangles"]
-                for i in p.basis.dofs_on_element(T_1):
-                    d_psi = p.basis.global_direction(i)
-                    value = non_local_kernel.RHS(edge_1, d_psi, p.k)
-                    rows.append(i)
-                    values.append(value)
+            # boundary conditions implemented as local operators
+            if region in p.regions_local_kernel:
+                bc = p.boundary_conditions[region]
+                local_kernel = p.numerics.local_boundary_kernels[type(bc)]
+                # for edge in p.mesh.edges_on_region(region):
+                for edge in p.mesh.edges_on(region):
+                    T, _ = edge["triangles"]
+                    for i in p.basis.dofs_on_element(T):
+                        d_psi = p.basis.global_direction(i)
+                        value = local_kernel.RHS(edge, d_psi, p.k)
+                        rows.append(i)
+                        values.append(value)
+
+            # boundary conditions implemented as non-local operators
+            elif region in p.regions_nonlocal_kernel:
+                bc = p.boundary_conditions[region]
+                non_local_kernel = p.numerics.nonlocal_boundary_kernels[type(bc)]
+                for edge_1 in p.mesh.edges_on(region):
+                    T_1, _ = edge_1["triangles"]
+                    for i in p.basis.dofs_on_element(T_1):
+                        d_psi = p.basis.global_direction(i)
+                        value = non_local_kernel.RHS(edge_1, d_psi, p.k)
+                        rows.append(i)
+                        values.append(value)
+
         b = np.zeros((p.N_DOF,), dtype=np.complex128)
         np.add.at(b, rows, values)
         return b
+
+
 @dataclass
 class SerialNumerics:
     interior_kernel: SerialTransmissionKernel
     local_boundary_kernels: Mapping[type[BoundaryCondition], SerialLocalKernel]
     nonlocal_boundary_kernels: Mapping[type[BoundaryCondition], SerialNonLocalKernel]
+
 
 class Problem(Generic[BoundaryRegions]):
     def __init__(self,
@@ -227,10 +245,11 @@ class Problem(Generic[BoundaryRegions]):
         self.numerics = numerics
         self.assembler = assembler
         self._A: coo_array | None = None
-        self._b: complex_array| None = None
+        self._b: complex_array | None = None
 
-        self._regions_local_kernel = [ region for region, bc in self.boundary_conditions.items() if type(bc) in numerics.local_boundary_kernels ]
-        self._regions_nonlocal_kernel = [ region for region, bc in self.boundary_conditions.items() if type(bc) in numerics.nonlocal_boundary_kernels ]
+        self._regions_local_kernel = [region for region, bc in self.boundary_conditions.items() if type(bc) in numerics.local_boundary_kernels]
+        self._regions_nonlocal_kernel = [region for region, bc in self.boundary_conditions.items() if type(bc) in numerics.nonlocal_boundary_kernels]
+        self._regions_RHS_term = [region for region, bc in self.boundary_conditions.items() if bc.data is not None]
 
     @property
     def regions_local_kernel(self):
@@ -239,12 +258,15 @@ class Problem(Generic[BoundaryRegions]):
     @property
     def regions_nonlocal_kernel(self):
         return self._regions_nonlocal_kernel
-
+    
+    @property
+    def regions_RHS_term(self):
+        return self._regions_RHS_term
 
     @property
     def N_DOF(self):
         return self.basis.N_DOF
-    
+
     @property
     def assembled(self) -> bool:
         return self.A is not None and self.b is not None
@@ -261,7 +283,6 @@ class Problem(Generic[BoundaryRegions]):
     def b(self) -> complex_array | None:
         return self._b
 
-
     def assemble_RHS(self):
         pass
         # self.A = self.assembler.assemble_RHS(self)
@@ -276,9 +297,3 @@ class Problem(Generic[BoundaryRegions]):
             self.u_h = u_h
         else:
             print("Problem not fully assembled yet.")
-
-    
-
-
-
-
