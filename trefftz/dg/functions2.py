@@ -1,17 +1,15 @@
 '''Module for defining Trefftz-DG functions'''
 from trefftz.dg.basis import TrefftzBasis
-from typing import Any, TYPE_CHECKING
 from numpy.typing import DTypeLike
 from trefftz.dg.basis import TrefftzBasis
-if TYPE_CHECKING:
-    from trefftz.mesh import TrefftzMesh
-
+from trefftz.mesh import TrefftzMesh
+from typing import Any
 from trefftz.numpy_types import complex_array, float_array
 import numpy as np
 
 
 class ComplexFunction:
-    def __init__(self, domain: "TrefftzMesh",  N_theta: int, k: float) -> None:
+    def __init__(self, domain: TrefftzMesh[Any],  N_theta: int, k: float) -> None:
         self.domain = domain
         self.N_theta = N_theta
         self.N_DOF = N_theta*domain.n_triangles
@@ -41,9 +39,9 @@ class ComplexFunction:
 class TrefftzFunction:
     '''Numerical function belonging to the finite dimensiona broken Trefftz space'''
 
-    def __init__(self, domain, basis: TrefftzBasis, dtype: DTypeLike = np.complex128):
+    def __init__(self, mesh: TrefftzMesh[Any], basis: TrefftzBasis, dtype: DTypeLike = np.complex128):
         self.basis = basis
-        self.domain = domain
+        self.mesh = mesh
         self.coefficients = np.zeros(basis.N_DOF, dtype=dtype)
 
     def set(self, coefficients):
@@ -55,7 +53,7 @@ class TrefftzFunction:
         y = np.asarray(y)
         XY = np.column_stack([x, y])
 
-        T_IDs = self.domain.mesh.get_cell(XY)
+        T_IDs = self.mesh.get_cell(XY)
         DOFs = self.basis.T_ID_to_DOFs[T_IDs, :]  # shape (Npts, Ntheta) 
 
         # evaluate plane-wave basis at points
@@ -65,3 +63,4 @@ class TrefftzFunction:
         values = np.sum(self.coefficients[DOFs] * np.exp(1j * k * np.dot(XY, D.T)), axis=1)
 
         return values
+

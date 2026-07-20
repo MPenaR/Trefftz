@@ -101,12 +101,16 @@ class SerialAssembler(Assembler):
         cols: list[int] = []
         values: list[complex] = []
 
-        # interior edges
+        # interior edges (POOR SOLUTION)
+        interior_kernel = p.numerics.interior_kernel
+        a = interior_kernel.a 
+        b = interior_kernel.b
         for edge in p.mesh.interior_edges:
-            interior_kernel = p.numerics.interior_kernel
             T1, T2 = edge["triangles"]
 
             # local T1
+            interior_kernel.a = a 
+            interior_kernel.b = b
             for i in p.basis.dofs_on_element(T1):
                 for j in p.basis.dofs_on_element(T1):
                     d_phi = p.basis.global_direction(j)
@@ -115,7 +119,8 @@ class SerialAssembler(Assembler):
                     rows.append(i)
                     cols.append(j)
                     values.append(val)
-
+            interior_kernel.a = -a 
+            interior_kernel.b = -b 
             for i in p.basis.dofs_on_element(T1):
                 for j in p.basis.dofs_on_element(T2):
                     d_phi = p.basis.global_direction(j)
@@ -125,6 +130,8 @@ class SerialAssembler(Assembler):
                     cols.append(j)
                     values.append(val)
 
+            interior_kernel.a = a 
+            interior_kernel.b = b
             for i in p.basis.dofs_on_element(T2):
                 for j in p.basis.dofs_on_element(T1):
                     d_phi = p.basis.global_direction(j)
@@ -132,8 +139,11 @@ class SerialAssembler(Assembler):
                     val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
                     rows.append(i)
                     cols.append(j)
-                    values.append(val)
+                    values.append(-val)
+
             # local T2
+            interior_kernel.a = -a 
+            interior_kernel.b = -b 
             for i in p.basis.dofs_on_element(T2):
                 for j in p.basis.dofs_on_element(T2):
                     d_phi = p.basis.global_direction(j)
@@ -141,7 +151,7 @@ class SerialAssembler(Assembler):
                     val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
                     rows.append(i)
                     cols.append(j)
-                    values.append(val)
+                    values.append(-val)
 
         # boundary conditions implemented as local operators
         for region in p.regions_local_kernel:
