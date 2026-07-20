@@ -3,7 +3,7 @@ from numpy.lib.scimath import sqrt
 from typing import NamedTuple
 from trefftz.numpy_types import float_array
 from enum import Enum, auto
-
+from typing import Protocol
 class Edge(NamedTuple):
     M: float_array
     l: float_array
@@ -22,6 +22,29 @@ class TT(Enum):
     PM = auto()
     MP = auto()
     MM = auto()
+
+
+class BlockTransmissionKernel(Protocol):
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float, sign: TT) -> complex:
+        ...
+
+
+class BlockLocalKernel(Protocol):
+    def LHS(self, edge: Edge, D, DD, k: float) -> complex:
+        ...
+
+    def RHS(self, edge: Edge, D, k: float) -> complex:
+        ...
+
+
+class BlockNonLocalKernel(Protocol):
+    def LHS(self, edge_1: Edge, edge_2: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+        ...
+
+
+
+
+
 
 class SoundHardKernel:
     '''Serial SoundHard kernel'''

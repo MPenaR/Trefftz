@@ -9,7 +9,7 @@ from trefftz.numpy_types import complex_array, float_array, int_array
 import numpy as np
 from trefftz.dg.functions2 import TrefftzFunction
 from trefftz.dg.serial_kernels import SerialLocalKernel, SerialNonLocalKernel, SerialTransmissionKernel
-from assemblers import SerialAssembler
+from trefftz.dg.assemblers import Assembler, SerialAssembler
 class BoundaryCondition(Protocol):
     data: Optional[Any]
 
@@ -52,13 +52,6 @@ class ExactSolution:
     ...
 
 
-class Assembler(Protocol):
-
-    def assemble_LHS(self, p: "Problem[BoundaryRegions]") -> coo_array:
-        ...
-
-    def assemble_RHS(self, p: "Problem[BoundaryRegions]") -> complex_array:
-        ...
 
 
 @dataclass
