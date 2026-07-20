@@ -3,12 +3,12 @@ from trefftz.dg.basis import PlanewaveBasis
 from typing import Protocol, Generic, Optional, Any
 from collections.abc import Mapping
 from scipy.sparse.linalg import spsolve
-from scipy.sparse import coo_array  # , csr_array, csc_array
+from scipy.sparse import coo_array, csr_array, csc_array
 from dataclasses import dataclass
 from trefftz.numpy_types import complex_array, float_array, int_array
 import numpy as np
-from trefftz.dg.serial_kernels import Edge
-
+from trefftz.dg.serial_kernels import Edge, TT
+from trefftz.dg.functions2 import TrefftzFunction
 
 class BoundaryCondition(Protocol):
     data: Optional[Any]
@@ -63,7 +63,7 @@ class Assembler(Protocol):
 
 
 class SerialTransmissionKernel(Protocol):
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float, sign: TT) -> complex:
         ...
 
 
@@ -103,73 +103,64 @@ class SerialAssembler(Assembler):
 
         # interior edges (POOR SOLUTION)
         interior_kernel = p.numerics.interior_kernel
-        a = interior_kernel.a 
-        b = interior_kernel.b
+        # a = interior_kernel.a 
+        # b = interior_kernel.b
         for edge in p.mesh.interior_edges:
             T1, T2 = edge["triangles"]
 
             # local T1
-            interior_kernel.a = a 
-            interior_kernel.b = b
+            # interior_kernel.a = a 
+            # interior_kernel.b = b
+            sign = TT.PP
             for i in p.basis.dofs_on_element(T1):
                 for j in p.basis.dofs_on_element(T1):
                     d_phi = p.basis.global_direction(j)
                     d_psi = p.basis.global_direction(i)
-                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
+                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k, sign=sign)
                     rows.append(i)
                     cols.append(j)
                     values.append(val)
-            interior_kernel.a = -a 
-            interior_kernel.b = -b 
+            # interior_kernel.a = -a 
+            # interior_kernel.b = -b 
+            sign = TT.PM
             for i in p.basis.dofs_on_element(T1):
                 for j in p.basis.dofs_on_element(T2):
                     d_phi = p.basis.global_direction(j)
                     d_psi = p.basis.global_direction(i)
-                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
+                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k, sign=sign)
                     rows.append(i)
                     cols.append(j)
                     values.append(val)
 
-            interior_kernel.a = a 
-            interior_kernel.b = b
+            # interior_kernel.a = a 
+            # interior_kernel.b = b
+            sign = TT.MP
             for i in p.basis.dofs_on_element(T2):
                 for j in p.basis.dofs_on_element(T1):
                     d_phi = p.basis.global_direction(j)
                     d_psi = p.basis.global_direction(i)
-                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
+                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k, sign=sign)
                     rows.append(i)
                     cols.append(j)
-                    values.append(-val)
+                    values.append(val)
 
-            # local T2
-            interior_kernel.a = -a 
-            interior_kernel.b = -b 
+            # # local T2
+            # interior_kernel.a = -a 
+            # interior_kernel.b = -b 
+            sign = TT.MM
             for i in p.basis.dofs_on_element(T2):
                 for j in p.basis.dofs_on_element(T2):
                     d_phi = p.basis.global_direction(j)
                     d_psi = p.basis.global_direction(i)
-                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
+                    val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k, sign=sign)
                     rows.append(i)
                     cols.append(j)
-                    values.append(-val)
+                    values.append(val)
 
         # boundary conditions implemented as local operators
         for region in p.regions_local_kernel:
             self.assemble_local_bc(p, region, rows, cols, values)
 
-        # for region in p.regions_local_kernel:
-        #     bc = p.boundary_conditions[region]
-        #     local_kernel = p.numerics.local_boundary_kernels[type(bc)]
-        #     for edge in p.mesh.edges_on_region(region):
-        #         T, _ = edge["triangles"]
-        #         for i in p.basis.dofs_on_element(T):
-        #             for j in p.basis.dofs_on_element(T):
-        #                 d_psi = p.basis.global_direction(i)
-        #                 d_phi = p.basis.global_direction(j)
-        #                 value = local_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, p.k)
-        #                 rows.append(i)
-        #                 cols.append(j)
-        #                 values.append(value)
 
         # boundary conditions implemented as non-local operators
         for region in p.regions_nonlocal_kernel:
@@ -284,8 +275,12 @@ class Problem(Generic[BoundaryRegions]):
         self.assemble_LHS()
 
     def solve(self):
+        DIRECT = True
         if self.assembled:
-            u_h = spsolve(A=self.A, b=self.b)
+            if DIRECT:
+                A = csr_array(self.A)
+            u_h = TrefftzFunction(self.mesh, self.basis)
+            u_h.set(coefficients=spsolve(A=A, b=self.b))
             self.u_h = u_h
         else:
             print("Problem not fully assembled yet.")

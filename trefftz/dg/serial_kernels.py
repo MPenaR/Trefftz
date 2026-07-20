@@ -2,6 +2,7 @@ from numpy import dot, exp, sinc, pi, conj
 from numpy.lib.scimath import sqrt
 from typing import NamedTuple
 from trefftz.numpy_types import float_array
+from enum import Enum, auto
 
 class Edge(NamedTuple):
     M: float_array
@@ -9,6 +10,18 @@ class Edge(NamedTuple):
     N: float_array
     T: float_array
 
+
+class TT(Enum):
+    '''sentinel for the transmission kernel
+    where PP (plus plus) stands for both trial
+    and test function coming from the plus triangle
+    whereas PM stands for the test function (psi) coming
+    from the + triangle and the trial function (phi) from
+    the - one.'''
+    PP = auto()
+    PM = auto()
+    MP = auto()
+    MM = auto()
 
 class SoundHardKernel:
     '''Serial SoundHard kernel'''
@@ -37,13 +50,25 @@ class UltraWeakKernel:
         self.a = a 
         self.b = b
     
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-        a = self.a 
-        b = self.b
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float, sign: TT) -> complex:
+        match sign:
+            case TT.PP:
+                a = self.a
+                b = self.b
+            case TT.PM:
+                a = -self.a
+                b = -self.b
+            case TT.MP:
+                a = self.a
+                b = self.b
+            case TT.MM:
+                a = -self.a
+                b = -self.b
+
         d_m = d_psi
         d_n = d_phi
 
-        k_n = k 
+        k_n = k
         k_m = k
 
         M = edge.M
@@ -53,7 +78,17 @@ class UltraWeakKernel:
 
         # I = -1j*l/2*(2*a*k + k_n*dot(d_n, N) + k_m*dot(d_m, N) + 2*b/k*k_n*dot(d_n, N)*k_m*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
         # I = -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
-        return -1j*k*l*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*exp(1j*k*dot(d_n-d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
+        I = -1j*k*l*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*exp(1j*k*dot(d_n-d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
+        match sign:
+            case TT.PP:
+                I = I
+            case TT.PM:
+                I = I
+            case TT.MP:
+                I = -I
+            case TT.MM:
+                I = -I
+        return I
 class NtDLocal:
     def __init__(self, R: float, d_2: float, n: int, H: float):
         self.R = R
