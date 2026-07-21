@@ -2,10 +2,8 @@ from numpy import dot, exp, sinc, pi, conj
 from numpy.lib.scimath import sqrt
 from typing import NamedTuple
 from trefftz.numpy_types import float_array
-from enum import Enum, auto
+from enum import Enum
 from typing import Protocol
-
-
 
 
 class Edge(NamedTuple):
@@ -15,21 +13,21 @@ class Edge(NamedTuple):
     T: float_array
 
 
-class TT(Enum):
-    '''sentinel for the transmission kernel
+class SIGN(Enum):
+    '''Sign for the transmission kernel
     where PP (plus plus) stands for both trial
     and test function coming from the plus triangle
     whereas PM stands for the test function (psi) coming
     from the + triangle and the trial function (phi) from
     the - one.'''
-    PP = auto()
-    PM = auto()
-    MP = auto()
-    MM = auto()
+    PP = (0, 0)
+    PM = (0, 1)
+    MP = (1, 0)
+    MM = (1, 1)
 
 
 class SerialTransmissionKernel(Protocol):
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float, sign: TT) -> complex:
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float, sign: SIGN) -> complex:
         ...
 
 
@@ -73,18 +71,18 @@ class UltraWeakKernel:
         self.a = a 
         self.b = b
     
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float, sign: TT) -> complex:
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float, sign: SIGN) -> complex:
         match sign:
-            case TT.PP:
+            case SIGN.PP:
                 a = self.a
                 b = self.b
-            case TT.PM:
+            case SIGN.PM:
+                a = self.a
+                b = self.b
+            case SIGN.MP:
                 a = -self.a
                 b = -self.b
-            case TT.MP:
-                a = self.a
-                b = self.b
-            case TT.MM:
+            case SIGN.MM:
                 a = -self.a
                 b = -self.b
 
@@ -103,13 +101,13 @@ class UltraWeakKernel:
         # I = -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
         I = -1j*k*l*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*exp(1j*k*dot(d_n-d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
         match sign:
-            case TT.PP:
+            case SIGN.PP:
                 I = I
-            case TT.PM:
-                I = I
-            case TT.MP:
+            case SIGN.PM:
                 I = -I
-            case TT.MM:
+            case SIGN.MP:
+                I = I
+            case SIGN.MM:
                 I = -I
         return I
 class NtDLocal:

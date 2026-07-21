@@ -9,56 +9,12 @@ from trefftz.numpy_types import complex_array, float_array, int_array
 import numpy as np
 from trefftz.dg.functions2 import TrefftzFunction
 from trefftz.dg.serial_kernels import SerialLocalKernel, SerialNonLocalKernel, SerialTransmissionKernel
-from trefftz.dg.assemblers import Assembler, SerialAssembler
-class BoundaryCondition(Protocol):
-    data: Optional[Any]
-
-
-class NeumannBC:
-    def __init__(self, data: Any | None = None):
-        self.data = data
-
-
-# class SoundHardBC:
-#     def __init__(self, data: object | None = None):
-#         self.data = data
-
-
-class SoundHardBC:
-    def __init__(self):
-        self.data = None
-
-
-class RadiatingBC:
-    def __init__(self, data: object | None = None):
-        self.data = data
-
-
-class NtDBC:
-    def __init__(self, truncating_radius: float, data: object | None = None):
-        self.truncating_radius = truncating_radius
-        self.data = data
-
-
-class CircularNtD:
-    ...
-
-
-class WaveguideNtD:
-    ...
-
+from trefftz.dg.assemblers import Assembler, SerialAssembler, SerialNumerics
+from trefftz.dg.boundary_conditions2 import BoundaryCondition
 
 class ExactSolution:
     ...
 
-
-
-
-@dataclass
-class SerialNumerics:
-    interior_kernel: SerialTransmissionKernel
-    local_boundary_kernels: Mapping[type[BoundaryCondition], SerialLocalKernel]
-    nonlocal_boundary_kernels: Mapping[type[BoundaryCondition], SerialNonLocalKernel]
 
 
 class Problem(Generic[BoundaryRegions]):
@@ -68,7 +24,7 @@ class Problem(Generic[BoundaryRegions]):
                  basis: PlanewaveBasis,
                  boundary_conditions: Mapping[BoundaryRegions, BoundaryCondition],
                  numerics: SerialNumerics,
-                 assembler: Assembler = SerialAssembler(),
+                 assembler: Assembler,
                  u: ExactSolution | None = None ):
         
         self.mesh = mesh
@@ -77,7 +33,10 @@ class Problem(Generic[BoundaryRegions]):
         self.boundary_conditions = boundary_conditions
         self.u = u
         self.numerics = numerics
-        self.assembler = assembler
+        self.assembler = SerialAssembler(self.mesh,
+                                         self.boundary_conditions,
+                                         self.numerics,
+                                         self.basis)
         self._A: coo_array | None = None
         self._b: complex_array | None = None
 
@@ -106,7 +65,7 @@ class Problem(Generic[BoundaryRegions]):
         return self.A is not None and self.b is not None
 
     def assemble_LHS(self):
-        self._A = self.assembler.assemble_LHS(self)
+        self._A = self.assembler.assemble_LHS()
         return self._A
 
     @property
@@ -114,7 +73,7 @@ class Problem(Generic[BoundaryRegions]):
         return self._A
 
     def assemble_RHS(self):
-        self._b = self.assembler.assemble_RHS(self)
+        self._b = self.assembler.assemble_RHS()
 
     @property
     def b(self) -> complex_array | None:
