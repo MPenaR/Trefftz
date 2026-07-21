@@ -33,10 +33,7 @@ class Problem(Generic[BoundaryRegions]):
         self.boundary_conditions = boundary_conditions
         self.u = u
         self.numerics = numerics
-        self.assembler = SerialAssembler(self.mesh,
-                                         self.boundary_conditions,
-                                         self.numerics,
-                                         self.basis)
+        self.assembler = assembler
         self._A: coo_array | None = None
         self._b: complex_array | None = None
 
@@ -74,6 +71,7 @@ class Problem(Generic[BoundaryRegions]):
 
     def assemble_RHS(self):
         self._b = self.assembler.assemble_RHS()
+        return self._b
 
     @property
     def b(self) -> complex_array | None:

@@ -222,7 +222,7 @@ class TrefftzMesh[BoundaryRegions]:
         edges["N"] = np.column_stack([edges["T"][:, 1], -edges["T"][:, 0]])
         edges["triangles"] = self._edge2triangles
         edges["on_boundary"] = (edges["triangles"][:, 1] == -1)
-        edges["region"] = -1
+        edges["region"] = -1 # will be deprecated
         # cell_sets_1D = self._cell_sets
         # for region in cell_sets_1D:
         #     edges["region"][cell_sets_1D[region]] = region
