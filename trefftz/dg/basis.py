@@ -52,6 +52,7 @@ from dataclasses import dataclass
 from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 
+
 @dataclass(slots=True)
 class PlanewaveBasis:
     """

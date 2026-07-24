@@ -1,18 +1,44 @@
-'''Module for defining different boundary conditions'''
-from enum import IntEnum  #, auto
-from typing import Protocol, Any
-from numpy.typing import NDArray
-
-class BoundaryConditionType(IntEnum):
-    '''Types of boundary condition'''
-    Transsmision = 0  # not really a "boundary" condition
-    SoundHard = 1
-    SoundSoft = 2
-    Radiating = 3
-    Dirichlet = 4  # when homogeneous becomes Soundsoft
-    Neumann = 5    # when homogeneous becomes SoundHard
+from typing import Protocol, Optional, Any
 
 
 class BoundaryCondition(Protocol):
-    def assemble_blocks(self) -> tuple[NDArray[Any]]:
-        ...
+    data: Optional[Any]
+
+
+class NeumannBC:
+    def __init__(self, data: Any | None = None):
+        self.data = data
+
+
+class SoundHardBC:
+    def __init__(self):
+        self.data = None
+
+
+class DirichletBC:
+    def __init__(self, data: Any | None = None):
+        self.data = data
+
+
+class SoundSoftBC:
+    def __init__(self):
+        self.data = None
+
+
+class RadiatingBC:
+    def __init__(self, data: object | None = None):
+        self.data = data
+
+
+class NtDBC:
+    def __init__(self, truncating_radius: float, data: object | None = None):
+        self.truncating_radius = truncating_radius
+        self.data = data
+
+
+# class CircularNtD:
+#     ...
+
+
+# class WaveguideNtD:
+#     ...

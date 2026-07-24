@@ -9,13 +9,13 @@ from matplotlib.collections import LineCollection
 import numpy as np
 from numpy.typing import NDArray
 # from regions import Region
-from problems.base import Domain
+from problems.base_old import Domain
 import gmsh
 
 from trefftz.mesh.readers import GmshArrays
 #from problems import Problem
-from trefftz.dg.fluxes import FluxType
-from problems.waveguide.exact_solutions import WaveguideMode
+from trefftz.dg.fluxes_old import FluxType
+from problems.waveguide_old.exact_solutions import WaveguideMode
 from trefftz.numpy_types import float_array, complex_array
 
 # from scipy.sparse import csc_matrix

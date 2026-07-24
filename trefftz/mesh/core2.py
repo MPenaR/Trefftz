@@ -67,8 +67,8 @@ from pathlib import Path
 # from .geometry import CellType
 
 
-BoundaryRegions = TypeVar("BoundaryRegions", IntEnum, StrEnum)
-InteriorRegions = TypeVar("InteriorRegions", IntEnum, StrEnum)
+# BoundaryRegions = TypeVar("BoundaryRegions", IntEnum, StrEnum)
+# InteriorRegions = TypeVar("InteriorRegions", IntEnum, StrEnum)
 
 DIM: Final = 2
 
@@ -89,7 +89,7 @@ triangle_dtype = [("A", np.float64, DIM),
                   ("area", np.float64)]
 
 
-class TrefftzMesh[BoundaryRegions]:
+class TrefftzMesh[BR: (IntEnum, StrEnum)]:
     """
     Mesh container for Trefftz-based methods using NumPy structured arrays.
 
@@ -152,8 +152,8 @@ class TrefftzMesh[BoundaryRegions]:
     """
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
-                 boundary_regions: type[BoundaryRegions], edge2triangles: int_array,
-                 locator: CellLocator, cell_sets: dict[BoundaryRegions, int_array]):
+                 boundary_regions: type[BR], edge2triangles: int_array,
+                 locator: CellLocator, cell_sets: dict[BR, int_array]):
         """
         Initialize the mesh and construct geometric data structures.
         """
@@ -178,12 +178,11 @@ class TrefftzMesh[BoundaryRegions]:
     # def edges_on_region(self, region: BoundaryRegions):
     #     return self.edges[self.edges["region"] == region]
 
-    def edges_on(self, region: BoundaryRegions):
+    def edges_on(self, region: BR):
         return self.edges[self._edges_on[region]]
 
-
     @property
-    def boundary_regions(self) -> type[BoundaryRegions]:
+    def boundary_regions(self) -> type[BR]:
         return self._boundary_regions
 
     def construct_numpy_arrays(self):
@@ -311,7 +310,7 @@ class TrefftzMesh[BoundaryRegions]:
         return self._triangles.shape[0]
     
     @classmethod
-    def from_msh(cls, file_path: Path | str, boundary_regions: type[BoundaryRegions]) -> "TrefftzMesh[BoundaryRegions]":
+    def from_msh(cls, file_path: Path | str, boundary_regions: type[BR]) -> "TrefftzMesh[BR]":
         from .readers.gmsh import GmshReader
         """
         Create a mesh from a Gmsh .mesh file.
@@ -330,7 +329,7 @@ class TrefftzMesh[BoundaryRegions]:
         return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets)
 
     @classmethod
-    def from_gmsh(cls, model, boundary_regions: type[BoundaryRegions]) -> "TrefftzMesh[BoundaryRegions]":
+    def from_gmsh(cls, model, boundary_regions: type[BR]) -> "TrefftzMesh[BR]":
         from .readers.gmsh import GmshArrays
         """
         Create a mesh from a Gmsh model object.
@@ -350,7 +349,7 @@ class TrefftzMesh[BoundaryRegions]:
 
 
     @classmethod
-    def from_ngsolve(cls, mesh, boundary_regions: type[BoundaryRegions]) -> "TrefftzMesh[BoundaryRegions]":
+    def from_ngsolve(cls, mesh, boundary_regions: type[BR]) -> "TrefftzMesh[BR]":
         from .readers.ngsolve import NGsolveReader
         """
         Create a mesh from a Gmsh mesh file.

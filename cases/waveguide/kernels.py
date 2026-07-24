@@ -1,113 +1,8 @@
-from numpy import dot, exp, sinc, pi, conj
-from numpy import outer, add, subtract
+from trefftz.numpy_types import float_array
+from trefftz.dg.serial_kernels import Edge
+from numpy import pi, dot, exp, sinc, conj
 from numpy.lib.scimath import sqrt
-from typing import NamedTuple
-from trefftz.numpy_types import float_array, complex_array
-from typing import Protocol
 
-
-class Edge(NamedTuple):
-    M: float_array
-    l: float_array
-    N: float_array
-    T: float_array
-
-
-class Edge(NamedTuple):
-    M: float_array
-    l: float_array
-    N: float_array
-    T: float_array
-
-
-class BlockTransmissionKernel(Protocol):
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex_array:
-        ...
-
-
-class BlockLocalKernel(Protocol):
-    def LHS(self, edge: Edge, D, DD, k: float) -> complex_array:
-        ...
-
-    def RHS(self, edge: Edge, D, k: float) -> complex_array:
-        ...
-
-
-class BlockNonLocalKernel(Protocol):
-    def LHS(self, edge_1: Edge, edge_2: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex_array:
-        ...
-
-
-
-
-
-
-class SoundHardKernel:
-    r"""
-    Computes the block for an edge in a sound hard boundary.
-    That is it computes the matrix :math:`\mathbf{M}=(M_{mn})` with:    
-    
-    .. math::
-    
-        M_{mn}=\boxed{(-ikl\left(1+d_{1}\mathbf{d}_{n}\cdot\mathbf{n}\right)\mathbf{d}_{m}\cdot\mathbf{n}e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\boldsymbol{\tau}\right)}
-
-
-    Parameters:
-    -----------
-
-    - k : complex
-        Wavenumber
-    - l: float
-        Length of the edge
-    - N: float_array
-        Normal of the edge
-    - T: float_array
-        Tangent of the edge
-    - M: float_array
-        Midpoint of the edge
-    - d : float_array
-        Set of directions
-    - d_d : float_array
-        Nd x Nd x 2 "Matrix" of differences of directions.
-    - d_1 : float
-        Stabilyzing parameter.
-    """
-    def __init__(self, d_1: float):
-        self.d_1 = d_1
-    
-    def LHS(self, edge: Edge, d: float_array, DD: float_array, k: float) -> complex_array:
-        d_1 = self.d_1
-
-        M = edge.M
-        l = edge.l
-        N = edge.N
-        T = edge.T
-
-        I = -1j*k*l*outer(dot(d, N), (1 + d_1*dot(d, N)))*exp(1j*k*dot(DD, M))*sinc(k*l/(2*pi)*dot(DD, T))
-        return I
-
-    def RHS(self, edge: Edge, d: float_array, k: float) -> complex:
-        raise NotImplementedError("Not implemented yet")
-
-
-class UltraWeakKernel:
-    '''Transmission kernel for the UWVF'''
-    def __init__(self, a: float, b: float):
-        self.a = a 
-        self.b = b
-    
-    def LHS(self, edge: Edge, d: float_array, DD: float_array, k: float) -> complex_array:
-
-        a = self.a
-        b = self.b
-
-        M = edge.M
-        l = edge.l
-        N = edge.N
-        T = edge.T
-
-        I = -1j*k*l*(a + add.outer(dot(d, N), dot(d, N))/2 + b*outer(dot(d, N), dot(d, N))) * exp(-1j*k*subtract.outer(dot(d, M), dot(d, M)))*sinc(l*k/(2*pi)*subtract.outer(dot(d, T), dot(d, T)))
-        return I
 class NtDLocal:
     def __init__(self, R: float, d_2: float, n: int, H: float):
         self.R = R
@@ -115,7 +10,7 @@ class NtDLocal:
         self.H = H
         self.d_2 = d_2
     
-    def LHS(self, edge: Edge, d: float_array, DD: float_array, k: float) -> complex:
+    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         r"""
         Computes the flux on a radiating boundary with respect to the degrees
         of freedom from the same cell, that is:
@@ -152,18 +47,21 @@ class NtDLocal:
         """
 
         d_2 = self.d_2
+        d_n = d_phi
+        d_m = d_psi
+
 
         M = edge.M
         l = edge.l
         N = edge.N
         T = edge.T
-        
-        I = -1j*k*l*(d_2 + dot(d, N))*exp(1j*k*dot(DD, M))*sinc(k*l/(2*pi)*dot(DD, T))
-        return I
 
-    def RHS(self, edge: Edge, d: float_array, k: float) -> complex_array:
+        return -1j*k*l*(d_2 + dot(d_n, N))*exp(1j*k*dot(d_n - d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
+
+    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
 
         t = self.mode_n
+        d = d_psi
         d_2 = self.d_2
         H = self.H
         
@@ -179,21 +77,21 @@ class NtDLocal:
         if t == 0:
             I = 2*1j*k*l*(dot(d, N) - d_2*(1-dot(d, N)))*exp(1j*k*(M_x - dot(d, M)))*sinc(k*l/(2*pi)*dot(d, T))
         else:
-            I = 1j*k*l*(dot(d, N) - d_2*(1-k/conj(beta)*dot(d, N)))*exp(1j*(beta*M_x - k*dot(d, M)))*( exp( 1j*t*pi*dot(M,T)/H)*sinc(k*l/(2*pi)*dot(d, T) - t*(l/(2*H)))+
-                                                                                                       exp(-1j*t*pi*dot(M,T)/H)*sinc(k*l/(2*pi)*dot(d, T) + t*(l/(2*H))))
+            I = 1j*k*l*(dot(d, N) - d_2*(1-k/conj(beta)*dot(d, N)))*exp(1j*(beta*M_x - k*dot(d, M)))*( exp( 1j*t*pi*dot(M, T)/H)*sinc(k*l/(2*pi)*dot(d, T) - t*(l/(2*H)))+
+                                                                                                       exp(-1j*t*pi*dot(M, T)/H)*sinc(k*l/(2*pi)*dot(d, T) + t*(l/(2*H))))
         return I
 
 
 
 
-class WaveguideNtD_nonlocal:
+class NtD_nonlocal:
     def __init__(self, R: float, d_2: float, M: int, H: float): 
         self.R = R
         self.d_2 = d_2 
         self.M = M 
         self.H = H
 
-    def LHS(self, edge_1: Edge, edge_2:Edge, d_phi: float_array, d_psi: float_array, k : float) -> complex_array:
+    def LHS(self, edge_1: Edge, edge_2:Edge, d_phi: float_array, d_psi: float_array, k : float) -> complex:
         r"""
         Computes the flux on a radiating boundary with respect to the degrees
         of freedom from another cell, that is:
@@ -244,22 +142,24 @@ class WaveguideNtD_nonlocal:
         d_n = d_phi
         d_m = d_psi
 
-        I1 = -1j*k*H*dot(d_n,N)*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
+        I1 = -1j*k*H*dot(d_n, N)*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n, M_u) - dot(d_m, M_v)))*l_u/H*l_v/H*(
             sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k**2 / abs(sqrt(complex(k**2 - (s*pi/H)**2)))**2 * (
             exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
             exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
             for s in range(1, M)]) )
         
-        I2 = -1j*k*H*dot(d_n,N)*(dot(d_m,N)-d_2)*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
+        I2 = -1j*k*H*dot(d_n, N)*(dot(d_m, N)-d_2)*exp(1j*k*(dot(d_n, M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
             sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / sqrt(complex(k**2 - (s*pi/H)**2)) * (
             exp( 1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
             exp(-1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
             for s in range(1, M)]) )
         
-        I3 = 1j*k*H*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
+        I3 = 1j*k*H*dot(d_m, N)*d_2*exp(1j*k*(dot(d_n, M_u) - dot(d_m, M_v)))*l_u/H*l_v/H*(
             sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / conj(sqrt(complex(k**2 - (s*pi/H)**2))) * (
             exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
             exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
             for s in range(1, M)]) )
 
-        return  I1 + I2 + I3
+        I = I1 + I2 + I3
+
+        return I

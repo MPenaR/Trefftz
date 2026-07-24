@@ -1,10 +1,10 @@
 '''would be moved into dg, after making it generic but right now its waveguide-specific.'''
 from trefftz.dg.basis import TrefftzBasis
 from trefftz.numpy_types import complex_array
-from .base import WaveguideRegions
-from trefftz.dg.serial_fluxes2 import SoundHard, Inner2, Radiating_local, mode_RHS, Radiating_nonlocal, mode_RHS2
+from .base_old import WaveguideRegions
+from trefftz.dg.serial_fluxes2_old import SoundHard, Inner2, Radiating_local, mode_RHS, Radiating_nonlocal, mode_RHS2
 #from scipy.sparse import coo_matrix, csr_matrix, spmatrix
-from trefftz.dg.fluxes import FluxType
+from trefftz.dg.fluxes_old import FluxType
 from scipy.sparse import coo_array, csr_array, sparray
 import numpy as np
 from typing import Mapping

@@ -1,3 +1,3 @@
-from .boundary_conditions import BoundaryCondition
+# from .boundary_conditions_old import BoundaryCondition
 
-__all__ = ["BoundaryCondition"]
+# __all__ = ["BoundaryCondition"]

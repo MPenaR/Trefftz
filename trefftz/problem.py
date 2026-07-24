@@ -1,30 +1,28 @@
-from trefftz.mesh import TrefftzMesh, BoundaryRegions
+from trefftz.mesh import TrefftzMesh  #, BoundaryRegions
 from trefftz.dg.basis import PlanewaveBasis
-from typing import Protocol, Generic, Optional, Any
 from collections.abc import Mapping
 from scipy.sparse.linalg import spsolve
 from scipy.sparse import coo_array, csr_array, csc_array
-from dataclasses import dataclass
-from trefftz.numpy_types import complex_array, float_array, int_array
-import numpy as np
+from trefftz.numpy_types import complex_array
 from trefftz.dg.functions2 import TrefftzFunction
-from trefftz.dg.serial_kernels import SerialLocalKernel, SerialNonLocalKernel, SerialTransmissionKernel
-from trefftz.dg.assemblers import Assembler, SerialAssembler, SerialNumerics
-from trefftz.dg.boundary_conditions2 import BoundaryCondition
+from trefftz.dg.assemblers import Assembler, SerialAssembler, SerialNumerics, Numerics
+from trefftz.dg.boundary_conditions import BoundaryCondition
+from enum import IntEnum, StrEnum
+
 
 class ExactSolution:
     ...
 
 
 
-class Problem(Generic[BoundaryRegions]):
+class Problem[BR: (IntEnum, StrEnum), N: Numerics]:
     def __init__(self,
-                 mesh: TrefftzMesh[BoundaryRegions],
+                 mesh: TrefftzMesh[BR],
                  wavenumber: float,
                  basis: PlanewaveBasis,
-                 boundary_conditions: Mapping[BoundaryRegions, BoundaryCondition],
+                 boundary_conditions: Mapping[BR, BoundaryCondition],
                  numerics: SerialNumerics,
-                 assembler: Assembler,
+                 assembler: Assembler[BR, N],
                  u: ExactSolution | None = None ):
         
         self.mesh = mesh
@@ -76,7 +74,6 @@ class Problem(Generic[BoundaryRegions]):
     @property
     def b(self) -> complex_array | None:
         return self._b
-
 
     def assemble(self):
         self.assemble_RHS()

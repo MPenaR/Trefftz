@@ -8,7 +8,7 @@ from trefftz.mesh import TrefftzMesh
 
 
 from trefftz.numpy_types import float_array, complex_array
-from trefftz.dg.fluxes import FluxType
+from trefftz.dg.fluxes_old import FluxType
 from trefftz.dg.basis import TrefftzBasis, PlanewaveBasis
 
 from enum import IntEnum

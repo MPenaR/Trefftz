@@ -1,5 +1,5 @@
-from .core2 import TrefftzMesh, BoundaryRegions
+from .core2 import TrefftzMesh
 # from .core import TrefftzMesh, EdgeType
 # __all__ = ["TrefftzMesh", "EdgeType"]
 
-__all__ = ["TrefftzMesh", "BoundaryRegions"]
+__all__ = ["TrefftzMesh"]
