@@ -62,7 +62,7 @@ from numpy.linalg import norm
 from .locators import CellLocator
 from trefftz.numpy_types import float_array, int_array
 from .geometry import triangle_area
-from enum import IntEnum, StrEnum
+from enum import Enum
 from pathlib import Path
 # from .geometry import CellType
 
@@ -89,7 +89,7 @@ triangle_dtype = [("A", np.float64, DIM),
                   ("area", np.float64)]
 
 
-class TrefftzMesh[BR: (IntEnum, StrEnum)]:
+class TrefftzMesh[BR: Enum]:
     """
     Mesh container for Trefftz-based methods using NumPy structured arrays.
 

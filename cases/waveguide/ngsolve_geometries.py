@@ -23,9 +23,10 @@ def CleanWaveguide(H: float = 1., R: float = 5., lc: float = 0.3, verbosity: int
 
     '''Creates a domain corresponging to a waveguide without scatterers.
     It assumes the default tags for the subregions, i.e.:
-    - Omega = 0
-    - Gamma = 1
-    - Sigma = 2
+    - Omega = "omega"
+    - Gamma = "Gamma"
+    - Sigma_L = "Sigma_L"
+    - Sigma_R = "Sigma_R"
     '''
 
     geo = SplineGeometry()
@@ -44,3 +45,6 @@ def CleanWaveguide(H: float = 1., R: float = 5., lc: float = 0.3, verbosity: int
     mesh = TrefftzMesh.from_ngsolve(ngmesh, boundary_regions=WaveguideRegions)
 
     return mesh
+
+
+
