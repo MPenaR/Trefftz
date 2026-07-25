@@ -63,7 +63,7 @@ def test_NtD_local_LHS(d_m, d_n):
     d_m = array(d_m)/norm(d_m)
 
     d2 = 0.5
-    kernel = NtDLocal_circle(R=R, d_2=d2, n=1, N_modes=15)
+    kernel = NtDLocal_circle(R=R, d_2=d2, n=1, N_modes=60)
     I_exact = kernel.LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
     I_num = num_NtDLocal_LHS(k, theta_1, theta_2, R, d_n, d_m, d2=d2,  Nt=N_POINTS)
     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'

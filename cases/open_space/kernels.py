@@ -221,7 +221,7 @@ class NtDLocal_circle:
         phi_n = atan2(d_n[1], d_n[0])
 
         # There are two terms, the easy one, d2 u conj(v), without information on the normal: 
-        I_easy = -1j*k*R*d_2*(jn(0, k*R*D)*(theta_2 - theta_1) + 2*sum( 1j**n*jn(n, k*R*D)/n*(sin(n*theta_2 - phi) - sin(n*theta_1 - phi))  for n in range(1, N_modes)))
+        I_easy = -1j*k*R*d_2*(jn(0, k*R*D)*(theta_2 - theta_1) + 2*sum( 1j**n*jn(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi)))  for n in range(1, N_modes)))
 
         # the du/dn conj(v) term, which involves n(theta)
         I_hard = 0.
