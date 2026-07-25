@@ -10,7 +10,7 @@ class NtDLocal:
         self.H = H
         self.d_2 = d_2
     
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         r"""
         Computes the flux on a radiating boundary with respect to the degrees
         of freedom from the same cell, that is:
@@ -51,10 +51,10 @@ class NtDLocal:
         d_m = d_psi
 
 
-        M = edge.M
-        l = edge.l
-        N = edge.N
-        T = edge.T
+        M = edge["M"]
+        l = edge["l"]
+        N = edge["N"]
+        T = edge["T"]
 
         return -1j*k*l*(d_2 + dot(d_n, N))*exp(1j*k*dot(d_n - d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
 
@@ -65,10 +65,10 @@ class NtDLocal:
         d_2 = self.d_2
         H = self.H
         
-        M = edge.M
-        l = edge.l
-        N = edge.N
-        T = edge.T
+        M = edge["M"]
+        l = edge["l"]
+        N = edge["N"]
+        T = edge["T"]
 
         M_x, _ = M  # I dont like it, it still assumes horizontal waveguide
 
@@ -129,14 +129,14 @@ class NtD_nonlocal:
         H = self.H
         M = self.M
 
-        M_u = edge_1.M
-        l_u = edge_1.l
+        M_u = edge_1["M"]
+        l_u = edge_1["l"]
 
-        M_v = edge_2.M
-        l_v = edge_2.l
+        M_v = edge_2["M"]
+        l_v = edge_2["l"]
 
 
-        N = edge_1.N
+        N = edge_1["N"]
         # T = edge_1.T
 
         d_n = d_phi

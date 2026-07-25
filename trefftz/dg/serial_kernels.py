@@ -27,20 +27,20 @@ class SIGN(Enum):
 
 
 class SerialTransmissionKernel(Protocol):
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float, sign: SIGN) -> complex:
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float, sign: SIGN) -> complex:
         ...
 
 
 class SerialLocalKernel(Protocol):
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         ...
 
-    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
+    def RHS(self, edge, d_psi: float_array, k: float) -> complex:
         ...
 
 
 class SerialNonLocalKernel(Protocol):
-    def LHS(self, edge_1: Edge, edge_2: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge_1, edge_2, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         ...
 
 
@@ -49,15 +49,15 @@ class NeumannKernel:
     def __init__(self, d_1: float):
         self.d_1 = d_1
     
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         d_1 = self.d_1
         d_m = d_psi
         d_n = d_phi
 
-        M = edge.M
-        l = edge.l
-        N = edge.N
-        T = edge.T
+        M = edge["M"]
+        l = edge["l"]
+        N = edge["N"]
+        T = edge["T"]
 
         return -1j*k*l*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*exp(1j*k*dot(d_n - d_m, M)) * sinc(k*l/(2*pi)*dot(d_n-d_m, T))
     
@@ -75,10 +75,10 @@ class DirichletKernel:
         d_m = d_psi
         d_n = d_phi
 
-        M = edge.M
-        l = edge.l
-        N = edge.N
-        T = edge.T
+        M = edge["M"]
+        l = edge["l"]
+        N = edge["N"]
+        T = edge["T"]
         raise NotImplementedError("Not implemented yet")
         
     def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
@@ -113,13 +113,11 @@ class UltraWeakKernel:
         k_n = k
         k_m = k
 
-        M = edge.M
-        l = edge.l
-        N = edge.N
-        T = edge.T
+        M = edge["M"]
+        l = edge["l"]
+        N = edge["N"]
+        T = edge["T"]
 
-        # I = -1j*l/2*(2*a*k + k_n*dot(d_n, N) + k_m*dot(d_m, N) + 2*b/k*k_n*dot(d_n, N)*k_m*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
-        # I = -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
         I = -1j*k*l*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*exp(1j*k*dot(d_n-d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
         match sign:
             case SIGN.PP:

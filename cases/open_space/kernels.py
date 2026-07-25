@@ -1,6 +1,6 @@
 from trefftz.numpy_types import float_array
 from trefftz.dg.serial_kernels import Edge
-from numpy import pi, dot, exp, sinc, conj, atan2
+from numpy import pi, dot, exp, sinc, conj, atan2, sin
 from numpy.linalg import norm
 from numpy.lib.scimath import sqrt
 from scipy.special import jn
@@ -10,6 +10,7 @@ class NtDLocal_Polygonal:
         self.R = R
         self.mode_n = n
         self.d_2 = d_2
+        raise NotImplementedError("Need to take care of the segment not being vertical")
     
     def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         r"""
@@ -89,6 +90,7 @@ class NtD_nonlocal_Polygonal:
         self.R = R
         self.d_2 = d_2 
         self.M = M
+        raise NotImplementedError("Need to take care of the segment not being vertical")
 
     def LHS(self, edge_1: Edge, edge_2:Edge, d_phi: float_array, d_psi: float_array, k : float) -> complex:
         r"""
@@ -164,28 +166,23 @@ class NtD_nonlocal_Polygonal:
 
 
 class NtDLocal_circle:
-    def __init__(self, R: float, d_2: float, n: int):
+    def __init__(self, R: float, d_2: float, n: int, N_modes: int):
         self.R = R
         self.mode_n = n
         self.d_2 = d_2
+        self.N_modes = N_modes
     
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         r"""
-        Computes the flux on a radiating boundary with respect to the degrees
+        Computes the flux on a circular radiating boundary with respect to the degrees
         of freedom from the same cell, that is:
 
-        TODO: it is assuming that the radiating boundary consists of a vertical segment. This should be easy to generalize.
         
         .. math::
         
             -\int_{E}\left(d_{2}ik\Phi_n(\mathbf{x})+\nabla \Phi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\Psi_n(\mathbf{x})}\,\mathrm{d}S_{\mathbf{x}}
 
-        which can be computed as:
-
-        .. math::
-        
-            \boxed{-ikl\left(d_{2}+\mathbf{d}_{n}\cdot\mathbf{n}\right)e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\mathbf{j}\right)}
-
+        TODO: old parameters
         Parameters
         ----------
         phi : Function
@@ -210,26 +207,32 @@ class NtDLocal_circle:
         d_m = d_psi
         R = self.R
 
-        M = edge.M
-        l = edge.l
-        N = edge.N
-        T = edge.T
+        N_modes = self.N_modes
 
-        B = edge.B 
-        A = edge.A
+        P = edge["P"] 
+        Q = edge["Q"]
 
-        theta_2 = atan2(B[1], B[0])
-        theta_1 = atan2(A[1], A[0])
+        theta_2 = atan2(Q[1], Q[0])
+        theta_1 = atan2(P[1], P[0])
         D = norm(d_n - d_m)
+        phi = atan2((d_n - d_m)[1], (d_n - d_m)[0])
 
-        return -1j*k*R*(d_2 + dot(d_n, N))*(jn(0, k*R*D)*(theta_2 - theta_1) + sum(  for n in range(1, M)))
+        D_n = norm(d_n)
+        phi_n = atan2(d_n[1], d_n[0])
+
+        # There are two terms, the easy one, d2 u conj(v), without information on the normal: 
+        I_easy = -1j*k*R*d_2*(jn(0, k*R*D)*(theta_2 - theta_1) + 2*sum( 1j**n*jn(n, k*R*D)/n*(sin(n*theta_2 - phi) - sin(n*theta_1 - phi))  for n in range(1, N_modes)))
+
+        # the du/dn conj(v) term, which involves n(theta)
+        I_hard = 0.
+
+        return I_easy + I_hard
 
     def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
 
         t = self.mode_n
         d = d_psi
         d_2 = self.d_2
-        H = self.H
         
         M = edge.M
         l = edge.l

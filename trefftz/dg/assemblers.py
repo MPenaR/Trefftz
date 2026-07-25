@@ -75,7 +75,7 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                 for j in basis.dofs_on_element(T):
                     d_psi = basis.global_direction(i)
                     d_phi = basis.global_direction(j)
-                    value = kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, basis.k)
+                    value = kernel.LHS(edge=edge, d_phi=d_phi, d_psi=d_psi, k=basis.k)
                     rows.append(i)
                     cols.append(j)
                     values.append(value)
@@ -104,7 +104,7 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                         for j in basis.dofs_on_element(T_u):
                             d_phi = basis.global_direction(j)
                             d_psi = basis.global_direction(i)
-                            val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, basis.k, sign=sign)
+                            val = interior_kernel.LHS(edge=edge, d_phi=d_phi, d_psi=d_psi, k=basis.k, sign=sign)
                             rows.append(i)
                             cols.append(j)
                             values.append(val)
@@ -129,9 +129,9 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                         for j in basis.dofs_on_element(T_2):
                             d_phi = basis.global_direction(j)
                             d_psi = basis.global_direction(i)
-                            value = non_local_kernel.LHS(Edge(edge_1["M"], edge_1["l"], edge_1["N"], edge_1["T"]),
-                                                         Edge(edge_2["M"], edge_2["l"], edge_2["N"], edge_2["T"]),
-                                                         d_phi, d_psi, basis.k)
+                            value = non_local_kernel.LHS(edge_1=edge_1,
+                                                         edge_2=edge_2,
+                                                         d_phi=d_phi, d_psi=d_psi, k=basis.k)
                             rows.append(i)
                             cols.append(j)
                             values.append(value)
@@ -157,7 +157,7 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                 T, _ = edge["triangles"]
                 for i in basis.dofs_on_element(T):
                     d_psi = basis.global_direction(i)
-                    value = local_kernel.RHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_psi, basis.k)
+                    value = local_kernel.RHS(edge=edge, d_psi=d_psi, k=basis.k)
                     rows.append(i)
                     values.append(value)
 
