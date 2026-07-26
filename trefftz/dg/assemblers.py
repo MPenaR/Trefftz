@@ -1,6 +1,6 @@
 from trefftz.mesh import TrefftzMesh
 from scipy.sparse import coo_array, bsr_array, csr_array, csc_array
-from trefftz.dg.serial_kernels import Edge, SIGN
+from trefftz.dg.serial_kernels import SIGN
 import numpy as np
 from trefftz.numpy_types import complex_array
 from trefftz.dg.serial_kernels import SerialLocalKernel, SerialNonLocalKernel, SerialTransmissionKernel
@@ -129,8 +129,8 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                         for j in basis.dofs_on_element(T_2):
                             d_phi = basis.global_direction(j)
                             d_psi = basis.global_direction(i)
-                            value = non_local_kernel.LHS(edge_1=edge_1,
-                                                         edge_2=edge_2,
+                            value = non_local_kernel.LHS(edge_u=edge_1,
+                                                         edge_v=edge_2,
                                                          d_phi=d_phi, d_psi=d_psi, k=basis.k)
                             rows.append(i)
                             cols.append(j)

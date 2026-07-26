@@ -6,13 +6,6 @@ from enum import Enum
 from typing import Protocol
 
 
-class Edge(NamedTuple):
-    M: float_array
-    l: float_array
-    N: float_array
-    T: float_array
-
-
 class SIGN(Enum):
     '''Sign for the transmission kernel
     where PP (plus plus) stands for both trial
@@ -40,7 +33,7 @@ class SerialLocalKernel(Protocol):
 
 
 class SerialNonLocalKernel(Protocol):
-    def LHS(self, edge_1, edge_2, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge_u, edge_v, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         ...
 
 
@@ -61,7 +54,7 @@ class NeumannKernel:
 
         return -1j*k*l*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*exp(1j*k*dot(d_n - d_m, M)) * sinc(k*l/(2*pi)*dot(d_n-d_m, T))
     
-    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
+    def RHS(self, edge, d_psi: float_array, k: float) -> complex:
         raise NotImplementedError("Not implemented yet")
 
 
@@ -70,7 +63,7 @@ class DirichletKernel:
     def __init__(self, d_1: float):
         self.d_1 = d_1
     
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         d_1 = self.d_1
         d_m = d_psi
         d_n = d_phi
@@ -81,7 +74,7 @@ class DirichletKernel:
         T = edge["T"]
         raise NotImplementedError("Not implemented yet")
         
-    def RHS(self, edge: Edge, d_psi: float_array, k: float) -> complex:
+    def RHS(self, edge, d_psi: float_array, k: float) -> complex:
         raise NotImplementedError("Not implemented yet")
 
 
@@ -92,7 +85,7 @@ class UltraWeakKernel:
         self.a = a 
         self.b = b
     
-    def LHS(self, edge: Edge, d_phi: float_array, d_psi: float_array, k: float, sign: SIGN) -> complex:
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float, sign: SIGN) -> complex:
         match sign:
             case SIGN.PP:
                 a = self.a

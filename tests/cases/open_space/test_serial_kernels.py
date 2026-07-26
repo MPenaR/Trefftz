@@ -31,7 +31,7 @@ def num_NtDLocal_LHS(k, theta_1, theta_2, R, d_n, d_m, d2=0, Nt = 100, Np=15) ->
     # I_hard = 0.
     I = I_easy + I_hard
 
-    return I
+    return I_easy + I_hard
 
 
 
