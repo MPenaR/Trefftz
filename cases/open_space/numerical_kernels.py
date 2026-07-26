@@ -1,83 +1,108 @@
-from cases.open_space.kernels import NtDLocal_circle
-import pytest
 from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
 from numpy.lib.scimath import sqrt
 from numpy.linalg import norm
 from numpy import trapezoid as Int
 import numpy as np
-from trefftz.mesh.core2 import edge_dtype
+from scipy.special import hankel1, h1vp
+from trefftz.numpy_types import float_array, complex_array
 
-TOL = 1E-7
-N_POINTS = int(1E5)
-
-
-from itertools import product
-NTH = 3
-directions = list(product([(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)],
-                          [(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)]))
-
-
-def num_NtDLocal_LHS(k, theta_1, theta_2, R, d_n, d_m, d2=0, Nt = 100, Np=15) -> complex:
-    theta = np.linspace(theta_1, theta_2, Nt)
-    u_r = np.column_stack([np.cos(theta), np.sin(theta)])
-    N = u_r
-    x = R*u_r
-    phi_n = exp(1j*k*dot(x, d_n))
-    psi_m = exp(1j*k*dot(x, d_m))
-    grad_phi_n_N = 1j*k*dot(N, d_n)*phi_n
-    # grad_psi_m_N = 1j*k*dot(N,d_m)*exp(1j*k*dot(x,d_m))
-    I_easy = -1j*k*d2*Int(phi_n*conj(psi_m), theta)*R
-    I_hard = -Int(grad_phi_n_N*conj(psi_m), theta)*R
-    # I_hard = 0.
-    I = I_easy + I_hard
-
-    return I
+N_POINTS = int(1E2)
+NtD_MODES = 20
 
 
 
-@pytest.mark.parametrize(('d_m', 'd_n'), directions )
-def test_NtD_local_LHS(d_m, d_n):
+class NtDLocal_circle:
+    def __init__(self, R: float, d_2: float, n: int):
+        self.R = R
+        self.mode_n = n
+        self.d_2 = d_2
+
     
-    theta_1 = np.pi*30/180
-    theta_2 = np.pi*45/180
-    R = 2.
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+        d2 = self.d_2
+        d_n = d_phi
+        d_m = d_psi
+        R = self.R
+
+        P = edge["P"]
+        Q = edge["Q"]
+        theta_1 = np.atan2(P[1], P[0])
+        theta_2 = np.atan2(Q[1], Q[0])
+
+        theta = np.linspace(theta_1, theta_2, N_POINTS)
+        u_r = np.column_stack([np.cos(theta), np.sin(theta)])
+        N = u_r
+        x = R*u_r
+        u = exp(1j*k*dot(x, d_n))
+        v = exp(1j*k*dot(x, d_m))
+        du_dn = 1j*k*dot(N, d_n)*u
+        I_uv = -1j*k*d2*Int(u*conj(v), theta)*R  # int -i*k*d_2*u*conj(v) dl 
+        I_duv = -Int(du_dn*conj(v), theta)*R  # int -du/dn *conj(v) dl
+        I = I_uv + I_duv
+        return I
+
+    def RHS(self) -> complex:
+        raise NotImplementedError
+        
+class NtDNon_Local_circle:
+    def __init__(self, R: float, d_2: float, n: int, N_MODES: int):
+        self.R = R
+        self.mode_n = n
+        self.d_2 = d_2
+        self.N_MODES = N_MODES
     
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+        d2 = self.d_2
+        d_n = d_phi
+        d_m = d_psi
+        R = self.R
+        N_MODES = self.N_MODES
+        P = edge["P"]
+        Q = edge["Q"]
+        theta_1 = np.atan2(P[1], P[0])
+        theta_2 = np.atan2(Q[1], Q[0])
 
-    P = R*array([np.cos(theta_1), np.sin(theta_1)])
-    Q = R*array([np.cos(theta_2), np.sin(theta_2)])
-    l = norm(P-Q)
-    T = (Q - P)/l
-    N = array([0,1]) # meaningless, is a curved edge
-    M = (P + Q)/2 # meaningless, is a curved edge
-    
-    E = np.zeros((), dtype=edge_dtype)
-    E["P"] = P
-    E["Q"] = Q
-    E["N"] = N
-    E["T"] = T
-    E["M"] = M
-    E["l"] = l
+        theta = np.linspace(theta_1, theta_2, N_POINTS)
+        u_r = np.column_stack([np.cos(theta), np.sin(theta)])
+        N = u_r
+        x = R*u_r
+        u = exp(1j*k*dot(x, d_n))
+        v = exp(1j*k*dot(x, d_m))
+        du_dn = 1j*k*dot(N, d_n)*u
+        dv_dn = 1j*k*dot(N, d_m)*v
 
-    k = 8.
-    d_n = array(d_n)/norm(d_n)
-    d_m = array(d_m)/norm(d_m)
-
-    d2 = 0.5
-    kernel = NtDLocal_circle(R=R, d_2=d2, n=1, N_modes=60)
-    I_exact = kernel.LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
-    I_num = num_NtDLocal_LHS(k, theta_1, theta_2, R, d_n, d_m, d2=d2,  Nt=N_POINTS)
-    assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
+        NtD_du = NewmanntoDirichlet(theta, du_dn, k, R, N_MODES)
+        NtD_dv = NewmanntoDirichlet(theta, dv_dn, k, R, N_MODES)
+        
+        I_Nudv = Int(NtD_du*conj(dv_dn), theta)*R
+        I_NuNv = Int(NtD_du*conj(NtD_dv), theta)*R
+        I_uNv  = Int(u*conj(NtD_dv), theta)*R
+        I_Nuv  = Int(NtD_du*conj(v), theta)*R
+        
+        I = I_Nudv - d2*1j*k*(I_NuNv - I_Nuv - I_uNv)
+        return I
 
 
-# def NewmanntoDirichlet(y, df_dy, k, H, M):
 
-#     dfn = np.zeros(M, dtype=np.complex128)
-#     dfn[0] = Int( df_dy*1/np.sqrt(H), y )
-#     for n in range(1,M):
-#         dfn[n] = Int( df_dy*cos(n*pi*y/H)/np.sqrt(H/2), y )
-    
-#     f_y = 1/(1j*k)*dfn[0]/np.sqrt(H)*np.ones_like(y) + sum([ 1/(1j*np.sqrt(complex(k**2 - (n*pi/H)**2)))*dfn[n]*cos(n*pi*y/H)/np.sqrt(H/2) for n in range(1,M)])
-#     return f_y
+
+
+def NewmanntoDirichlet(theta: float_array, df_dn: complex_array, k: float, R: float, M: int) -> complex_array:
+    L = 2*np.pi*R
+    # dfn = np.zeros(M, dtype=np.complex128)
+    # dfn[0] = R*Int( df_dn*1/np.sqrt(L), theta )
+    # for n in range(1,M):
+    #     dfn[n] = Int( df_dy*cos(n*pi*y/H)/np.sqrt(H/2), y )
+
+    # f_y = 1/(1j*k)*dfn[0]/np.sqrt(H)*np.ones_like(y) + sum([ 1/(1j*np.sqrt(complex(k**2 - (n*pi/H)**2)))*dfn[n]*cos(n*pi*y/H)/np.sqrt(H/2) for n in range(1,M)])
+
+    dfn = np.zeros(2*M+1, dtype=np.complex128)
+    for n in range(-M, M+1):
+        i = n+M
+        dfn[i] = R*Int(df_dn*exp(-1j*n*theta)/np.sqrt(L), theta)
+
+    f = 1/k*sum((hankel1(n, k*R)/h1vp(n, k*R)*dfn[n+M]*exp(1j*n*theta)/np.sqrt(L) for n in range(-M, M+1)))
+
+    return f
 
 
 

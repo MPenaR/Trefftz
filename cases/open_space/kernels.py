@@ -1,6 +1,6 @@
 from trefftz.numpy_types import float_array
 from trefftz.dg.serial_kernels import Edge
-from numpy import pi, dot, exp, sinc, conj, atan2, sin
+from numpy import pi, dot, exp, sinc, conj, atan2, sin, cos
 from numpy.linalg import norm
 from numpy.lib.scimath import sqrt
 from scipy.special import jn
@@ -224,7 +224,10 @@ class NtDLocal_circle:
         I_easy = -1j*k*R*d_2*(jn(0, k*R*D)*(theta_2 - theta_1) + 2*sum( 1j**n*jn(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi)))  for n in range(1, N_modes)))
 
         # the du/dn conj(v) term, which involves n(theta)
-        I_hard = 0.
+        I_hard = -1j*k*R*D_n*(1j*jn(1, k*R*D)*cos(phi - phi_n)*(theta_2 - theta_1) + 1j*sum(1j**n/n*(
+            jn(n+1, k*R*D)*(sin(n*(theta_2 - phi) - (phi - phi_n)) - sin(n*(theta_1 - phi) - (phi - phi_n))) +
+            jn(n-1, k*R*D)*(sin(n*(theta_2 - phi) + (phi - phi_n)) - sin(n*(theta_1 - phi) + (phi - phi_n))) )
+            for n in range(1, N_modes)))
 
         return I_easy + I_hard
 
