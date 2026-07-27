@@ -70,6 +70,7 @@ The project is under active development. The core architecture is functional, bu
   * Neumann boundary condition right-hand side.
   * Dirichlet boundary condition implementation.
   * Additional kernels that are already available in the legacy implementation.
+* The numerical implementation of the circular NtD is buggy as it depends on the edges being oriented in the counter-clockwise direction, something which is not asserted.
 
 ## Examples
 

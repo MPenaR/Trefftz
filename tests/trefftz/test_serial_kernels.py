@@ -1,4 +1,5 @@
-from trefftz.dg.serial_kernels import NeumannKernel, UltraWeakKernel, SIGN  #, Radiating_local  #, Radiating_nonlocal
+from trefftz.dg.serial_kernels import NeumannKernel, UltraWeakKernel, SIGN
+from trefftz.dg.numerical_kernels import numericalNeumannKernel, numericalUltraWeakKernel
 import pytest
 from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
 from numpy.linalg import norm
@@ -55,22 +56,20 @@ def test_TransmissionKernel(d_m,d_n):
     a = 0.5
     b = 0.5
 
-    kernel = UltraWeakKernel(a=a, b=b)
-
-    I_exact = kernel.LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k, sign=SIGN.PP)
-    I_num = num_Transmission( k, P, Q, N, d_n, d_m, a = a, b = b,  Nt=N_POINTS)
+    I_exact = UltraWeakKernel(a=a, b=b).LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k, sign=SIGN.PP)
+    I_num = numericalUltraWeakKernel(a=a, b=b).LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
 
-def num_NeumannLHS(k, P, Q, N, d_n, d_m, d1, Nt):
-    t = linspace(0, 1, Nt)
-    x = P + outer(t, Q-P)
-    phi_n = exp(1j*k*dot(x, d_n))
-    grad_phi_n_N = 1j*k*dot(N, d_n)*exp(1j*k*dot(x, d_n))
-    grad_psi_m_N = 1j*k*dot(N, d_m)*exp(1j*k*dot(x, d_m))
+# def num_NeumannLHS(k, P, Q, N, d_n, d_m, d1, Nt):
+#     t = linspace(0, 1, Nt)
+#     x = P + outer(t, Q-P)
+#     phi_n = exp(1j*k*dot(x, d_n))
+#     grad_phi_n_N = 1j*k*dot(N, d_n)*exp(1j*k*dot(x, d_n))
+#     grad_psi_m_N = 1j*k*dot(N, d_m)*exp(1j*k*dot(x, d_m))
 
-    I = Int((phi_n + d1/(1j*k)*grad_phi_n_N)*conj(grad_psi_m_N)*norm(Q-P), t)
-    return I
+#     I = Int((phi_n + d1/(1j*k)*grad_phi_n_N)*conj(grad_psi_m_N)*norm(Q-P), t)
+#     return I
 
 
 @pytest.mark.parametrize(('d_m', 'd_n'), directions )
@@ -95,9 +94,9 @@ def test_NeumannLHS(d_m, d_n):
     d_m = array(d_m)/norm(d_m)
 
     d1 = 0.5
-    kernel = NeumannKernel(d_1=d1)
-    I_exact = kernel.LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
-    I_num = num_NeumannLHS(k, P, Q, N, d_n, d_m, d1=d1,  Nt=N_POINTS)
+    I_exact = NeumannKernel(d_1=d1).LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
+    I_num = numericalNeumannKernel(d_1=d1).LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
+    
     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
 
