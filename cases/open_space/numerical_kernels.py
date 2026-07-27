@@ -6,7 +6,7 @@ import numpy as np
 from scipy.special import hankel1, h1vp
 from trefftz.numpy_types import float_array, complex_array
 
-N_POINTS = int(1E2)
+N_POINTS = int(1E1)
 NtD_MODES = 20
 
 
