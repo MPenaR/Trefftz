@@ -2,7 +2,7 @@ from trefftz.numpy_types import float_array
 from numpy import pi, dot, exp, sinc, conj, atan2, sin, cos
 from numpy.linalg import norm
 from numpy.lib.scimath import sqrt
-from scipy.special import jn
+from scipy.special import jv
 
 # class NtDLocal_Polygonal:
 #     def __init__(self, R: float, d_2: float, n: int):
@@ -220,15 +220,15 @@ class NtDLocal_circle:
         phi_n = atan2(d_n[1], d_n[0])
 
         # There are two terms, the easy one, d2 u conj(v), without information on the normal: 
-        I_uv = -1j*k*R*d_2*(jn(0, k*R*D)*(theta_2 - theta_1) + 2*sum( 1j**n*jn(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi)))  for n in range(1, N_modes)))
+        I_uv = -1j*k*R*d_2*(jv(0, k*R*D)*(theta_2 - theta_1) + 2*sum( 1j**n*jv(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi)))  for n in range(1, N_modes)))
 
         # the du/dn conj(v) term, which involves n(theta)
-        I_duv = -1j*k*R*D_n*(1j*jn(1, k*R*D)*cos(phi - phi_n)*(theta_2 - theta_1) + 1j*sum(1j**n/n*(
-            jn(n+1, k*R*D)*(sin(n*(theta_2 - phi) - (phi - phi_n)) - sin(n*(theta_1 - phi) - (phi - phi_n))) +
-            jn(n-1, k*R*D)*(sin(n*(theta_2 - phi) + (phi - phi_n)) - sin(n*(theta_1 - phi) + (phi - phi_n))) )
+        I_duv = -1j*k*R*D_n*(1j*jv(1, k*R*D)*cos(phi - phi_n)*(theta_2 - theta_1) + 1j*sum(1j**n/n*(
+            jv(n+1, k*R*D)*(sin(n*(theta_2 - phi) - (phi - phi_n)) - sin(n*(theta_1 - phi) - (phi - phi_n))) +
+            jv(n-1, k*R*D)*(sin(n*(theta_2 - phi) + (phi - phi_n)) - sin(n*(theta_1 - phi) + (phi - phi_n))) )
             for n in range(1, N_modes)))
-
-        return I_uv + I_duv
+        I = -1j*k*d_2*I_uv(edge, d_phi, d_psi, k, R, N_modes) + I_duv
+        return I
 
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
         raise NotImplementedError
@@ -283,68 +283,73 @@ def I_uv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes: 
     phi = atan2((d_u - d_v)[1], (d_u - d_v)[0])
 
 
-    I = R*(jn(0, k*R*D)*(theta_2 - theta_1) + 2*sum(1j**n*jn(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi))) for n in range(1, N_modes)))
+    I = R*(jv(0, k*R*D)*(theta_2 - theta_1) + 2*sum(1j**n*jv(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi))) for n in range(1, N_modes)))
 
     return I
 
-def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+def I_duv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes: int) -> complex:
     r"""
-    Computes the flux on a circular radiating boundary with respect to the degrees
-    of freedom from the same cell, that is:
+    Computes the integral: 
 
-    
     .. math::
-    
-        -\int_{E}\left(d_{2}ik\Phi_n(\mathbf{x})+\nabla \Phi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\Psi_n(\mathbf{x})}\,\mathrm{d}S_{\mathbf{x}}
+        \int_E \nabla u\cdot\mathbf{n}\conj(v)\,\mathrm{d}\ell
 
-    TODO: old parameters
-    Parameters
+    where u and v are plane waves:
+
+    .. math::
+        u(\mathbf{x}) = \exp(ik\mathbf{d}_u\cdot\mathbf{x})
+
+    .. math::
+        v(\mathbf{x}) = \exp(ik\mathbf{d}_v\cdot\mathbf{x})
+
+    and E is an arc of a circle of radius R centered at the origin.
+
+
+    Patameters
     ----------
-    phi : Function
-        Trial function.
-    psi : Function
-        Test function.
+    edge :
+        Edge parameters.
+    d_u : (2,) float array.
+        Propagation direction of the u plane wave.
+    d_v : (2,) float array.
+        Propagation direction of the u plane wave.
     k : float
         Wave number.
-    edge : Edge
-        Edge parameters.
-    d_2 : float
-        Stabilyzing parameter.
-
+    R : float.
+        Radius of the circle defining the arc E.
+    N_modes : int.
+        Number of modes used in the series computation of I.
+        
     Returns
     -------
     I : complex
         The integral.
     """
 
-    d_2 = self.d_2
-    d_n = d_phi
-    d_m = d_psi
-    R = self.R
-
-    N_modes = self.N_modes
 
     P = edge["P"] 
     Q = edge["Q"]
 
     theta_2 = atan2(Q[1], Q[0])
     theta_1 = atan2(P[1], P[0])
-    D = norm(d_n - d_m)
-    phi = atan2((d_n - d_m)[1], (d_n - d_m)[0])
 
-    D_n = norm(d_n)
-    phi_n = atan2(d_n[1], d_n[0])
+    D = norm(d_u - d_v)
+    phi = atan2((d_u - d_v)[1], (d_u - d_v)[0])
 
-    # There are two terms, the easy one, d2 u conj(v), without information on the normal: 
-    I_uv = -1j*k*R*d_2*(jn(0, k*R*D)*(theta_2 - theta_1) + 2*sum( 1j**n*jn(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi)))  for n in range(1, N_modes)))
+    D_n = norm(d_u)
+    phi_n = atan2(d_u[1], d_u[0])
 
-    # the du/dn conj(v) term, which involves n(theta)
-    I_duv = -1j*k*R*D_n*(1j*jn(1, k*R*D)*cos(phi - phi_n)*(theta_2 - theta_1) + 1j*sum(1j**n/n*(
-        jn(n+1, k*R*D)*(sin(n*(theta_2 - phi) - (phi - phi_n)) - sin(n*(theta_1 - phi) - (phi - phi_n))) +
-        jn(n-1, k*R*D)*(sin(n*(theta_2 - phi) + (phi - phi_n)) - sin(n*(theta_1 - phi) + (phi - phi_n))) )
-        for n in range(1, N_modes)))
+    def odd_term(n: int, theta: float) -> complex:
+        return 1j**n / n * (-cos(n*(theta - phi) + (phi - phi_n))*jv(n-1, k*R*D) + cos(n*(theta - phi) - (phi - phi_n))*jv(n+1, k*R*D))
 
-    return I_uv + I_duv
+    def even_term(n: int, theta: float) -> complex:
+        return 1j**(n+1) / n * (-sin(n*(theta - phi) + (phi - phi_n))*jv(n-1, k*R*D) + sin(n*(theta - phi) - (phi - phi_n))*jv(n+1, k*R*D))
+        
+
+    I = R*D_n*(1j*jv(1, k*R*D)*cos(phi - phi_n)*(theta_2 - theta_1) +
+               sum( even_term(n, theta_2) - even_term(n, theta_1) if n % 2 == 0 else
+                    odd_term(n, theta_2) - odd_term(n, theta_1) for n in range(1, N_modes)))
+    return I
 
 
 

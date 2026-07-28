@@ -59,6 +59,25 @@ def numerical_I_uv(edge, d_u: float_array, d_v: float_array, k: float, R: float)
     I = Int(u*conj(v), theta)*R  # int u*conj(v) dl 
     return I
 
+def numerical_I_duv(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
+    P = edge["P"]
+    Q = edge["Q"]
+    theta_1 = np.atan2(P[1], P[0])
+    theta_2 = np.atan2(Q[1], Q[0])
+
+    theta = np.linspace(theta_1, theta_2, N_POINTS)
+    u_r = np.column_stack([np.cos(theta), np.sin(theta)])
+    N = u_r
+    x = R*u_r
+
+    u = exp(1j*k*dot(x, d_u))
+    v = exp(1j*k*dot(x, d_v))
+
+    du_dn = 1j*k*dot(N, d_u)*u
+
+    I = Int(du_dn*conj(v), theta)*R  # int u*conj(v) dl 
+    return I
+
 
 class NtDNon_Local_circle:
     def __init__(self, R: float, d_2: float, n: int, N_MODES: int):
