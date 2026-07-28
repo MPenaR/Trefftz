@@ -1,4 +1,5 @@
 from cases.waveguide.kernels import NtDLocal, NtD_nonlocal
+from cases.waveguide.numerical_kernels import numerical_NtDLocal
 import pytest
 from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
 from numpy.lib.scimath import sqrt
@@ -56,10 +57,13 @@ def test_NtD_local_LHS(d_m, d_n):
     H = 1.
 
     d2 = 0.5
-    kernel = NtDLocal(R=2, d_2=d2, n=1, H=H)
-    I_exact = kernel.LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
-    I_num = num_NtDLocal_LHS(k, P, Q, N, H, d_n, d_m, d2=d2,  Nt=N_POINTS)
+    I_exact = NtDLocal(R=2, d_2=d2, n=1, H=H).LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
+    I_num = numerical_NtDLocal(R=2, d_2=d2, n=1).LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
+    
+    # I_num = num_NtDLocal_LHS(k, P, Q, N, H, d_n, d_m, d2=d2,  Nt=N_POINTS)
     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
+
+
 
 
 # def NewmanntoDirichlet(y, df_dy, k, H, M):

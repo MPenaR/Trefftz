@@ -17,7 +17,7 @@ class WaveguideRegions(IntEnum):
     SIGMA_R = 3
 
 
-def CleanWaveguide(H: float = 1., R: float = 5., lc: float = 0.3, verbose: bool = False) -> TrefftzMesh[WaveguideRegions]:
+def Empty(H: float = 1., R: float = 5., lc: float = 0.3, verbose: bool = False) -> TrefftzMesh[WaveguideRegions]:
     '''Creates a domain corresponging to a waveguide without scatterers.
     It assumes the default tags for the subregions, i.e.:
     - Omega = 0

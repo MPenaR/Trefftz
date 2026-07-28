@@ -17,24 +17,23 @@ directions = list(product([(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, e
                           [(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)]))
 
 
+# def num_Transmission(k, P, Q, N, d_n, d_m, a=0, b=0, Nt=100):
+#     t = linspace(0, 1, Nt)
+#     x = P + outer(t, Q-P)
+#     phi_n = exp(1j*k*dot(x, d_n))
+#     psi_m = exp(1j*k*dot(x, d_m))
+#     grad_phi_n_N = 1j*k*dot(N, d_n)*exp(1j*k*dot(x, d_n))
+#     grad_psi_m_N = 1j*k*dot(N, d_m)*exp(1j*k*dot(x, d_m))
 
-def num_Transmission(k, P, Q, N, d_n, d_m, a=0, b=0, Nt=100):
-    t = linspace(0, 1, Nt)
-    x = P + outer(t, Q-P)
-    phi_n = exp(1j*k*dot(x, d_n))
-    psi_m = exp(1j*k*dot(x, d_m))
-    grad_phi_n_N = 1j*k*dot(N, d_n)*exp(1j*k*dot(x, d_n))
-    grad_psi_m_N = 1j*k*dot(N, d_m)*exp(1j*k*dot(x, d_m))
-
-    I  = 1/2*Int(phi_n*conj(grad_psi_m_N) - grad_phi_n_N*conj(psi_m), t)
-    I += b*Int(1/(1j*k)*grad_phi_n_N * conj(grad_psi_m_N), t)
-    I -= a*Int(1j*k*phi_n*conj(psi_m), t)
-    I = norm(Q-P)*I
-    return I
+#     I  = 1/2*Int(phi_n*conj(grad_psi_m_N) - grad_phi_n_N*conj(psi_m), t)
+#     I += b*Int(1/(1j*k)*grad_phi_n_N * conj(grad_psi_m_N), t)
+#     I -= a*Int(1j*k*phi_n*conj(psi_m), t)
+#     I = norm(Q-P)*I
+#     return I
 
 
 @pytest.mark.parametrize(('d_m', 'd_n'), directions )
-def test_TransmissionKernel(d_m,d_n):
+def test_UltraWeakKernel(d_m,d_n):
     P = array([3,3])
     Q = array([1,1])
     l = norm(Q-P)
