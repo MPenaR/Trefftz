@@ -75,7 +75,7 @@ def numerical_I_duv(edge, d_u: float_array, d_v: float_array, k: float, R: float
 
     du_dn = 1j*k*dot(N, d_u)*u
 
-    I = Int(du_dn*conj(v), theta)*R  # int u*conj(v) dl 
+    I = Int(du_dn*conj(v), theta)*R  # int du/dn*conj(v) dl 
     return I
 
 

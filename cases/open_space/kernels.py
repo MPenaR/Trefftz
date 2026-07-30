@@ -336,19 +336,15 @@ def I_duv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes:
     D = norm(d_u - d_v)
     phi = atan2((d_u - d_v)[1], (d_u - d_v)[0])
 
-    D_n = norm(d_u)
     phi_n = atan2(d_u[1], d_u[0])
 
-    def odd_term(n: int, theta: float) -> complex:
-        return 1j**n / n * (-cos(n*(theta - phi) + (phi - phi_n))*jv(n-1, k*R*D) + cos(n*(theta - phi) - (phi - phi_n))*jv(n+1, k*R*D))
+    def indefinite_integral(theta: float) -> complex:
+        I = -k*R*(jv(1, k*R*D)*cos(phi - phi_n)*(theta) +
+                    sum( 1j**n/n*(- jv(n-1, k*R*D)*sin(n*(theta - phi) + (phi-phi_n)) + jv(n+1, k*R*D)*sin(n*(theta - phi) - (phi-phi_n))) for n in range(1, N_modes)))
+        return I
+    
+    I = indefinite_integral(theta=theta_2) - indefinite_integral(theta=theta_1)
 
-    def even_term(n: int, theta: float) -> complex:
-        return 1j**(n+1) / n * (-sin(n*(theta - phi) + (phi - phi_n))*jv(n-1, k*R*D) + sin(n*(theta - phi) - (phi - phi_n))*jv(n+1, k*R*D))
-        
-
-    I = R*D_n*(1j*jv(1, k*R*D)*cos(phi - phi_n)*(theta_2 - theta_1) +
-               sum( even_term(n, theta_2) - even_term(n, theta_1) if n % 2 == 0 else
-                    odd_term(n, theta_2) - odd_term(n, theta_1) for n in range(1, N_modes)))
     return I
 
 
