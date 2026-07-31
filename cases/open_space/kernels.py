@@ -2,7 +2,7 @@ from trefftz.numpy_types import float_array
 from numpy import pi, dot, exp, sinc, conj, atan2, sin, cos
 from numpy.linalg import norm
 from numpy.lib.scimath import sqrt
-from scipy.special import jv
+from scipy.special import jv, jvp
 
 # class NtDLocal_Polygonal:
 #     def __init__(self, R: float, d_2: float, n: int):
@@ -208,26 +208,8 @@ class NtDLocal_circle:
 
         N_modes = self.N_modes
 
-        P = edge["P"] 
-        Q = edge["Q"]
+        I = -I_duv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=N_modes) - d_2*1j*k*I_uv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=N_modes)
 
-        theta_2 = atan2(Q[1], Q[0])
-        theta_1 = atan2(P[1], P[0])
-        D = norm(d_n - d_m)
-        phi = atan2((d_n - d_m)[1], (d_n - d_m)[0])
-
-        D_n = norm(d_n)
-        phi_n = atan2(d_n[1], d_n[0])
-
-        # There are two terms, the easy one, d2 u conj(v), without information on the normal: 
-        I_uv = -1j*k*R*d_2*(jv(0, k*R*D)*(theta_2 - theta_1) + 2*sum( 1j**n*jv(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi)))  for n in range(1, N_modes)))
-
-        # the du/dn conj(v) term, which involves n(theta)
-        I_duv = -1j*k*R*D_n*(1j*jv(1, k*R*D)*cos(phi - phi_n)*(theta_2 - theta_1) + 1j*sum(1j**n/n*(
-            jv(n+1, k*R*D)*(sin(n*(theta_2 - phi) - (phi - phi_n)) - sin(n*(theta_1 - phi) - (phi - phi_n))) +
-            jv(n-1, k*R*D)*(sin(n*(theta_2 - phi) + (phi - phi_n)) - sin(n*(theta_1 - phi) + (phi - phi_n))) )
-            for n in range(1, N_modes)))
-        I = -1j*k*d_2*I_uv(edge, d_phi, d_psi, k, R, N_modes) + I_duv
         return I
 
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
@@ -338,15 +320,34 @@ def I_duv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes:
 
     phi_n = atan2(d_u[1], d_u[0])
 
-    def indefinite_integral(theta: float) -> complex:
+    def primitive(theta: float) -> complex:
         I = -k*R*(jv(1, k*R*D)*cos(phi - phi_n)*(theta) +
                     sum( 1j**n/n*(- jv(n-1, k*R*D)*sin(n*(theta - phi) + (phi-phi_n)) + jv(n+1, k*R*D)*sin(n*(theta - phi) - (phi-phi_n))) for n in range(1, N_modes)))
         return I
     
-    I = indefinite_integral(theta=theta_2) - indefinite_integral(theta=theta_1)
+    I = primitive(theta=theta_2) - primitive(theta=theta_1)
 
     return I
 
+
+def FourierCoef(edge, d_u: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
+    P = edge["P"] 
+    Q = edge["Q"]
+
+    theta_2 = atan2(Q[1], Q[0])
+    theta_1 = atan2(P[1], P[0])
+
+    phi_n = atan2(d_u[1], d_u[0])
+
+    def primitive(theta: float) -> complex:
+        I = -2*1j*exp(-1j*t*phi_n)*1j**t*(jvp(t, k*R)*theta +
+                                          sum( 1j**p/(1j*p)*(jvp(p+t, k*R)*exp( 1j*p*(theta - phi_n))
+                                                    -(-1)**t*jvp(p-t, k*R)*exp(-1j*p*(theta - phi_n)) ) for p in range(1, N_modes)))
+        return I
+
+    I = 1j*k*(primitive(theta=theta_2) - primitive(theta=theta_1))/(2*pi)
+
+    return I
 
 
 # class NtD_nonlocal_circle:

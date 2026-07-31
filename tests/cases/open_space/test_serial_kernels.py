@@ -1,5 +1,5 @@
-from cases.open_space.kernels import NtDLocal_circle, I_uv, I_duv
-from cases.open_space.numerical_kernels import numerical_I_uv, numerical_I_duv
+from cases.open_space.kernels import NtDLocal_circle, I_uv, I_duv, FourierCoef
+from cases.open_space.numerical_kernels import numerical_I_uv, numerical_I_duv, num_FourierCoef
 import pytest
 from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
 from numpy.lib.scimath import sqrt
@@ -12,66 +12,11 @@ TOL = 1E-7
 N_POINTS = int(1E5)
 
 
-from itertools import product
 NTH = 3
-directions = list(product([(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)],
-                          [(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)]))
+directions = [(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)]
 
-
-# def num_NtDLocal_LHS(k, theta_1, theta_2, R, d_n, d_m, d2=0, Nt = 100, Np=15) -> complex:
-#     theta = np.linspace(theta_1, theta_2, Nt)
-#     u_r = np.column_stack([np.cos(theta), np.sin(theta)])
-#     N = u_r
-#     x = R*u_r
-#     phi_n = exp(1j*k*dot(x, d_n))
-#     psi_m = exp(1j*k*dot(x, d_m))
-#     grad_phi_n_N = 1j*k*dot(N, d_n)*phi_n
-#     # grad_psi_m_N = 1j*k*dot(N,d_m)*exp(1j*k*dot(x,d_m))
-#     I_easy = -1j*k*d2*Int(phi_n*conj(psi_m), theta)*R
-#     I_hard = -Int(grad_phi_n_N*conj(psi_m), theta)*R
-#     # I_hard = 0.
-#     I = I_easy + I_hard
-
-#     return I_easy + I_hard
-
-
-
-# @pytest.mark.parametrize(('d_m', 'd_n'), directions )
-# def test_NtD_local_LHS(d_m, d_n):
-    
-#     theta_1 = np.pi*30/180
-#     theta_2 = np.pi*45/180
-#     R = 2.
-    
-
-#     P = R*array([np.cos(theta_1), np.sin(theta_1)])
-#     Q = R*array([np.cos(theta_2), np.sin(theta_2)])
-#     l = norm(P-Q)
-#     T = (Q - P)/l
-#     N = array([0,1]) # meaningless, is a curved edge
-#     M = (P + Q)/2 # meaningless, is a curved edge
-    
-#     E = np.zeros((), dtype=edge_dtype)
-#     E["P"] = P
-#     E["Q"] = Q
-#     E["N"] = N
-#     E["T"] = T
-#     E["M"] = M
-#     E["l"] = l
-
-#     k = 8.
-#     d_n = array(d_n)/norm(d_n)
-#     d_m = array(d_m)/norm(d_m)
-
-#     d2 = 0.5
-#     kernel = NtDLocal_circle(R=R, d_2=d2, n=1, N_modes=60)
-#     I_exact = kernel.LHS(edge=E, d_phi=d_n, d_psi=d_m, k=k)
-#     I_num = num_NtDLocal_LHS(k, theta_1, theta_2, R, d_n, d_m, d2=d2,  Nt=N_POINTS)
-#     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
-
-
-
-@pytest.mark.parametrize(('d_m', 'd_n'), directions )
+@pytest.mark.parametrize('d_m', directions )
+@pytest.mark.parametrize('d_n', directions )
 def test_Iuv(d_m, d_n):
     
     theta_1 = np.pi*30/180
@@ -103,7 +48,8 @@ def test_Iuv(d_m, d_n):
     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
 
-@pytest.mark.parametrize(('d_m', 'd_n'), directions )
+@pytest.mark.parametrize('d_m', directions )
+@pytest.mark.parametrize('d_n', directions )
 def test_Iduv(d_m, d_n):
     
     theta_1 = np.pi*30/180
@@ -135,6 +81,36 @@ def test_Iduv(d_m, d_n):
     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
 
+@pytest.mark.parametrize('t', [0, 1, 2] )
+@pytest.mark.parametrize('d_n', directions )
+def test_FourierCoeff(d_n, t):
+    
+    theta_1 = np.pi*30/180
+    theta_2 = np.pi*45/180
+    R = 2.
+    
+
+    P = R*array([np.cos(theta_1), np.sin(theta_1)])
+    Q = R*array([np.cos(theta_2), np.sin(theta_2)])
+    l = norm(P-Q)
+    T = (Q - P)/l
+    N = array([0,1]) # meaningless, is a curved edge
+    M = (P + Q)/2 # meaningless, is a curved edge
+    
+    E = np.zeros((), dtype=edge_dtype)
+    E["P"] = P
+    E["Q"] = Q
+    E["N"] = N
+    E["T"] = T
+    E["M"] = M
+    E["l"] = l
+
+    k = 8.
+    d_n = array(d_n)/norm(d_n)
+
+    I_exact = FourierCoef(edge=E, d_u=d_n, k=k, R=R, N_modes=40, t=t)
+    I_num = num_FourierCoef(edge=E, d_u=d_n, k=k, R=R, t=t)
+    assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
 # def NewmanntoDirichlet(y, df_dy, k, H, M):
 

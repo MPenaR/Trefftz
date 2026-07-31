@@ -14,10 +14,8 @@ N_POINTS = int(1E5)
 Edge = namedtuple('Edge', ['P', 'Q', 'N', 'T', 'M', 'l'])
 Function = namedtuple('Function', ['d', 'n'])
 
-from itertools import product  ## SHOULD BE A FIXTURE IN CONFTEST.PY
 NTH = 3
-directions = list(product([(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)],
-                          [(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)]))
+directions = [(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)]
 
 
 
@@ -36,7 +34,8 @@ def num_Inner(k, P, Q, N, d_n, d_m, a=0, b=0, Nt=100):
     return I
 
 
-@pytest.mark.parametrize(('d_m', 'd_n'), directions )
+@pytest.mark.parametrize('d_m', directions )
+@pytest.mark.parametrize('d_n', directions )
 def test_Inner(d_m,d_n):
     P = array([3,3])
     Q = array([1,1])
@@ -74,7 +73,9 @@ def num_SoundHard(k, P, Q, N, d_n, d_m, d1, Nt):
     I = Int((phi_n + d1/(1j*k)*grad_phi_n_N)*conj(grad_psi_m_N)*norm(Q-P), t)
     return I
 
-@pytest.mark.parametrize(('d_m', 'd_n'), directions )
+
+@pytest.mark.parametrize('d_m', directions )
+@pytest.mark.parametrize('d_n', directions )
 def test_SoundHard(d_m, d_n):
     P = array([0,1])
     Q = array([3,1])
@@ -114,7 +115,9 @@ def num_Radiating_local( k, P, Q, N, H, d_n, d_m, d2=0, Nt = 100, Np=15):
     
     return I
 
-@pytest.mark.parametrize(('d_m', 'd_n'), directions )
+
+@pytest.mark.parametrize('d_m', directions )
+@pytest.mark.parametrize('d_n', directions )
 def test_Radiating_local(d_m,d_n):
     H=1
     R= 10
