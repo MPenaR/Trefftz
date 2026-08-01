@@ -220,7 +220,7 @@ def test_IuNv(d_m, d_n):
     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
 
-#@pytest.mark.slow
+@pytest.mark.slow
 @pytest.mark.parametrize('d_m', directions )
 @pytest.mark.parametrize('d_n', directions )
 def test_IuNv(d_m, d_n):
