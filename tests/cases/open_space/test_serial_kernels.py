@@ -144,17 +144,18 @@ def test_Fu(d_n, t):
     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize('d_m', directions )
 @pytest.mark.parametrize('d_n', directions )
 def test_INuv(d_m, d_n):
     
-    R = 2.
+    R = 3.
 
     thetas = [ (np.pi*30/180, np.pi*45/180 ),
                (np.pi*60/180, np.pi*90/180,)]
 
-    theta_1 = np.pi*30/180
-    theta_2 = np.pi*45/180
+    E = np.zeros((2,), dtype=edge_dtype)
+
     for i, (theta_1, theta_2) in enumerate(thetas):
         P = R*array([np.cos(theta_1), np.sin(theta_1)])
         Q = R*array([np.cos(theta_2), np.sin(theta_2)])
@@ -163,14 +164,12 @@ def test_INuv(d_m, d_n):
         N = array([0,1]) # meaningless, is a curved edge
         M = (P + Q)/2 # meaningless, is a curved edge
         
-        E = np.zeros((2,), dtype=edge_dtype)
         E[i]["P"] = P
         E[i]["Q"] = Q
         E[i]["N"] = N
         E[i]["T"] = T
         E[i]["M"] = M
         E[i]["l"] = l
-
 
     k = 8.
     d_n = array(d_n)/norm(d_n)

@@ -143,7 +143,7 @@ def num_I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: f
     theta_1_v = np.atan2(P_v[1], P_v[0])
     theta_2_v = np.atan2(Q_v[1], Q_v[0])
 
-    theta = np.linspace(0, 2*np.pi, N_POINTS, endpoint=False)
+    theta = np.linspace(0, 2*np.pi, N_POINTS*80, endpoint=False)
     u_r = np.column_stack([np.cos(theta), np.sin(theta)])
     N = u_r
     x = R*u_r
@@ -161,7 +161,7 @@ def num_I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: f
     dv_dn = 1j*k*dot(N, d_v)*v
 
     NtD_du = NewmanntoDirichlet(theta, du_dn, k, R, NtD_modes)   
-    I = Int(NtD_du*conj(dv_dn), theta)*R
+    I = Int(NtD_du*conj(v), theta)*R
 
     return I
 
@@ -220,10 +220,8 @@ def num_Fu(edge, d: float_array, k: float, R: float, t: int) -> complex:
 
     return I
 
-    # return 1/(2*np.pi)*R*Int(du_dn*exp(-1j*t*theta), theta)
-
 def NewmanntoDirichlet(theta: float_array, df_dn: complex_array, k: float, R: float, M: int) -> complex_array:
-    L = 2*np.pi*R
+    L = 2*np.pi
     # dfn = np.zeros(M, dtype=np.complex128)
     # dfn[0] = R*Int( df_dn*1/np.sqrt(L), theta )
     # for n in range(1,M):
@@ -234,7 +232,7 @@ def NewmanntoDirichlet(theta: float_array, df_dn: complex_array, k: float, R: fl
     dfn = np.zeros(2*M+1, dtype=np.complex128)
     for n in range(-M, M+1):
         i = n+M
-        dfn[i] = R*Int(df_dn*exp(-1j*n*theta)/np.sqrt(L), theta)
+        dfn[i] = Int(df_dn*exp(-1j*n*theta)/np.sqrt(L), theta)
 
     f = 1/k*sum((hankel1(n, k*R)/h1vp(n, k*R)*dfn[n+M]*exp(1j*n*theta)/np.sqrt(L) for n in range(-M, M+1)))
 

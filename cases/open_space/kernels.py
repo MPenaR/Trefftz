@@ -337,16 +337,15 @@ def Fdudn(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> com
     theta_2 = atan2(Q[1], Q[0])
     theta_1 = atan2(P[1], P[0])
 
-    phi_n = atan2(d[1], d[0])
+    phi = atan2(d[1], d[0])
 
     def primitive(theta: float) -> complex:
-        I = -1j*exp(-1j*t*phi_n)*1j**t*(jvp(t, k*R)*theta +
-                                          sum( 1j**p/(1j*p)*(jvp(p+t, k*R)*exp( 1j*p*(theta - phi_n))
-                                                    -(-1)**t*jvp(p-t, k*R)*exp(-1j*p*(theta - phi_n)) ) for p in range(1, N_modes)))
+        I = -1j*exp(-1j*t*phi)*1j**t*(jvp(t, k*R)*theta +
+                                          sum( 1j**p/(1j*p)*(jvp(p+t, k*R)*exp( 1j*p*(theta - phi))
+                                                    -(-1)**t*jvp(p-t, k*R)*exp(-1j*p*(theta - phi)) ) for p in range(1, N_modes)))
         return I
 
     I = 1j*k*(primitive(theta=theta_2) - primitive(theta=theta_1))/sqrt(2*pi)
-
     return I
 
 def Fu(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
@@ -373,8 +372,7 @@ def NtD_coeff(edge, d: float_array, k: float, R: float, t: int, N_modes: int) ->
 
 
 def I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int, N_modes: int) -> complex:
-    NtD_modes = 10
-    I = sum(NtD_coeff(edge_u, d_u, k, R, t, N_modes)*conj(Fu(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
+    I = R*sum(NtD_coeff(edge_u, d_u, k, R, t, N_modes)*conj(Fu(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
     return I
 
 # class NtD_nonlocal_circle:

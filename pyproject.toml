@@ -46,3 +46,8 @@ include = ["trefftz*", "problems*", "cases*"]
 
 [tool.ruff]
 target-version = "py312"
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: expensive tests",
+]
