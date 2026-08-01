@@ -131,6 +131,40 @@ class NtDNon_Local_circle:
         I = I_Nudv - d2*1j*k*(I_NuNv - I_Nuv - I_uNv)
         return I
 
+def num_I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int) -> complex:
+       
+    P_u = edge_u["P"]
+    Q_u = edge_u["Q"]
+    theta_1_u = np.atan2(P_u[1], P_u[0])
+    theta_2_u = np.atan2(Q_u[1], Q_u[0])
+    
+    P_v = edge_v["P"]
+    Q_v = edge_v["Q"]
+    theta_1_v = np.atan2(P_v[1], P_v[0])
+    theta_2_v = np.atan2(Q_v[1], Q_v[0])
+
+    theta = np.linspace(0, 2*np.pi, N_POINTS, endpoint=False)
+    u_r = np.column_stack([np.cos(theta), np.sin(theta)])
+    N = u_r
+    x = R*u_r
+
+    # u = np.where(theta_1_u < theta < theta_2_u, exp(1j*k*dot(x, d_n)), 0)
+    mask_u = (theta_1_u <= theta) & (theta <= theta_2_u)
+    u = np.zeros_like(theta, dtype=np.complex128)
+    u[mask_u] = exp(1j*k*dot(x[mask_u, :], d_u))
+    # v = np.where(theta_1_v < theta < theta_2_v, exp(1j*k*dot(x, d_m)), 0)
+    mask_v = (theta_1_v <= theta) & (theta <= theta_2_v)
+    v = np.zeros_like(theta, dtype=np.complex128)
+    v[mask_v] = exp(1j*k*dot(x[mask_v, :], d_v))
+
+    du_dn = 1j*k*dot(N, d_u)*u
+    dv_dn = 1j*k*dot(N, d_v)*v
+
+    NtD_du = NewmanntoDirichlet(theta, du_dn, k, R, NtD_modes)   
+    I = Int(NtD_du*conj(dv_dn), theta)*R
+
+    return I
+
 
 
 
@@ -143,7 +177,7 @@ def FourierCoefficient(theta: float_array, f: float_array, t: int) -> complex:
     return 1/sqrt(2*np.pi)*Int(f*exp(-1j*t*theta), theta)
 
 
-def num_Fdudn(edge, d_u: float_array, k: float, R: float, t: int) -> complex:
+def num_Fdudn(edge, d: float_array, k: float, R: float, t: int) -> complex:
     r'''Computes the t Fourier coefficient of 
     .. math ::
     \nabla u\cdot \mathbf{n} 
@@ -159,8 +193,8 @@ def num_Fdudn(edge, d_u: float_array, k: float, R: float, t: int) -> complex:
     N = u_r
     x = R*u_r
 
-    u = exp(1j*k*dot(x, d_u))
-    du_dn = 1j*k*dot(N, d_u)*u
+    u = exp(1j*k*dot(x, d))
+    du_dn = 1j*k*dot(N, d)*u
 
     I = FourierCoefficient(theta, du_dn, t)
 
