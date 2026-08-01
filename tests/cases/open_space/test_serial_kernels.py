@@ -1,5 +1,5 @@
-from cases.open_space.kernels import NtDLocal_circle, I_uv, I_duv, FourierCoef
-from cases.open_space.numerical_kernels import numerical_I_uv, numerical_I_duv, num_FourierCoef
+from cases.open_space.kernels import NtDLocal_circle, I_uv, I_duv, Fdudn, Fu
+from cases.open_space.numerical_kernels import numerical_I_uv, numerical_I_duv, num_Fdudn, num_Fu
 import pytest
 from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
 from numpy.lib.scimath import sqrt
@@ -83,7 +83,7 @@ def test_Iduv(d_m, d_n):
 
 @pytest.mark.parametrize('t', [0, 1, 2] )
 @pytest.mark.parametrize('d_n', directions )
-def test_FourierCoeff(d_n, t):
+def test_Fdudn(d_n, t):
     
     theta_1 = np.pi*30/180
     theta_2 = np.pi*45/180
@@ -108,21 +108,40 @@ def test_FourierCoeff(d_n, t):
     k = 8.
     d_n = array(d_n)/norm(d_n)
 
-    I_exact = FourierCoef(edge=E, d_u=d_n, k=k, R=R, N_modes=40, t=t)
-    I_num = num_FourierCoef(edge=E, d_u=d_n, k=k, R=R, t=t)
+    I_exact = Fdudn(edge=E, d_u=d_n, k=k, R=R, N_modes=40, t=t)
+    I_num = num_Fdudn(edge=E, d_u=d_n, k=k, R=R, t=t)
     assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
-# def NewmanntoDirichlet(y, df_dy, k, H, M):
-
-#     dfn = np.zeros(M, dtype=np.complex128)
-#     dfn[0] = Int( df_dy*1/np.sqrt(H), y )
-#     for n in range(1,M):
-#         dfn[n] = Int( df_dy*cos(n*pi*y/H)/np.sqrt(H/2), y )
+@pytest.mark.parametrize('t', [0, 1, 2] )
+@pytest.mark.parametrize('d_n', directions )
+def test_Fu(d_n, t):
     
-#     f_y = 1/(1j*k)*dfn[0]/np.sqrt(H)*np.ones_like(y) + sum([ 1/(1j*np.sqrt(complex(k**2 - (n*pi/H)**2)))*dfn[n]*cos(n*pi*y/H)/np.sqrt(H/2) for n in range(1,M)])
-#     return f_y
+    theta_1 = np.pi*30/180
+    theta_2 = np.pi*45/180
+    R = 2.
+    
 
+    P = R*array([np.cos(theta_1), np.sin(theta_1)])
+    Q = R*array([np.cos(theta_2), np.sin(theta_2)])
+    l = norm(P-Q)
+    T = (Q - P)/l
+    N = array([0,1]) # meaningless, is a curved edge
+    M = (P + Q)/2 # meaningless, is a curved edge
+    
+    E = np.zeros((), dtype=edge_dtype)
+    E["P"] = P
+    E["Q"] = Q
+    E["N"] = N
+    E["T"] = T
+    E["M"] = M
+    E["l"] = l
 
+    k = 8.
+    d_n = array(d_n)/norm(d_n)
+
+    I_exact = Fu(edge=E, d=d_n, k=k, R=R, N_modes=40, t=t)
+    I_num = num_Fu(edge=E, d=d_n, k=k, R=R, t=t)
+    assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
 
 
@@ -143,36 +162,6 @@ def test_FourierCoeff(d_n, t):
 #     I+= -d2*1j*k*Int((N_gradphi_n - phi_n)*conj(N_gradpsi_m - psi_m), t)*l
     
 #     return I
-
-# #@pytest.mark.xfail(reason="mixed up dimensions of the waveguide")
-# @pytest.mark.parametrize(('d_m', 'd_n'), directions )
-# def test_Radiating(d_m,d_n):
-#     H=1
-#     R= 10
-#     P = np.array([R,0])
-#     Q = np.array([R,H])
-
-#     l = norm(Q-P)
-#     T = (Q - P)/l
-#     N = np.array([1,0])
-#     M = (P+Q)/2
-
-#     E = Edge(P,Q,N,T,M,l)
-
-#     k = 8.
-#     d_n = np.array(d_n)/norm(d_n)
-#     d_m = np.array(d_m)/norm(d_m)
-
-#     phi = Function(d=d_n,n=1)
-#     psi = Function(d=d_m,n=1)
-#     d_2 = 0.5
-
-#     N_modes = 15
-#     I_exact_local = Radiating_local(phi, psi, k, E, d_2)
-#     I_exact_nonlocal = Radiating_nonlocal(phi=phi, psi=psi, k=k, edge_u=E, edge_v=E, d_2=d_2, N_modes=N_modes, H=H)
-#     I_exact = I_exact_nonlocal + I_exact_local
-#     I_num = num_Radiating( k, P, Q, N, H, d_n, d_m, d2=d_2,  Nt=N_POINTS, N_modes=N_modes)
-#     assert np.isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
 
 
 

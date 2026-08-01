@@ -330,7 +330,7 @@ def I_duv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes:
     return I
 
 
-def FourierCoef(edge, d_u: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
+def Fdudn(edge, d_u: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
     P = edge["P"] 
     Q = edge["Q"]
 
@@ -340,14 +340,33 @@ def FourierCoef(edge, d_u: float_array, k: float, R: float, t: int, N_modes: int
     phi_n = atan2(d_u[1], d_u[0])
 
     def primitive(theta: float) -> complex:
-        I = -2*1j*exp(-1j*t*phi_n)*1j**t*(jvp(t, k*R)*theta +
+        I = -1j*exp(-1j*t*phi_n)*1j**t*(jvp(t, k*R)*theta +
                                           sum( 1j**p/(1j*p)*(jvp(p+t, k*R)*exp( 1j*p*(theta - phi_n))
                                                     -(-1)**t*jvp(p-t, k*R)*exp(-1j*p*(theta - phi_n)) ) for p in range(1, N_modes)))
         return I
 
-    I = 1j*k*(primitive(theta=theta_2) - primitive(theta=theta_1))/(2*pi)
+    I = 1j*k*(primitive(theta=theta_2) - primitive(theta=theta_1))/sqrt(2*pi)
 
     return I
+
+def Fu(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
+    P = edge["P"] 
+    Q = edge["Q"]
+
+    theta_2 = atan2(Q[1], Q[0])
+    theta_1 = atan2(P[1], P[0])
+
+    phi = atan2(d[1], d[0])
+
+    def primitive(theta: float) -> complex:
+        I = 1j**t*exp(-1j*phi*t)*(jv(t, k*R)*theta + sum( 1j**p/(1j*p)*(jv(p+t, k*R)*exp( 1j*p*(theta - phi))
+                                                              - (-1)**t*jv(p-t, k*R)*exp(-1j*p*(theta - phi))) for p in range(1, N_modes)))
+        return I
+
+    I = (primitive(theta=theta_2) - primitive(theta=theta_1))/sqrt(2*pi)
+
+    return I
+
 
 
 # class NtD_nonlocal_circle:

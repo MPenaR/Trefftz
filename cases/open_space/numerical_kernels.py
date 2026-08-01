@@ -133,11 +133,21 @@ class NtDNon_Local_circle:
 
 
 
-def num_FourierCoef(edge, d_u: float_array, k: float, R: float, t: int) -> complex:
+
+def FourierCoefficient(theta: float_array, f: float_array, t: int) -> complex:
     r'''Computes the t Fourier coefficient defined as:
     
     .. math ::
         \frac{1}{2\pi}*\int_0^{2\pi}f(\theta)e^{-it\theta}\,\mathrm{d}\theta
+    '''
+    return 1/sqrt(2*np.pi)*Int(f*exp(-1j*t*theta), theta)
+
+
+def num_Fdudn(edge, d_u: float_array, k: float, R: float, t: int) -> complex:
+    r'''Computes the t Fourier coefficient of 
+    .. math ::
+    \nabla u\cdot \mathbf{n} 
+    supported at a single edge.
     '''
     P = edge["P"]
     Q = edge["Q"]
@@ -151,8 +161,32 @@ def num_FourierCoef(edge, d_u: float_array, k: float, R: float, t: int) -> compl
 
     u = exp(1j*k*dot(x, d_u))
     du_dn = 1j*k*dot(N, d_u)*u
-    
-    return 1/(2*np.pi)*R*Int(du_dn*exp(-1j*t*theta), theta)
+
+    I = FourierCoefficient(theta, du_dn, t)
+
+    return I
+
+def num_Fu(edge, d: float_array, k: float, R: float, t: int) -> complex:
+    r'''Computes the t Fourier coefficient of 
+    .. math ::
+    \nabla u\cdot \mathbf{n} 
+    supported at a single edge.
+    '''
+    P = edge["P"]
+    Q = edge["Q"]
+    theta_1 = np.atan2(P[1], P[0])
+    theta_2 = np.atan2(Q[1], Q[0])
+
+    theta = np.linspace(theta_1, theta_2, N_POINTS)
+    u_r = np.column_stack([np.cos(theta), np.sin(theta)])
+    x = R*u_r
+
+    u = exp(1j*k*dot(x, d))
+    I = FourierCoefficient(theta, u, t)
+
+    return I
+
+    # return 1/(2*np.pi)*R*Int(du_dn*exp(-1j*t*theta), theta)
 
 def NewmanntoDirichlet(theta: float_array, df_dn: complex_array, k: float, R: float, M: int) -> complex_array:
     L = 2*np.pi*R
