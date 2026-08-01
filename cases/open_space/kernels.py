@@ -375,6 +375,16 @@ def I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float
     I = R*sum(NtD_coeff(edge_u, d_u, k, R, t, N_modes)*conj(Fu(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
     return I
 
+def I_uNv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int, N_modes: int) -> complex:
+    I = R*sum(Fu(edge_u, d_u, k, R, t, N_modes)*conj(NtD_coeff(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
+    return I
+
+def I_NuNv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int, N_modes: int) -> complex:
+    I = R*sum(NtD_coeff(edge_u, d_u, k, R, t, N_modes)*conj(NtD_coeff(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
+    return I
+
+
+
 # class NtD_nonlocal_circle:
 #     def __init__(self, R: float, d_2: float, M: int): 
 #         self.R = R

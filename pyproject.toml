@@ -47,7 +47,14 @@ include = ["trefftz*", "problems*", "cases*"]
 [tool.ruff]
 target-version = "py312"
 
+[tool.flake8]
+extend-ignore = ["E501"]
+
 [tool.pytest.ini_options]
 markers = [
     "slow: expensive tests",
 ]
+
+[[tool.mypy.overrides]]
+module = ["numpy.*"]
+ignore_errors = true
