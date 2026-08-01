@@ -2,7 +2,7 @@ from trefftz.numpy_types import float_array
 from numpy import pi, dot, exp, sinc, conj, atan2, sin, cos
 from numpy.linalg import norm
 from numpy.lib.scimath import sqrt
-from scipy.special import jv, jvp
+from scipy.special import jv, jvp, hankel1, h1vp
 
 # class NtDLocal_Polygonal:
 #     def __init__(self, R: float, d_2: float, n: int):
@@ -330,14 +330,14 @@ def I_duv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes:
     return I
 
 
-def Fdudn(edge, d_u: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
+def Fdudn(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
     P = edge["P"] 
     Q = edge["Q"]
 
     theta_2 = atan2(Q[1], Q[0])
     theta_1 = atan2(P[1], P[0])
 
-    phi_n = atan2(d_u[1], d_u[0])
+    phi_n = atan2(d[1], d[0])
 
     def primitive(theta: float) -> complex:
         I = -1j*exp(-1j*t*phi_n)*1j**t*(jvp(t, k*R)*theta +
@@ -367,7 +367,15 @@ def Fu(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> comple
 
     return I
 
+def NtD_coeff(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
+    NtD_t = Fdudn(edge, d, k, R, t, N_modes)
+    return 1/k*NtD_t*hankel1(t, k*R)/h1vp(t, k*R)
 
+
+def I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, N_modes: int) -> complex:
+    NtD_modes = 10
+    I = sum(NtD_coeff(edge_u, d_u, k, R, t, N_modes)*conj(Fu(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
+    return I
 
 # class NtD_nonlocal_circle:
 #     def __init__(self, R: float, d_2: float, M: int): 
