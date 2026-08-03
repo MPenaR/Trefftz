@@ -1,17 +1,17 @@
 from trefftz.numpy_types import float_array
-from numpy import pi, dot, exp, sinc, conj, atan2, sin, cos
+from numpy import pi, exp, conj, atan2, sin, cos
 from numpy.linalg import norm
 from numpy.lib.scimath import sqrt
 from scipy.special import jv, jvp, hankel1, h1vp
 
-JAC_ANGER_MODES = 30
+from trefftz.dg.serial_kernels import JAC_ANGER_MODES, I_uv_arc, I_duv_arc
+
 
 class NtDLocal_circle:
-    def __init__(self, R: float, d_2: float, n: int, NtD_modes: int):
+    def __init__(self, R: float, d_2: float, n: int):
         self.R = R
         self.mode_n = n
         self.d_2 = d_2
-        self.NtD_modes = NtD_modes
     
     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         r"""
@@ -48,7 +48,8 @@ class NtDLocal_circle:
         d_m = d_psi
         R = self.R
 
-        I = -I_duv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=JAC_ANGER_MODES) - d_2*1j*k*I_uv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=JAC_ANGER_MODES)
+        #I = -I_duv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=JAC_ANGER_MODES) - d_2*1j*k*I_uv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=JAC_ANGER_MODES)
+        I = -I_duv_arc(edge, d_n, d_m, k, R) -1j*k*d_2*I_uv_arc(edge, d_n, d_m, k, R)
 
         return I
 

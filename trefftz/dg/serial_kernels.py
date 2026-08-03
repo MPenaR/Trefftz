@@ -1,10 +1,74 @@
-from numpy import dot, exp, sinc, pi, conj
-from numpy.lib.scimath import sqrt
-from typing import NamedTuple
+from numpy import dot, exp, sinc, pi, atan2, sin, cos
+from numpy.linalg import norm
 from trefftz.numpy_types import float_array
 from enum import Enum
 from typing import Protocol
+from scipy.special import jv
 
+JAC_ANGER_MODES = 30
+
+def I_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u \overline{v}\,\mathrm{d}\ell
+    
+    where $u$ and $v$ are plane waves and $E$ is a straight edge.'''
+    l = edge["l"]
+    M = edge["M"]
+    T = edge["T"]
+
+    return l*exp(1j*k*dot((d_u - d_v), M))*sinc(k*l/(2*pi)*dot(d_u - d_v, T))
+
+
+def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u \overline{v}\,\mathrm{d}\ell
+    
+    where $u$ and $v$ are plane waves and $E$ is an arc of circunference.'''
+
+    # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
+    # edge should be a arc_edge
+
+    P = edge["P"]
+    Q = edge["Q"]
+
+    theta_1 = atan2(P[1], P[0])
+    theta_2 = atan2(Q[1], Q[0])
+    
+    D_uv = norm(d_u - d_v)
+    phi_uv = atan2((d_u - d_v)[1], (d_u - d_v)[0])
+
+    return R*(jv(0, k*R*D_uv)*(theta_2-theta_1) +
+              2*sum(1j**t/t*jv(t, k*R*D_uv)*(sin(t*(theta_2 - phi_uv)) - sin(t*(theta_1 - phi_uv)))
+                    for t in range(1, JAC_ANGER_MODES)))
+
+def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E nabla(u)\cdot\mathbf{n} \overline{v}\,\mathrm{d}\ell
+    
+    where $u$ and $v$ are plane waves and $E$ is an arc of circunference.'''
+
+    # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
+    # edge should be a arc_edge
+
+    P = edge["P"]
+    Q = edge["Q"]
+
+    theta_1 = atan2(P[1], P[0])
+    theta_2 = atan2(Q[1], Q[0])
+    
+    D_uv = norm(d_u - d_v)
+    phi_uv = atan2((d_u - d_v)[1], (d_u - d_v)[0])
+
+    phi_u = atan2(d_u[1], d_u[0])
+
+    primitive = lambda theta: k*R*(-jv(1, k*R*D_uv)*cos(phi_uv - phi_u)* theta + sum(1j**p/p*(jv(p-1,k*R*D_uv)*sin(p*(theta-phi_uv)+(phi_uv-phi_u))-
+                                                                                              jv(p+1,k*R*D_uv)*sin(p*(theta-phi_uv)-(phi_uv-phi_u)))
+                                                                                              for p in range(1, JAC_ANGER_MODES)))
+
+    return primitive(theta_2) - primitive(theta_1)
 
 class SIGN(Enum):
     '''Sign for the transmission kernel
@@ -47,35 +111,46 @@ class NeumannKernel:
         d_m = d_psi
         d_n = d_phi
 
-        M = edge["M"]
-        l = edge["l"]
         N = edge["N"]
-        T = edge["T"]
 
-        return -1j*k*l*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*exp(1j*k*dot(d_n - d_m, M)) * sinc(k*l/(2*pi)*dot(d_n-d_m, T))
-    
+        return -1j*k*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*I_uv(edge, d_phi, d_psi, k)
+
+
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
         raise NotImplementedError("Not implemented yet")
 
 
 class DirichletKernel:
     '''Serial Dirichlet kernel'''
-    def __init__(self, d_1: float):
-        self.d_1 = d_1
+    def __init__(self, a: float):
+        self.a = a
     
     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-        d_1 = self.d_1
-        d_m = d_psi
+        a = self.a
         d_n = d_phi
-
-        M = edge["M"]
-        l = edge["l"]
         N = edge["N"]
-        T = edge["T"]
-        raise NotImplementedError("Not implemented yet")
+
+        return -1j*k*(dot(d_n, N) + a)*I_uv(edge, d_phi, d_psi, k)
         
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
         raise NotImplementedError("Not implemented yet")
+
+
+class CircularDirichletKernel:
+    '''Serial Dirichlet kernel'''
+    def __init__(self, a: float, R: float):
+        self.a = a
+        self.R = R
+    
+    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+        a = self.a
+        R = self.R
+
+        return -I_duv_arc(edge, d_phi, d_psi, k, R) - 1j*k*a*I_uv_arc(edge, d_phi, d_psi, k, R)
+        
+    def RHS(self, edge, d_psi: float_array, k: float) -> complex:
+        raise NotImplementedError("Not implemented yet")
+
 
 
 
@@ -111,7 +186,9 @@ class UltraWeakKernel:
         N = edge["N"]
         T = edge["T"]
 
-        I = -1j*k*l*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*exp(1j*k*dot(d_n-d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
+        # I = -1j*k*l*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*exp(1j*k*dot(d_n-d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
+        I = -1j*k*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*I_uv(edge, d_n, d_m, k)
+
         match sign:
             case SIGN.PP:
                 I = I

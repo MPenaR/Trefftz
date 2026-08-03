@@ -2,11 +2,11 @@ from trefftz.dg.serial_fluxes_old import SoundHard, Inner, Radiating_local  #, R
 
 # , Gamma_term, Sigma_term, exact_RHS
 import pytest
-from numpy import linspace, outer, sqrt, sin, cos, pi, exp, dot, conj, isclose, array
+from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
 from numpy.linalg import norm
 from numpy import trapezoid as Int
 import numpy as np
-
+from trefftz.mesh.core2 import edge_dtype
 
 from collections import namedtuple
 TOL = 1E-7
@@ -14,8 +14,49 @@ N_POINTS = int(1E5)
 Edge = namedtuple('Edge', ['P', 'Q', 'N', 'T', 'M', 'l'])
 Function = namedtuple('Function', ['d', 'n'])
 
+
+
+TOL = 1E-7
+N_POINTS = int(1E5)
+
+
 NTH = 3
 directions = [(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)]
+
+
+@pytest.mark.parametrize('d_m', directions )
+@pytest.mark.parametrize('d_n', directions )
+def test_Iuv_arc(d_m, d_n):
+    
+    theta_1 = np.pi*30/180
+    theta_2 = np.pi*45/180
+    R = 2.
+    
+
+    P = R*array([np.cos(theta_1), np.sin(theta_1)])
+    Q = R*array([np.cos(theta_2), np.sin(theta_2)])
+    l = norm(P-Q)
+    T = (Q - P)/l
+    N = array([0,1]) # meaningless, is a curved edge
+    M = (P + Q)/2 # meaningless, is a curved edge
+    
+    E = np.zeros((), dtype=edge_dtype)
+    E["P"] = P
+    E["Q"] = Q
+    E["N"] = N
+    E["T"] = T
+    E["M"] = M
+    E["l"] = l
+
+    k = 8.
+    d_n = array(d_n)/norm(d_n)
+    d_m = array(d_m)/norm(d_m)
+
+    I_exact = I_uv_arc(edge=E, d_u=d_n, d_v=d_m, k=k, R=R, N_modes=60)
+    I_num = numerical_I_uv(edge=E, d_u=d_n, d_v=d_m, k=k, R=R)
+    assert isclose(I_num, I_exact, TOL, TOL), f'{I_exact=}, {I_num=}'
+
+
 
 
 

@@ -15,6 +15,7 @@ N_POINTS = int(1E5)
 NTH = 3
 directions = [(cos(th), sin(th)) for th in linspace(0, pi/2, NTH, endpoint=False)]
 
+
 @pytest.mark.parametrize('d_m', directions )
 @pytest.mark.parametrize('d_n', directions )
 def test_Iuv(d_m, d_n):
