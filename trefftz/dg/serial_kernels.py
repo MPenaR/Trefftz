@@ -122,8 +122,9 @@ class NeumannKernel:
 
 class DirichletKernel:
     '''Serial Dirichlet kernel'''
-    def __init__(self, a: float):
+    def __init__(self, a: float, data = None):
         self.a = a
+        self.data = data
     
     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         a = self.a
@@ -138,9 +139,10 @@ class DirichletKernel:
 
 class CircularDirichletKernel:
     '''Serial Dirichlet kernel'''
-    def __init__(self, a: float, R: float):
+    def __init__(self, a: float, R: float, data = None):
         self.a = a
         self.R = R
+        self.data = data
     
     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         a = self.a
@@ -149,7 +151,11 @@ class CircularDirichletKernel:
         return -I_duv_arc(edge, d_phi, d_psi, k, R) - 1j*k*a*I_uv_arc(edge, d_phi, d_psi, k, R)
         
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
-        raise NotImplementedError("Not implemented yet")
+        d_inc = self.data["d_inc"]
+        a = self.a
+        R = self.R
+        return I_dv_arc(edge, d_inc, d_psi, k, R) + 1j*a*k*I_v_arc(edge, d_inc, d_psi, k, R)
+
 
 
 
@@ -199,3 +205,54 @@ class UltraWeakKernel:
             case SIGN.MM:
                 I = -I
         return I
+    
+
+def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float, R: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
+    
+    where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is an arc of circunference.'''
+
+    # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
+    # edge should be a arc_edge
+
+    P = edge["P"]
+    Q = edge["Q"]
+
+    theta_1 = atan2(P[1], P[0])
+    theta_2 = atan2(Q[1], Q[0])
+    
+    D_iv = norm(d_inc - d_v)
+    phi_iv = atan2((d_inc - d_v)[1], (d_inc - d_v)[0])
+
+    return R*(jv(0, k*R*D_iv)*(theta_2-theta_1) +
+              2*sum(1j**t/t*jv(t, k*R*D_iv)*(sin(t*(theta_2 - phi_iv)) - sin(t*(theta_1 - phi_iv)))
+                    for t in range(1, JAC_ANGER_MODES)))
+
+def I_dv_arc(edge, d_inc: float_array, d_v: float_array, k: float, R: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u_{\mathrm{inc}} \overline{nabla(v)\cdot\mathbf{n}}\,\mathrm{d}\ell
+    
+    where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is an arc of circunference.'''
+
+    # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
+    # edge should be a arc_edge
+
+    P = edge["P"]
+    Q = edge["Q"]
+
+    theta_1 = atan2(P[1], P[0])
+    theta_2 = atan2(Q[1], Q[0])
+    
+    D_iv = norm(d_inc - d_v)
+    phi_iv = atan2((d_inc - d_v)[1], (d_inc - d_v)[0])
+
+    phi_v = atan2(d_v[1], d_v[0])
+
+    primitive = lambda theta: -k*R*(-jv(1, k*R*D_iv)*cos(phi_iv - phi_v)* theta + sum(1j**p/p*(jv(p-1, k*R*D_iv)*sin(p*(theta-phi_iv)+(phi_iv-phi_v))-
+                                                                                               jv(p+1, k*R*D_iv)*sin(p*(theta-phi_iv)-(phi_iv-phi_v)))
+                                                                                              for p in range(1, JAC_ANGER_MODES)))
+
+    return primitive(theta_2) - primitive(theta_1)
