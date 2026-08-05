@@ -56,7 +56,7 @@ The module currently targets two-dimensional triangular meshes.
 """
 
 
-from typing import Final, TypeVar
+from typing import Final
 import numpy as np
 from numpy.linalg import norm
 from .locators import CellLocator
@@ -64,11 +64,7 @@ from trefftz.numpy_types import float_array, int_array
 from .geometry import triangle_area
 from enum import Enum
 from pathlib import Path
-# from .geometry import CellType
 
-
-# BoundaryRegions = TypeVar("BoundaryRegions", IntEnum, StrEnum)
-# InteriorRegions = TypeVar("InteriorRegions", IntEnum, StrEnum)
 
 DIM: Final = 2
 
@@ -81,6 +77,15 @@ edge_dtype = [("P", np.float64, DIM),
               ("on_boundary", np.bool),
               ("region", np.int8),
               ("triangles", np.int32, 2)]
+
+arc_edge_dtype = [("theta_1", np.float64),
+                  ("theta_2", np.float64),
+                  ("l", np.float64),
+                  ("R", np.float64),
+                  ("O", np.float64, 2),
+                  ("on_boundary", np.bool),
+                  ("triangles", np.int32, 2)]
+
 
 triangle_dtype = [("A", np.float64, DIM),
                   ("B", np.float64, DIM),
@@ -166,6 +171,11 @@ class TrefftzMesh[BR: Enum]:
         self._edge2triangles = edge2triangles
         self.construct_numpy_arrays()
         self._edges_on = cell_sets
+        # I DONT LIKE THIS, MOVING TOWARDS TWO TYPES OF EDGES, and HAVE THEM SEPARATED IN THE MESH
+        self.boundary_Edges = {}
+        for reg in self.boundary_regions:
+            self.boundary_Edges[reg] = self.edges_on(reg)
+
 
     @property
     def boundary_edges(self):
@@ -174,9 +184,6 @@ class TrefftzMesh[BR: Enum]:
     @property
     def interior_edges(self):
         return self.edges[~self.edges["on_boundary"]]
-
-    # def edges_on_region(self, region: BoundaryRegions):
-    #     return self.edges[self.edges["region"] == region]
 
     def edges_on(self, region: BR):
         return self.edges[self._edges_on[region]]
@@ -222,9 +229,7 @@ class TrefftzMesh[BR: Enum]:
         edges["triangles"] = self._edge2triangles
         edges["on_boundary"] = (edges["triangles"][:, 1] == -1)
         edges["region"] = -1 # will be deprecated
-        # cell_sets_1D = self._cell_sets
-        # for region in cell_sets_1D:
-        #     edges["region"][cell_sets_1D[region]] = region
+
 
         self.edges = edges
 
@@ -256,6 +261,7 @@ class TrefftzMesh[BR: Enum]:
         # midpoints = boundary_edges["M"]
         inner_normals = np.sign(np.vecdot(bar_minus-bar_plus, inner_edges["N"]))[:, np.newaxis]*inner_edges["N"]
         edges["N"][~edges["on_boundary"]] = inner_normals
+
 
     def get_cell(self, p: float_array) -> int_array | int:
         """
@@ -311,14 +317,17 @@ class TrefftzMesh[BR: Enum]:
     
     @classmethod
     def from_msh(cls, file_path: Path | str, boundary_regions: type[BR]) -> "TrefftzMesh[BR]":
-        from .readers.gmsh import GmshReader
+        from trefftz.mesh.readers.gmsh import GmshReader
         """
         Create a mesh from a Gmsh .mesh file.
 
         Parameters
         ----------
-        file_path : Path or str
+        file_path: Path or str
             Path to the Gmsh ``.msh`` file.
+        
+        boundary_regions: Enum
+            Enun with the names of the boundary regions
 
         Returns
         -------
@@ -330,14 +339,17 @@ class TrefftzMesh[BR: Enum]:
 
     @classmethod
     def from_gmsh(cls, model, boundary_regions: type[BR]) -> "TrefftzMesh[BR]":
-        from .readers.gmsh import GmshArrays
+        from trefftz.mesh.readers.gmsh import GmshArrays
         """
         Create a mesh from a Gmsh model object.
 
         Parameters
         ----------
-        file_path : Path or str
-            Path to the Gmsh ``.msh`` file.
+        model: gmsh model object (geometry has to be initialized)
+            Geometry has to be initialized.
+
+        boundary_regions: Enum
+            Enun with the names of the boundary regions
 
         Returns
         -------
@@ -350,14 +362,17 @@ class TrefftzMesh[BR: Enum]:
 
     @classmethod
     def from_ngsolve(cls, mesh, boundary_regions: type[BR]) -> "TrefftzMesh[BR]":
-        from .readers.ngsolve import NGsolveReader
+        from trefftz.mesh.readers.ngsolve import NGsolveReader
         """
-        Create a mesh from a Gmsh mesh file.
+        Create a mesh from a ngsolve mesh.
 
         Parameters
         ----------
-        file_path : Path or str
-            Path to the Gmsh ``.msh`` file.
+        mesh : NGsolve mesh
+            mesh.
+
+        boundary_regions: Enum
+            Enun with the names of the boundary regions
 
         Returns
         -------
@@ -366,3 +381,31 @@ class TrefftzMesh[BR: Enum]:
         """
         points, edges, triangles, edges2triangles, locator, cell_sets = NGsolveReader(mesh, boundary_regions)
         return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets)
+    
+    def curve_region(self, region: BR, radius: float, center: tuple[float, float] = (0., 0.)):
+        edges = self.edges_on(region)
+        ne = len(edges)
+        curved_edges = np.empty(shape=(ne,), dtype=arc_edge_dtype)
+        O = np.asarray(center)
+        R = radius
+        for i, edge in enumerate(edges):
+            P = edge["P"]
+            Q = edge["Q"]
+
+            OP = P - O
+            OQ = P - Q
+
+            theta_1 = np.atan2(OP[1], OP[0])
+            theta_2 = np.atan2(OQ[1], OQ[0])
+            d_theta = np.mod(theta_2 - theta_1, 2*np.pi)
+            if d_theta <= np.pi:
+                theta_1, theta_2 = theta_1, theta_1+d_theta
+            else:
+                d_theta = 2*np.pi - d_theta
+                theta_1, theta_2 = theta_2, theta_2+d_theta
+            
+            l = R*d_theta
+
+            curved_edges[i] = (theta_1, theta_2, l, R, O, edge["on_boundary"], edge["triangles"])
+
+        self.boundary_Edges[region] = curved_edges

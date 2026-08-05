@@ -111,7 +111,8 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
 
         # boundary conditions implemented as local operators
         for region in regions_local_kernel:
-            edges_on_region = mesh.edges_on(region)
+            #edges_on_region = mesh.edges_on(region)
+            edges_on_region = mesh.boundary_Edges[region]
             bc = boundary_conditions[region]
             kernel = numerics.local_boundary_kernels[type(bc)]
             self.assemble_local_bc(edges_on_region, kernel, basis, rows, cols, values)
@@ -121,9 +122,10 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
         for region in regions_nonlocal_kernel:
             bc = boundary_conditions[region]
             non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
-            for edge_1 in mesh.edges_on(region):
+            #for edge_1 in mesh.edges_on(region):
+            for edge_1 in mesh.boundary_Edges[region]:
                 T_1, _ = edge_1["triangles"]
-                for edge_2 in mesh.edges_on(region):
+                for edge_2 in mesh.boundary_Edges[region]:
                     T_2, _ = edge_2["triangles"]
                     for i in basis.dofs_on_element(T_1):
                         for j in basis.dofs_on_element(T_2):
@@ -152,8 +154,8 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
         for region in regions_RHS_term:  # I should check redefining this lists as sets or something like that, because of the local AND RHS
             bc = boundary_conditions[region]
             local_kernel = numerics.local_boundary_kernels[type(bc)]
-            # for edge in p.mesh.edges_on_region(region):
-            for edge in mesh.edges_on(region):
+            # for edge in mesh.edges_on(region):
+            for edge in mesh.boundary_Edges[region]:
                 T, _ = edge["triangles"]
                 for i in basis.dofs_on_element(T):
                     d_psi = basis.global_direction(i)

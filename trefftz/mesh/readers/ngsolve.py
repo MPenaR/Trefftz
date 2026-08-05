@@ -114,13 +114,11 @@ def NGsolveReader(mesh: ngsolve.comp.Mesh, boundary_regions: StrEnum) -> tuple[f
     - manifold edge connectivity
     """
 
-    # raise NotImplementedError("NGsolve reader implemented yet, inner edges marker misssing.")
-
     points = np.array([v.point for v in mesh.vertices])
     edges = np.array([(E.vertices[0].nr, E.vertices[1].nr) for E in mesh.edges])
     # triangles = np.array([(C.vertices[0].nr, C.vertices[1].nr, C.vertices[2].nr) for C in mesh.Elements()])
     triangles = np.array([(F.vertices[0].nr, F.vertices[1].nr, F.vertices[2].nr) for F in mesh.faces]) # face-centric? 
-    elem_to_faces = np.array([E.faces[0].nr for E in mesh.Elements()])
+    # elem_to_faces = np.array([E.faces[0].nr for E in mesh.Elements()])
     edge2triangles = np.array([(E.faces[0].nr, E.faces[1].nr if len(E.faces) > 1 else -1) for E in mesh.edges])
 
     locator = NGsolveLocator(mesh)

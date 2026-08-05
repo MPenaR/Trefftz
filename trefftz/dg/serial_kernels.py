@@ -20,7 +20,7 @@ def I_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     return l*exp(1j*k*dot((d_u - d_v), M))*sinc(k*l/(2*pi)*dot(d_u - d_v, T))
 
 
-def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
+def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{v}\,\mathrm{d}\ell
@@ -30,11 +30,15 @@ def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> co
     # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
     # edge should be a arc_edge
 
-    P = edge["P"]
-    Q = edge["Q"]
+    # P = edge["P"]
+    # Q = edge["Q"]
 
-    theta_1 = atan2(P[1], P[0])
-    theta_2 = atan2(Q[1], Q[0])
+    # theta_1 = atan2(P[1], P[0])
+    # theta_2 = atan2(Q[1], Q[0])
+
+    theta_1 = edge["theta_1"]
+    theta_2 = edge["theta_2"]
+    R = edge["R"]    
     
     D_uv = norm(d_u - d_v)
     phi_uv = atan2((d_u - d_v)[1], (d_u - d_v)[0])
@@ -43,7 +47,7 @@ def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> co
               2*sum(1j**t/t*jv(t, k*R*D_uv)*(sin(t*(theta_2 - phi_uv)) - sin(t*(theta_1 - phi_uv)))
                     for t in range(1, JAC_ANGER_MODES)))
 
-def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
+def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E nabla(u)\cdot\mathbf{n} \overline{v}\,\mathrm{d}\ell
@@ -53,12 +57,16 @@ def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> c
     # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
     # edge should be a arc_edge
 
-    P = edge["P"]
-    Q = edge["Q"]
+    # P = edge["P"]
+    # Q = edge["Q"]
 
-    theta_1 = atan2(P[1], P[0])
-    theta_2 = atan2(Q[1], Q[0])
-    
+    # theta_1 = atan2(P[1], P[0])
+    # theta_2 = atan2(Q[1], Q[0])
+
+    theta_1 = edge["theta_1"]
+    theta_2 = edge["theta_2"]
+    R = edge["R"]
+
     D_uv = norm(d_u - d_v)
     phi_uv = atan2((d_u - d_v)[1], (d_u - d_v)[0])
 
@@ -139,22 +147,19 @@ class DirichletKernel:
 
 class CircularDirichletKernel:
     '''Serial Dirichlet kernel'''
-    def __init__(self, a: float, R: float, data = None):
+    def __init__(self, a: float, data = None):
         self.a = a
-        self.R = R
         self.data = data
     
     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         a = self.a
-        R = self.R
 
-        return -I_duv_arc(edge, d_phi, d_psi, k, R) - 1j*k*a*I_uv_arc(edge, d_phi, d_psi, k, R)
+        return -I_duv_arc(edge, d_phi, d_psi, k) - 1j*k*a*I_uv_arc(edge, d_phi, d_psi, k)
         
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
         d_inc = self.data["d_inc"]
         a = self.a
-        R = self.R
-        return I_dv_arc(edge, d_inc, d_psi, k, R) + 1j*a*k*I_v_arc(edge, d_inc, d_psi, k, R)
+        return I_dv_arc(edge, d_inc, d_psi, k) + 1j*a*k*I_v_arc(edge, d_inc, d_psi, k)
 
 
 
@@ -207,7 +212,7 @@ class UltraWeakKernel:
         return I
     
 
-def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float, R: float) -> complex:
+def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
@@ -217,12 +222,17 @@ def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float, R: float) -> c
     # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
     # edge should be a arc_edge
 
-    P = edge["P"]
-    Q = edge["Q"]
+    # P = edge["P"]
+    # Q = edge["Q"]
 
-    theta_1 = atan2(P[1], P[0])
-    theta_2 = atan2(Q[1], Q[0])
+    # theta_1 = atan2(P[1], P[0])
+    # theta_2 = atan2(Q[1], Q[0])
     
+    theta_1 = edge["theta_1"]
+    theta_2 = edge["theta_2"]
+    R = edge["R"]
+
+
     D_iv = norm(d_inc - d_v)
     phi_iv = atan2((d_inc - d_v)[1], (d_inc - d_v)[0])
 
@@ -230,7 +240,7 @@ def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float, R: float) -> c
               2*sum(1j**t/t*jv(t, k*R*D_iv)*(sin(t*(theta_2 - phi_iv)) - sin(t*(theta_1 - phi_iv)))
                     for t in range(1, JAC_ANGER_MODES)))
 
-def I_dv_arc(edge, d_inc: float_array, d_v: float_array, k: float, R: float) -> complex:
+def I_dv_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{nabla(v)\cdot\mathbf{n}}\,\mathrm{d}\ell
@@ -240,12 +250,16 @@ def I_dv_arc(edge, d_inc: float_array, d_v: float_array, k: float, R: float) -> 
     # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
     # edge should be a arc_edge
 
-    P = edge["P"]
-    Q = edge["Q"]
+    # P = edge["P"]
+    # Q = edge["Q"]
 
-    theta_1 = atan2(P[1], P[0])
-    theta_2 = atan2(Q[1], Q[0])
+    # theta_1 = atan2(P[1], P[0])
+    # theta_2 = atan2(Q[1], Q[0])
     
+    theta_1 = edge["theta_1"]
+    theta_2 = edge["theta_2"]
+    R = edge["R"]
+
     D_iv = norm(d_inc - d_v)
     phi_iv = atan2((d_inc - d_v)[1], (d_inc - d_v)[0])
 

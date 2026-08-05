@@ -49,7 +49,7 @@ class NtDLocal_circle:
         R = self.R
 
         #I = -I_duv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=JAC_ANGER_MODES) - d_2*1j*k*I_uv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=JAC_ANGER_MODES)
-        I = -I_duv_arc(edge, d_n, d_m, k, R) -1j*k*d_2*I_uv_arc(edge, d_n, d_m, k, R)
+        I = -I_duv_arc(edge, d_n, d_m, k) -1j*k*d_2*I_uv_arc(edge, d_n, d_m, k)
 
         return I
 
@@ -57,126 +57,130 @@ class NtDLocal_circle:
         raise NotImplementedError
 
 
-def I_uv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes: int) -> complex:
-    r"""
-    Computes the integral: 
+# def I_uv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes: int) -> complex:
+#     r"""
+#     Computes the integral: 
 
-    .. math::
-        \int_E u\conj(v)\,\mathrm{d}\ell
+#     .. math::
+#         \int_E u\conj(v)\,\mathrm{d}\ell
 
-    where u and v are plane waves:
+#     where u and v are plane waves:
 
-    .. math::
-        u(\mathbf{x}) = \exp(ik\mathbf{d}_u\cdot\mathbf{x})
+#     .. math::
+#         u(\mathbf{x}) = \exp(ik\mathbf{d}_u\cdot\mathbf{x})
 
-    .. math::
-        v(\mathbf{x}) = \exp(ik\mathbf{d}_v\cdot\mathbf{x})
+#     .. math::
+#         v(\mathbf{x}) = \exp(ik\mathbf{d}_v\cdot\mathbf{x})
 
-    and E is an arc of a circle of radius R centered at the origin.
+#     and E is an arc of a circle of radius R centered at the origin.
 
 
-    Patameters
-    ----------
-    edge :
-        Edge parameters.
-    d_u : (2,) float array.
-        Propagation direction of the u plane wave.
-    d_v : (2,) float array.
-        Propagation direction of the u plane wave.
-    k : float
-        Wave number.
-    R : float.
-        Radius of the circle defining the arc E.
-    N_modes : int.
-        Number of modes used in the series computation of I.
+#     Patameters
+#     ----------
+#     edge :
+#         Edge parameters.
+#     d_u : (2,) float array.
+#         Propagation direction of the u plane wave.
+#     d_v : (2,) float array.
+#         Propagation direction of the u plane wave.
+#     k : float
+#         Wave number.
+#     R : float.
+#         Radius of the circle defining the arc E.
+#     N_modes : int.
+#         Number of modes used in the series computation of I.
         
-    Returns
-    -------
-    I : complex
-        The integral.
-    """
+#     Returns
+#     -------
+#     I : complex
+#         The integral.
+#     """
 
-    P = edge["P"] 
-    Q = edge["Q"]
+#     P = edge["P"] 
+#     Q = edge["Q"]
 
-    theta_2 = atan2(Q[1], Q[0])
-    theta_1 = atan2(P[1], P[0])
+#     theta_2 = atan2(Q[1], Q[0])
+#     theta_1 = atan2(P[1], P[0])
 
-    D = norm(d_u - d_v)
-    phi = atan2((d_u - d_v)[1], (d_u - d_v)[0])
-
-
-    I = R*(jv(0, k*R*D)*(theta_2 - theta_1) + 2*sum(1j**n*jv(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi))) for n in range(1, N_modes)))
-
-    return I
-
-def I_duv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes: int) -> complex:
-    r"""
-    Computes the integral: 
-
-    .. math::
-        \int_E \nabla u\cdot\mathbf{n}\conj(v)\,\mathrm{d}\ell
-
-    where u and v are plane waves:
-
-    .. math::
-        u(\mathbf{x}) = \exp(ik\mathbf{d}_u\cdot\mathbf{x})
-
-    .. math::
-        v(\mathbf{x}) = \exp(ik\mathbf{d}_v\cdot\mathbf{x})
-
-    and E is an arc of a circle of radius R centered at the origin.
+#     D = norm(d_u - d_v)
+#     phi = atan2((d_u - d_v)[1], (d_u - d_v)[0])
 
 
-    Patameters
-    ----------
-    edge :
-        Edge parameters.
-    d_u : (2,) float array.
-        Propagation direction of the u plane wave.
-    d_v : (2,) float array.
-        Propagation direction of the u plane wave.
-    k : float
-        Wave number.
-    R : float.
-        Radius of the circle defining the arc E.
-    N_modes : int.
-        Number of modes used in the series computation of I.
+#     I = R*(jv(0, k*R*D)*(theta_2 - theta_1) + 2*sum(1j**n*jv(n, k*R*D)/n*(sin(n*(theta_2 - phi)) - sin(n*(theta_1 - phi))) for n in range(1, N_modes)))
+
+#     return I
+
+# def I_duv(edge, d_u: float_array, d_v: float_array, k: float, R: float, N_modes: int) -> complex:
+#     r"""
+#     Computes the integral: 
+
+#     .. math::
+#         \int_E \nabla u\cdot\mathbf{n}\conj(v)\,\mathrm{d}\ell
+
+#     where u and v are plane waves:
+
+#     .. math::
+#         u(\mathbf{x}) = \exp(ik\mathbf{d}_u\cdot\mathbf{x})
+
+#     .. math::
+#         v(\mathbf{x}) = \exp(ik\mathbf{d}_v\cdot\mathbf{x})
+
+#     and E is an arc of a circle of radius R centered at the origin.
+
+
+#     Patameters
+#     ----------
+#     edge :
+#         Edge parameters.
+#     d_u : (2,) float array.
+#         Propagation direction of the u plane wave.
+#     d_v : (2,) float array.
+#         Propagation direction of the u plane wave.
+#     k : float
+#         Wave number.
+#     R : float.
+#         Radius of the circle defining the arc E.
+#     N_modes : int.
+#         Number of modes used in the series computation of I.
         
-    Returns
-    -------
-    I : complex
-        The integral.
-    """
+#     Returns
+#     -------
+#     I : complex
+#         The integral.
+#     """
 
 
-    P = edge["P"] 
-    Q = edge["Q"]
+#     P = edge["P"] 
+#     Q = edge["Q"]
 
-    theta_2 = atan2(Q[1], Q[0])
-    theta_1 = atan2(P[1], P[0])
+#     theta_2 = atan2(Q[1], Q[0])
+#     theta_1 = atan2(P[1], P[0])
 
-    D = norm(d_u - d_v)
-    phi = atan2((d_u - d_v)[1], (d_u - d_v)[0])
+#     D = norm(d_u - d_v)
+#     phi = atan2((d_u - d_v)[1], (d_u - d_v)[0])
 
-    phi_n = atan2(d_u[1], d_u[0])
+#     phi_n = atan2(d_u[1], d_u[0])
 
-    def primitive(theta: float) -> complex:
-        I = -k*R*(jv(1, k*R*D)*cos(phi - phi_n)*(theta) +
-                    sum( 1j**n/n*(- jv(n-1, k*R*D)*sin(n*(theta - phi) + (phi-phi_n)) + jv(n+1, k*R*D)*sin(n*(theta - phi) - (phi-phi_n))) for n in range(1, N_modes)))
-        return I
+#     def primitive(theta: float) -> complex:
+#         I = -k*R*(jv(1, k*R*D)*cos(phi - phi_n)*(theta) +
+#                     sum( 1j**n/n*(- jv(n-1, k*R*D)*sin(n*(theta - phi) + (phi-phi_n)) + jv(n+1, k*R*D)*sin(n*(theta - phi) - (phi-phi_n))) for n in range(1, N_modes)))
+#         return I
     
-    I = primitive(theta=theta_2) - primitive(theta=theta_1)
+#     I = primitive(theta=theta_2) - primitive(theta=theta_1)
 
-    return I
+#     return I
 
 
-def Fdudn(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
-    P = edge["P"] 
-    Q = edge["Q"]
+def Fdudn(edge, d: float_array, k: float, t: int, N_modes: int) -> complex:
+    # P = edge["P"] 
+    # Q = edge["Q"]
 
-    theta_2 = atan2(Q[1], Q[0])
-    theta_1 = atan2(P[1], P[0])
+    # theta_2 = atan2(Q[1], Q[0])
+    # theta_1 = atan2(P[1], P[0])
+
+    theta_1 = edge["theta_1"]
+    theta_2 = edge["theta_2"]
+    R = edge["R"]
 
     phi = atan2(d[1], d[0])
 
@@ -189,12 +193,15 @@ def Fdudn(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> com
     I = 1j*k*(primitive(theta=theta_2) - primitive(theta=theta_1))/sqrt(2*pi)
     return I
 
-def Fu(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
-    P = edge["P"] 
-    Q = edge["Q"]
+def Fu(edge, d: float_array, k: float, t: int, N_modes: int) -> complex:
+    # P = edge["P"] 
+    # Q = edge["Q"]
 
-    theta_2 = atan2(Q[1], Q[0])
-    theta_1 = atan2(P[1], P[0])
+    # theta_2 = atan2(Q[1], Q[0])
+    # theta_1 = atan2(P[1], P[0])
+    theta_1 = edge["theta_1"]
+    theta_2 = edge["theta_2"]
+    R = edge["R"]
 
     phi = atan2(d[1], d[0])
 
@@ -207,25 +214,30 @@ def Fu(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> comple
 
     return I
 
-def NtD_coeff(edge, d: float_array, k: float, R: float, t: int, N_modes: int) -> complex:
-    NtD_t = Fdudn(edge, d, k, R, t, N_modes)
+def NtD_coeff(edge, d: float_array, k: float, t: int, N_modes: int) -> complex:
+    R = edge["R"]
+    NtD_t = Fdudn(edge, d, k, t, N_modes)
     return 1/k*NtD_t*hankel1(t, k*R)/h1vp(t, k*R)
 
 
-def I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int, N_modes: int) -> complex:
-    I = R*sum(NtD_coeff(edge_u, d_u, k, R, t, N_modes)*conj(Fu(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
+def I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, NtD_modes: int, N_modes: int) -> complex:
+    R = edge_u["R"]
+    I = R*sum(NtD_coeff(edge_u, d_u, k, t, N_modes)*conj(Fu(edge_v, d_v, k, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
     return I
 
-def I_uNv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int, N_modes: int) -> complex:
-    I = R*sum(Fu(edge_u, d_u, k, R, t, N_modes)*conj(NtD_coeff(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
+def I_uNv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, NtD_modes: int, N_modes: int) -> complex:
+    R = edge_u["R"]
+    I = R*sum(Fu(edge_u, d_u, k, t, N_modes)*conj(NtD_coeff(edge_v, d_v, k, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
     return I
 
-def I_NuNv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int, N_modes: int) -> complex:
-    I = R*sum(NtD_coeff(edge_u, d_u, k, R, t, N_modes)*conj(NtD_coeff(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
+def I_NuNv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, NtD_modes: int, N_modes: int) -> complex:
+    R = edge_u["R"]
+    I = R*sum(NtD_coeff(edge_u, d_u, k, t, N_modes)*conj(NtD_coeff(edge_v, d_v, k, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
     return I
 
-def I_Nudv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int, N_modes: int) -> complex:
-    I = R*sum(NtD_coeff(edge_u, d_u, k, R, t, N_modes)*conj(Fdudn(edge_v, d_v, k, R, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
+def I_Nudv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, NtD_modes: int, N_modes: int) -> complex:
+    R = edge_u["R"]
+    I = R*sum(NtD_coeff(edge_u, d_u, k, t, N_modes)*conj(Fdudn(edge_v, d_v, k, t, N_modes)) for t in range(-NtD_modes, NtD_modes+1))
     return I
 
 
@@ -270,13 +282,12 @@ class NtDNonLocal_circle:
         d_2 = self.d_2
         d_u = d_phi
         d_v = d_psi
-        R = self.R
 
         NtD_modes = self.NtD_modes
 
-        I = I_Nudv(edge_u, edge_v, d_u, d_v, k, R, NtD_modes, JAC_ANGER_MODES) - d_2*1j*k*(I_NuNv(edge_u, edge_v, d_u, d_v, k, R, NtD_modes, JAC_ANGER_MODES)
-                                                                                           -I_Nuv(edge_u, edge_v, d_u, d_v, k, R, NtD_modes, JAC_ANGER_MODES)
-                                                                                           -I_uNv(edge_u, edge_v, d_u, d_v, k, R, NtD_modes, JAC_ANGER_MODES))
+        I = I_Nudv(edge_u, edge_v, d_u, d_v, k, NtD_modes, JAC_ANGER_MODES) - d_2*1j*k*(I_NuNv(edge_u, edge_v, d_u, d_v, k, NtD_modes, JAC_ANGER_MODES)
+                                                                                           -I_Nuv(edge_u, edge_v, d_u, d_v, k, NtD_modes, JAC_ANGER_MODES)
+                                                                                           -I_uNv(edge_u, edge_v, d_u, d_v, k, NtD_modes, JAC_ANGER_MODES))
         return I
 
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
