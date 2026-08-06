@@ -251,6 +251,7 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
         return coo_array((np.asarray(values), (np.asarray(rows), np.asarray(cols))), shape=(basis.N_DOF, basis.N_DOF))
 
     def assemble_RHS(self) -> complex_array:
+        raise NotImplementedError
 
         rows: list[int] = []
         values: list[complex] = []

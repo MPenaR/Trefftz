@@ -10,7 +10,7 @@ N_POINTS = int(1E5)
 NtD_MODES = 20
 
 
-class numNeumannKernel:
+class NeumannKernel:
 
     r"""Implements the integral: 
     .. math ::
@@ -44,7 +44,7 @@ class numNeumannKernel:
     def RHS(self) -> complex:
         raise NotImplementedError
         
-class numUltraWeakKernel:
+class UltraWeakKernel:
 
     r"""Implements the integral: 
     .. math ::
@@ -79,7 +79,7 @@ class numUltraWeakKernel:
         return I
 
 
-def numI_uv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
+def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
     P = edge["P"]
     Q = edge["Q"]
     theta_1 = np.atan2(P[1], P[0])
@@ -94,7 +94,7 @@ def numI_uv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) ->
     return I
 
 
-def numI_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     P = edge["P"]
     T = edge["T"]
     l = edge["l"]
@@ -107,7 +107,7 @@ def numI_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     return I
 
 
-def numI_duv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
+def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
     P = edge["P"]
     Q = edge["Q"]
     theta_1 = np.atan2(P[1], P[0])
