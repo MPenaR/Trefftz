@@ -78,13 +78,33 @@ edge_dtype = [("P", np.float64, DIM),
               ("region", np.int8),
               ("triangles", np.int32, 2)]
 
-arc_edge_dtype = [("theta_1", np.float64),
+arc_dtype = [("theta_1", np.float64),
                   ("theta_2", np.float64),
                   ("l", np.float64),
                   ("R", np.float64),
                   ("O", np.float64, 2),
                   ("on_boundary", np.bool),
                   ("triangles", np.int32, 2)]
+
+
+def fill_edge_geometry(P: float_array, Q: float_array):
+        edges = np.empty((), dtype=edge_dtype)
+        edges["P"] = P
+        edges["Q"] = Q
+        edges["M"] = 0.5*(edges["P"]+edges["Q"])
+        edges["l"] = norm(edges["Q"] - edges["P"], axis=-1)
+        edges["T"] = (edges["Q"] - edges["P"])/edges["l"][..., np.newaxis]
+        edges["N"] = np.column_stack([edges["T"][..., 1], -edges["T"][..., 0]])
+        return edges
+
+def fill_arc_geometry(theta_1: float, theta_2: float, R: float, center: float_array = np.array([0., 0.])):
+        edges = np.empty((), dtype=arc_dtype)
+        edges["R"] = R
+        edges["theta_1"] = theta_1
+        edges["theta_2"] = theta_2
+        edges["l"]  = R*(theta_2-theta_1)
+        edges["O"] = center
+        return edges
 
 
 triangle_dtype = [("A", np.float64, DIM),
@@ -385,7 +405,7 @@ class TrefftzMesh[BR: Enum]:
     def curve_region(self, region: BR, radius: float, center: tuple[float, float] = (0., 0.)):
         edges = self.edges_on(region)
         ne = len(edges)
-        curved_edges = np.empty(shape=(ne,), dtype=arc_edge_dtype)
+        curved_edges = np.empty(shape=(ne,), dtype=arc_dtype)
         O = np.asarray(center)
         R = radius
         for i, edge in enumerate(edges):

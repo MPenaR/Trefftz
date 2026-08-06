@@ -79,12 +79,11 @@ class UltraWeakKernel:
         return I
 
 
-def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
-    P = edge["P"]
-    Q = edge["Q"]
-    theta_1 = np.atan2(P[1], P[0])
-    theta_2 = np.atan2(Q[1], Q[0])
-
+def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+    theta_1 = edge["theta_1"]
+    theta_2 = edge["theta_2"]
+    R = edge["R"]
+    
     theta = np.linspace(theta_1, theta_2, N_POINTS)
     u_r = np.column_stack([np.cos(theta), np.sin(theta)])
     x = R*u_r
@@ -107,11 +106,10 @@ def I_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     return I
 
 
-def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float, R: float) -> complex:
-    P = edge["P"]
-    Q = edge["Q"]
-    theta_1 = np.atan2(P[1], P[0])
-    theta_2 = np.atan2(Q[1], Q[0])
+def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+    theta_1 = edge["theta_1"]
+    theta_2 = edge["theta_2"]
+    R = edge["R"]
 
     theta = np.linspace(theta_1, theta_2, N_POINTS)
     u_r = np.column_stack([np.cos(theta), np.sin(theta)])
