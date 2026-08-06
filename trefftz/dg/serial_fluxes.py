@@ -3,7 +3,7 @@ from trefftz.numpy_types import float_array
 from enum import Enum
 from typing import Protocol
 
-from trefftz.dg.serial_kernels import I_uv, I_uv_arc, I_duv_arc, I_v_arc, I_dv_arc
+from trefftz.dg.serial_kernels import I_uv, I_uv_arc, I_duv_arc, I_v_arc, I_dv_arc, I_v
 
 
 JAC_ANGER_MODES = 80
@@ -120,7 +120,12 @@ class DirichletFlux:
         return -1j*k*(dot(d_n, N) + a)*I_uv(edge, d_phi, d_psi, k)
         
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
-        raise NotImplementedError("Not implemented yet")
+        d_inc = self.data["d_inc"]
+        a = self.a
+        d_v = d_psi
+        N = edge["N"]
+        return (-1j*k*dot(d_v, N) + 1j*a*k)*I_v(edge, d_inc, d_psi, k)
+
 
 
 class CircularDirichletFlux:

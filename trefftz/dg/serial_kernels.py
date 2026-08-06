@@ -26,14 +26,6 @@ def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     
     where $u$ and $v$ are plane waves and $E$ is an arc of circunference.'''
 
-    # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
-    # edge should be a arc_edge
-
-    # P = edge["P"]
-    # Q = edge["Q"]
-
-    # theta_1 = atan2(P[1], P[0])
-    # theta_2 = atan2(Q[1], Q[0])
 
     theta_1 = edge["theta_1"]
     theta_2 = edge["theta_2"]
@@ -94,6 +86,20 @@ def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
 #     def LHS(self, edge_u, edge_v, d_phi: float_array, d_psi: float_array, k: float) -> complex:
 #         ...
 
+
+def I_v(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
+    
+    where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
+
+    l = edge["l"]
+    M = edge["M"]
+    T = edge["T"]
+
+    return l*exp(1j*k*dot((d_inc - d_v), M))*sinc(k*l/(2*pi)*dot(d_inc - d_v, T))
+
 def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
@@ -101,14 +107,6 @@ def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is an arc of circunference.'''
 
-    # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
-    # edge should be a arc_edge
-
-    # P = edge["P"]
-    # Q = edge["Q"]
-
-    # theta_1 = atan2(P[1], P[0])
-    # theta_2 = atan2(Q[1], Q[0])
     
     theta_1 = edge["theta_1"]
     theta_2 = edge["theta_2"]
@@ -129,14 +127,6 @@ def I_dv_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is an arc of circunference.'''
 
-    # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
-    # edge should be a arc_edge
-
-    # P = edge["P"]
-    # Q = edge["Q"]
-
-    # theta_1 = atan2(P[1], P[0])
-    # theta_2 = atan2(Q[1], Q[0])
     
     theta_1 = edge["theta_1"]
     theta_2 = edge["theta_2"]
