@@ -36,8 +36,8 @@ class NeumannFlux:
 def avg(w):
     return 0.5*w
 
-# def jump(w, sign: SIGN):
-#     return (-1)**SIGN[0]*w
+def jump(w, sign: SIGN):
+    return (-1)**sign.value[0]*w
 
 
 class UltraWeakFlux:
@@ -47,19 +47,8 @@ class UltraWeakFlux:
         self.b = b
     
     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float, sign: SIGN) -> complex:
-        match sign:
-            case SIGN.PP:
-                a = self.a
-                b = self.b
-            case SIGN.PM:
-                a = self.a
-                b = self.b
-            case SIGN.MP:
-                a = -self.a
-                b = -self.b
-            case SIGN.MM:
-                a = -self.a
-                b = -self.b
+        a = self.a
+        b = self.b
 
         d_v = d_psi
         d_u = d_phi
@@ -76,18 +65,7 @@ class UltraWeakFlux:
         v = exp(1j*k*dot(x, d_v))
         dv_dn = 1j*k*dot(N, d_v)*v
 
-        I = Int((avg(u) + b/(1j*k)*du_dn)*conj(dv_dn) - (a*1j*k*u + avg(du_dn))*conj(v), t)*l
-
-
-        match sign:
-            case SIGN.PP:
-                I = I
-            case SIGN.PM:
-                I = -I
-            case SIGN.MP:
-                I = I
-            case SIGN.MM:
-                I = -I
+        I = Int((avg(u) + b/(1j*k)*jump(du_dn, sign))*conj(jump(dv_dn, sign)) - (a*1j*k*jump(u, sign) + avg(du_dn))*conj(jump(v, sign)), t)*l
         return I
 
 

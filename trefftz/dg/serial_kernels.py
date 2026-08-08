@@ -69,23 +69,6 @@ def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
 
     return primitive(theta_2) - primitive(theta_1)
 
-# class SerialTransmissionKernel(Protocol):
-#     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float, sign: SIGN) -> complex:
-#         ...
-
-
-# class SerialLocalKernel(Protocol):
-#     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-#         ...
-
-#     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
-#         ...
-
-
-# class SerialNonLocalKernel(Protocol):
-#     def LHS(self, edge_u, edge_v, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-#         ...
-
 
 def I_v(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:

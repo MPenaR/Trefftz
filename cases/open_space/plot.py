@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from trefftz.mesh.core2 import TrefftzMesh, edge_dtype, arc_edge_dtype
+from trefftz.mesh.core2 import TrefftzMesh, edge_dtype, arc_dtype
 def plot_openspace(mesh: TrefftzMesh, plot_tangents: bool = False, plot_normals: bool = False):
     from matplotlib.collections import LineCollection
     _, ax = plt.subplots(figsize=(8,8))
@@ -14,7 +14,7 @@ def plot_openspace(mesh: TrefftzMesh, plot_tangents: bool = False, plot_normals:
     ax.add_collection(LineCollection(np.stack([inner_edges["P"], inner_edges["Q"]], axis=1), colors='k', linewidths=lw))
     for reg in mesh.boundary_regions:
         edges = mesh.boundary_Edges[reg]
-        if edges.dtype == arc_edge_dtype:
+        if edges.dtype == arc_dtype:
             theta_1 = edges["theta_1"]
             theta_2 = edges["theta_2"]
             R = edges[0]["R"]

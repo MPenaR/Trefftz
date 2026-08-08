@@ -1,9 +1,9 @@
 from trefftz.mesh import TrefftzMesh
 from scipy.sparse import coo_array, bsr_array, csr_array, csc_array
-from trefftz.dg.serial_kernels import SIGN
+from trefftz.dg.serial_fluxes import SIGN
 import numpy as np
 from trefftz.numpy_types import complex_array
-from trefftz.dg.serial_kernels import SerialLocalKernel, SerialNonLocalKernel, SerialTransmissionKernel
+from trefftz.dg.serial_fluxes import SerialLocalKernel, SerialNonLocalKernel, SerialTransmissionKernel
 from trefftz.dg.block_kernels import BlockLocalKernel, BlockNonLocalKernel, BlockTransmissionKernel
 from trefftz.dg.basis import PlanewaveBasis
 from typing import Protocol, Mapping, Any
