@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Protocol
 
 # from trefftz.dg.serial_kernels import I_uv, I_duv, I_uv_arc, I_duv_arc, I_v_arc, I_dv_arc, I_v
-from trefftz.dg.serial_kernels import I_uv, I_duv, I_uincdv, I_uincv
+from trefftz.dg.serial_kernels import I_uv, I_duv, I_udv, I_dudv, I_uincdv, I_uincv
 
 
 JAC_ANGER_MODES = 80
@@ -52,8 +52,7 @@ class NeumannFlux:
 
         N = edge["N"]
 
-        return -1j*k*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*I_uv(edge, d_phi, d_psi, k)
-
+        return I_udv(edge, d_phi, d_psi, k) + d_1/(1j*k)*I_dudv(edge, d_phi, d_psi, k)
 
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
         raise NotImplementedError("Not implemented yet")
@@ -81,20 +80,10 @@ class UltraWeakFlux:
                 a = -self.a
                 b = -self.b
 
-        d_m = d_psi
-        d_n = d_phi
-
         k_n = k
         k_m = k
 
-        M = edge["M"]
-        l = edge["l"]
-        N = edge["N"]
-        T = edge["T"]
-
-        # I = -1j*k*l*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*exp(1j*k*dot(d_n-d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
-        I = -1j*k*((1/2+b*dot(d_n, N))*dot(d_m, N) + 1/2*dot(d_n, N) + a)*I_uv(edge, d_n, d_m, k)
-
+        I = 1/2*I_udv(edge, d_phi, d_psi, k) + b /(1j*k)*I_dudv(edge, d_phi, d_psi, k) - a*1j*k*I_uv(edge, d_phi, d_psi, k) - 1/2*I_duv(edge, d_phi, d_psi, k)
         match sign:
             case SIGN.PP:
                 I = I
