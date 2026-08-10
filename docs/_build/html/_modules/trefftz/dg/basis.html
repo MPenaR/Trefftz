@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>trefftz.dg.basis - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
@@ -313,6 +313,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.axes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
+
 <div class="viewcode-block" id="PlanewaveBasis">
 <a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.PlanewaveBasis">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -361,12 +362,13 @@
 <span class="sd">    :contentReference[oaicite:2]{index=2}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">k</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="c1">#not really sure if k should be an attribute. </span>
     <span class="n">_N_theta</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">_N_DOF</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">_N_elements</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">_T_ID_to_DOFs</span><span class="p">:</span> <span class="n">int_array</span>
     <span class="n">_D</span><span class="p">:</span> <span class="n">float_array</span>
+    <span class="n">_D_D</span><span class="p">:</span> <span class="n">float_array</span>
         
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_elements</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">thetas</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_N_theta</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">thetas</span><span class="p">)</span>
@@ -379,6 +381,7 @@
 
         <span class="c1"># plane-wave directions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">thetas</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">thetas</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_D_D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">N_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -402,8 +405,19 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;array of directions (x_i, y_i)&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Ntheta x 2, array of directions D = (d_ij) with:</span>
+<span class="sd">          d_i1 = cos(theta_i)</span>
+<span class="sd">          d_i2 = sin(theta_i) &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">D_D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;N_theta x N_theta x 2 array of differences of directions:</span>
+<span class="sd">         </span>
+<span class="sd">          (D_D)_ijk = D_ik - D_jk</span>
+<span class="sd">           </span>
+<span class="sd">        Very useful in many fluxes. &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D_D</span>
 
 <div class="viewcode-block" id="PlanewaveBasis.dofs_on_element">
 <a class="viewcode-back" href="../../../api/trefftz.dg.basis.html#trefftz.dg.basis.PlanewaveBasis.dofs_on_element">[docs]</a>
@@ -618,8 +632,8 @@
     </aside>
   </div>
 </div><script src="../../../_static/documentation_options.js?v=01f34227"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

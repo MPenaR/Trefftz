@@ -1,3 +1,3 @@
-# from .boundary_conditions_old import BoundaryCondition
+from .serial_fluxes import NeumannFlux, DirichletFlux, UltraWeakFlux
 
-# __all__ = ["BoundaryCondition"]
+__all__ = ["NeumannFlux", "DirichletFlux", "UltraWeakFlux"]

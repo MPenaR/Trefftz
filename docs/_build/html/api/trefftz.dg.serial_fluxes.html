@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="trefftz.dg.serial_fluxes2 module" href="trefftz.dg.serial_fluxes2.html"><link rel="prev" title="trefftz.dg.functions module" href="trefftz.dg.functions.html">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>trefftz.dg.serial_fluxes module - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
@@ -267,142 +267,245 @@
         <article role="main" id="furo-main-content">
           <section id="module-trefftz.dg.serial_fluxes">
 <span id="trefftz-dg-serial-fluxes-module"></span><h1>trefftz.dg.serial_fluxes module<a class="headerlink" href="#module-trefftz.dg.serial_fluxes" title="Link to this heading">¶</a></h1>
-<p>Module for the evaluation of fluxes for a single pair of test and trial functions. It was the initial
-implementation of the code and now serves as a test for the vectorized implementation. It is tested
-against numerical computations of the fluxes.</p>
-<p>All around this page, <span class="math notranslate nohighlight">\(\Phi_{n}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_n)\)</span> and <span class="math notranslate nohighlight">\(\Psi_{m}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_m)\)</span>
-are the trial and test functions. <span class="math notranslate nohighlight">\(l\)</span> is the length of an edge, <span class="math notranslate nohighlight">\(\mathbf{M}\)</span> its midpoint and <span class="math notranslate nohighlight">\(\boldsymbol{\tau}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{n}\)</span>
-its tangent and normal unitary vectors.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.Edge">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">Edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">numpy.dtype</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><span class="pre">numpy.floating</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">numpy.dtype</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><span class="pre">numpy.floating</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">numpy.dtype</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><span class="pre">numpy.floating</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#Edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.Edge" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SIGN">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">SIGN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#SIGN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.SIGN" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Sign for the transmission kernel
+where PP (plus plus) stands for both trial
+and test function coming from the plus triangle
+whereas PM stands for the test function (psi) coming
+from the + triangle and the trial function (phi) from
+the - one.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SIGN.PP">
+<span class="sig-name descname"><span class="pre">PP</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">0)</span></span><a class="headerlink" href="#trefftz.dg.serial_fluxes.SIGN.PP" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SIGN.PM">
+<span class="sig-name descname"><span class="pre">PM</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">1)</span></span><a class="headerlink" href="#trefftz.dg.serial_fluxes.SIGN.PM" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SIGN.MP">
+<span class="sig-name descname"><span class="pre">MP</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(1,</span> <span class="pre">0)</span></span><a class="headerlink" href="#trefftz.dg.serial_fluxes.SIGN.MP" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SIGN.MM">
+<span class="sig-name descname"><span class="pre">MM</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(1,</span> <span class="pre">1)</span></span><a class="headerlink" href="#trefftz.dg.serial_fluxes.SIGN.MM" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SerialTransmissionKernel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">SerialTransmissionKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#SerialTransmissionKernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.SerialTransmissionKernel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SerialTransmissionKernel.LHS">
+<span class="sig-name descname"><span class="pre">LHS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sign</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#SerialTransmissionKernel.LHS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.SerialTransmissionKernel.LHS" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_phi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>d_psi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>sign</strong> (<a class="reference internal" href="#trefftz.dg.serial_fluxes.SIGN" title="trefftz.dg.serial_fluxes.SIGN"><em>SIGN</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SerialLocalKernel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">SerialLocalKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#SerialLocalKernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.SerialLocalKernel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SerialLocalKernel.LHS">
+<span class="sig-name descname"><span class="pre">LHS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#SerialLocalKernel.LHS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.SerialLocalKernel.LHS" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_phi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>d_psi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SerialLocalKernel.RHS">
+<span class="sig-name descname"><span class="pre">RHS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#SerialLocalKernel.RHS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.SerialLocalKernel.RHS" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_psi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SerialNonLocalKernel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">SerialNonLocalKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#SerialNonLocalKernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.SerialNonLocalKernel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SerialNonLocalKernel.LHS">
+<span class="sig-name descname"><span class="pre">LHS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#SerialNonLocalKernel.LHS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.SerialNonLocalKernel.LHS" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_phi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>d_psi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.NeumannFlux">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">NeumannFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d_1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#NeumannFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.NeumannFlux" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Serial Neumann kernel</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>M</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a><em>]</em><em>]</em>)</p></li>
-<li><p><strong>l</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>N</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a><em>]</em><em>]</em>)</p></li>
-<li><p><strong>T</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><em>dtype</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><em>floating</em></a><em>]</em><em>]</em>)</p></li>
-</ul>
+<dd class="field-odd"><p><strong>d_1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.Edge.M">
-<span class="sig-name descname"><span class="pre">M</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><span class="pre">floating</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#trefftz.dg.serial_fluxes.Edge.M" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.Edge.l">
-<span class="sig-name descname"><span class="pre">l</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><a class="headerlink" href="#trefftz.dg.serial_fluxes.Edge.l" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.Edge.N">
-<span class="sig-name descname"><span class="pre">N</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><span class="pre">floating</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#trefftz.dg.serial_fluxes.Edge.N" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.Edge.T">
-<span class="sig-name descname"><span class="pre">T</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.4)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.floating" title="(in NumPy v2.4)"><span class="pre">floating</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#trefftz.dg.serial_fluxes.Edge.T" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.SoundHard">
-<span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">SoundHard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#SoundHard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.SoundHard" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the flux on a sound-hard boundary, that is:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}\]</div>
-</div>
-<p>This quantity can be exactly evaluated as:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\boxed{-ikl\left(1+d_{1}\mathbf{d}_{n}\cdot\mathbf{n}\right)\mathbf{d}_{m}\cdot\mathbf{n}e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\boldsymbol{\tau}\right)}\]</div>
-</div>
-<dl class="field-list simple">
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.NeumannFlux.LHS">
+<span class="sig-name descname"><span class="pre">LHS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#NeumannFlux.LHS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.NeumannFlux.LHS" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>phi</strong> (<em>Function</em>) – Trial function.</p></li>
-<li><p><strong>psi</strong> (<em>Function</em>) – Test function.</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Wavenumber.</p></li>
-<li><p><strong>edge</strong> (<a class="reference internal" href="#trefftz.dg.serial_fluxes.Edge" title="trefftz.dg.serial_fluxes.Edge"><em>Edge</em></a>) – Edge parameters.</p></li>
-<li><p><strong>d_1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Stabilyzing parameter.</p></li>
+<li><p><strong>d_phi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>d_psi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>I</strong> – The integral.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.Inner">
-<span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">Inner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stabilizing_parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#Inner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.Inner" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the flux on a inner facet with respect to the degrees
-of freedom from the same cell, that is:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\int_E \left(\left(\varphi_n(\mathbf{x})+\frac{b}{ik}\nabla\varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla\psi_m(\mathbf{x})\cdot\mathbf{n}}- \left(\vphantom{\frac{1}{2}}aik\varphi_n(\mathbf{x})+\nabla\varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\psi_m(\mathbf{x})}\right) \,\mathrm{d}S_\mathbf{x}\]</div>
-</div>
-<dl class="field-list simple">
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.NeumannFlux.RHS">
+<span class="sig-name descname"><span class="pre">RHS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#NeumannFlux.RHS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.NeumannFlux.RHS" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>phi</strong> (<em>Function</em>) – Trial function.</p></li>
-<li><p><strong>psi</strong> (<em>Function</em>) – Test function.</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Wavenumber.</p></li>
-<li><p><strong>edge</strong> (<a class="reference internal" href="#trefftz.dg.serial_fluxes.Edge" title="trefftz.dg.serial_fluxes.Edge"><em>Edge</em></a>) – Edge parameters.</p></li>
-<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Stabilyzing parameter.</p></li>
-<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Stabilyzing parameter.</p></li>
-<li><p><strong>stabilizing_parameters</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.14)"><em>Mapping</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em>)</p></li>
+<li><p><strong>d_psi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>I</strong> – The integral.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.Radiating_local">
-<span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">Radiating_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#Radiating_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.Radiating_local" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the flux on a radiating boundary with respect to the degrees
-of freedom from the same cell, that is:</p>
-<p>TODO: it is assuming that the radiating boundary consists of a vertical segment. This should be easy to generalize.</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[-\int_{E}\left(d_{2}ik\Phi_n(\mathbf{x})+\nabla \Phi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\Psi_n(\mathbf{x})}\,\mathrm{d}S_{\mathbf{x}}\]</div>
-</div>
-<p>which can be computed as:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\boxed{-ikl\left(d_{2}+\mathbf{d}_{n}\cdot\mathbf{n}\right)e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\mathbf{j}\right)}\]</div>
-</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.UltraWeakFlux">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">UltraWeakFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#UltraWeakFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.UltraWeakFlux" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Transmission flux for the UWVF</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>phi</strong> (<em>Function</em>) – Trial function.</p></li>
-<li><p><strong>psi</strong> (<em>Function</em>) – Test function.</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Wave number.</p></li>
-<li><p><strong>edge</strong> (<a class="reference internal" href="#trefftz.dg.serial_fluxes.Edge" title="trefftz.dg.serial_fluxes.Edge"><em>Edge</em></a>) – Edge parameters.</p></li>
-<li><p><strong>d_2</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Stabilyzing parameter.</p></li>
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>I</strong> – The integral.</p>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.UltraWeakFlux.LHS">
+<span class="sig-name descname"><span class="pre">LHS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sign</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#UltraWeakFlux.LHS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.UltraWeakFlux.LHS" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_phi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>d_psi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>sign</strong> (<a class="reference internal" href="#trefftz.dg.serial_fluxes.SIGN" title="trefftz.dg.serial_fluxes.SIGN"><em>SIGN</em></a>)</p></li>
+</ul>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.DirichletFlux">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">DirichletFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#DirichletFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.DirichletFlux" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Serial Dirichlet kernel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.DirichletFlux.LHS">
+<span class="sig-name descname"><span class="pre">LHS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#DirichletFlux.LHS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.DirichletFlux.LHS" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_phi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>d_psi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.DirichletFlux.RHS">
+<span class="sig-name descname"><span class="pre">RHS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#DirichletFlux.RHS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.DirichletFlux.RHS" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_psi</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -463,16 +566,40 @@ of freedom from the same cell, that is:</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">trefftz.dg.serial_fluxes module</a><ul>
-<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.Edge"><code class="docutils literal notranslate"><span class="pre">Edge</span></code></a><ul>
-<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.Edge.M"><code class="docutils literal notranslate"><span class="pre">Edge.M</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.Edge.l"><code class="docutils literal notranslate"><span class="pre">Edge.l</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.Edge.N"><code class="docutils literal notranslate"><span class="pre">Edge.N</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.Edge.T"><code class="docutils literal notranslate"><span class="pre">Edge.T</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SIGN"><code class="docutils literal notranslate"><span class="pre">SIGN</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SIGN.PP"><code class="docutils literal notranslate"><span class="pre">SIGN.PP</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SIGN.PM"><code class="docutils literal notranslate"><span class="pre">SIGN.PM</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SIGN.MP"><code class="docutils literal notranslate"><span class="pre">SIGN.MP</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SIGN.MM"><code class="docutils literal notranslate"><span class="pre">SIGN.MM</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SoundHard"><code class="docutils literal notranslate"><span class="pre">SoundHard()</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.Inner"><code class="docutils literal notranslate"><span class="pre">Inner()</span></code></a></li>
-<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.Radiating_local"><code class="docutils literal notranslate"><span class="pre">Radiating_local()</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SerialTransmissionKernel"><code class="docutils literal notranslate"><span class="pre">SerialTransmissionKernel</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SerialTransmissionKernel.LHS"><code class="docutils literal notranslate"><span class="pre">SerialTransmissionKernel.LHS()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SerialLocalKernel"><code class="docutils literal notranslate"><span class="pre">SerialLocalKernel</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SerialLocalKernel.LHS"><code class="docutils literal notranslate"><span class="pre">SerialLocalKernel.LHS()</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SerialLocalKernel.RHS"><code class="docutils literal notranslate"><span class="pre">SerialLocalKernel.RHS()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SerialNonLocalKernel"><code class="docutils literal notranslate"><span class="pre">SerialNonLocalKernel</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.SerialNonLocalKernel.LHS"><code class="docutils literal notranslate"><span class="pre">SerialNonLocalKernel.LHS()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.NeumannFlux"><code class="docutils literal notranslate"><span class="pre">NeumannFlux</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.NeumannFlux.LHS"><code class="docutils literal notranslate"><span class="pre">NeumannFlux.LHS()</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.NeumannFlux.RHS"><code class="docutils literal notranslate"><span class="pre">NeumannFlux.RHS()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.UltraWeakFlux"><code class="docutils literal notranslate"><span class="pre">UltraWeakFlux</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.UltraWeakFlux.LHS"><code class="docutils literal notranslate"><span class="pre">UltraWeakFlux.LHS()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.DirichletFlux"><code class="docutils literal notranslate"><span class="pre">DirichletFlux</span></code></a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.DirichletFlux.LHS"><code class="docutils literal notranslate"><span class="pre">DirichletFlux.LHS()</span></code></a></li>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.DirichletFlux.RHS"><code class="docutils literal notranslate"><span class="pre">DirichletFlux.RHS()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -485,10 +612,8 @@ of freedom from the same cell, that is:</p>
     </aside>
   </div>
 </div><script src="../_static/documentation_options.js?v=01f34227"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

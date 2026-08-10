@@ -9,7 +9,7 @@ Welcome to Trefftz's Documentation
    theory/fluxes
    theory/dg_trefftz
    design/data_structures
-   design/assembly_flow
+   design/workflow
    tutorials/quickstart
    api/index
    

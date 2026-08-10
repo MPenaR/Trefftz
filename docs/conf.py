@@ -5,10 +5,10 @@ import os
 import sys
 from datetime import datetime
 
-# -- Path setup --------------------------------------------------------------
+# # -- Path setup --------------------------------------------------------------
 
-# Add the Trefftz package to sys.path so autodoc can import it
-sys.path.insert(0, os.path.abspath("../trefftz"))
+# # Add the Trefftz package to sys.path so autodoc can import it
+# sys.path.insert(0, os.path.abspath("../trefftz"))
 
 # -- Project information -----------------------------------------------------
 

@@ -110,23 +110,3 @@ class DirichletFlux:
         d_inc = self.data["d_inc"]
         a = self.a
         return I_uincdv(edge, d_inc, d_psi, k) + 1j*a*k*I_uincv(edge, d_inc, d_psi, k)
-
-
-
-# class CircularDirichletFlux:
-#     '''Serial Dirichlet kernel'''
-#     def __init__(self, a: float, data = None):
-#         self.a = a
-#         self.data = data
-    
-#     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-#         a = self.a
-
-#         return -I_duv_arc(edge, d_phi, d_psi, k) - 1j*k*a*I_uv_arc(edge, d_phi, d_psi, k)
-        
-#     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
-#         d_inc = self.data["d_inc"]
-#         a = self.a
-#         return I_dv_arc(edge, d_inc, d_psi, k) + 1j*a*k*I_v_arc(edge, d_inc, d_psi, k)
-
-
