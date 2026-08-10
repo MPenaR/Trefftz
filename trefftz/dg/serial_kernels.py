@@ -1,25 +1,77 @@
 from numpy import dot, exp, sinc, pi, atan2, sin, cos
 from numpy.linalg import norm
 from trefftz.numpy_types import float_array
-from typing import Protocol
+from trefftz.mesh.core2 import edge_dtype, arc_dtype
 from scipy.special import jv
 
 JAC_ANGER_MODES = 80
+
 
 def I_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{v}\,\mathrm{d}\ell
     
-    where $u$ and $v$ are plane waves and $E$ is a straight edge.'''
-    l = edge["l"]
-    M = edge["M"]
-    T = edge["T"]
+    where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.'''
+    if edge.dtype == edge_dtype:
+        return I_uv_segment(edge, d_u, d_v, k)
+    elif edge_dtype == arc_dtype:
+        return I_uv_arc(edge, d_u, d_v, k)
+
+
+def I_duv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u \overline{v}\,\mathrm{d}\ell
+    
+    where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.'''
+    if edge.dtype == edge_dtype:
+        return I_duv_segment(edge, d_u, d_v, k)
+    elif edge_dtype == arc_dtype:
+        return I_duv_arc(edge, d_u, d_v, k)
+
+
+def I_uincv(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
+    r'''Computes the integral:
+.. math ::
+        \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
+    
+    where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is either an arc of circunference or a segment.'''
+    if edge.dtype == edge_dtype:
+        return I_uincv_segment(edge, d_inc, d_v, k)
+    elif edge_dtype == arc_dtype:
+        return I_uincv_arc(edge, d_inc, d_v, k)
+
+
+def I_uincdv(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u_{\mathrm{inc}} \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
+    
+    where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is either an arc of circunference or a segment.'''
+    if edge.dtype == edge_dtype:
+        return I_uincdv_segment(edge, d_inc, d_v, k)
+    elif edge_dtype == arc_dtype:
+        return I_uincdv_arc(edge, d_inc, d_v, k)
+
+
+
+
+
+def I_uv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u \overline{v}\,\mathrm{d}\ell
+    
+    where $u$ and $v$ are plane waves and $E$ is a segment.'''
+    l = segment["l"]
+    M = segment["M"]
+    T = segment["T"]
 
     return l*exp(1j*k*dot((d_u - d_v), M))*sinc(k*l/(2*pi)*dot(d_u - d_v, T))
 
 
-def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_uv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{v}\,\mathrm{d}\ell
@@ -27,9 +79,9 @@ def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     where $u$ and $v$ are plane waves and $E$ is an arc of circunference.'''
 
 
-    theta_1 = edge["theta_1"]
-    theta_2 = edge["theta_2"]
-    R = edge["R"]    
+    theta_1 = arc["theta_1"]
+    theta_2 = arc["theta_2"]
+    R = arc["R"]    
     
     D_uv = norm(d_u - d_v)
     phi_uv = atan2((d_u - d_v)[1], (d_u - d_v)[0])
@@ -38,25 +90,31 @@ def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
               2*sum(1j**t/t*jv(t, k*R*D_uv)*(sin(t*(theta_2 - phi_uv)) - sin(t*(theta_1 - phi_uv)))
                     for t in range(1, JAC_ANGER_MODES)))
 
-def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_duv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E nabla(u)\cdot\mathbf{n} \overline{v}\,\mathrm{d}\ell
+    
+    where $u$ and $v$ are plane waves and $E$ is a segment.'''
+    l = segment["l"]
+    M = segment["M"]
+    T = segment["T"]
+    N = segment["N"]
+    return 1j*k*l*exp(1j*k*dot((d_u - d_v), M))*dot(d_u, N)*sinc(k*l/(2*pi)*dot(d_u - d_v, T))
+
+
+
+
+def I_duv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E nabla(u)\cdot\mathbf{n} \overline{v}\,\mathrm{d}\ell
     
     where $u$ and $v$ are plane waves and $E$ is an arc of circunference.'''
 
-    # to be replaced with edge["theta_2"], edge["theta_1"], and edge["R"] as
-    # edge should be a arc_edge
-
-    # P = edge["P"]
-    # Q = edge["Q"]
-
-    # theta_1 = atan2(P[1], P[0])
-    # theta_2 = atan2(Q[1], Q[0])
-
-    theta_1 = edge["theta_1"]
-    theta_2 = edge["theta_2"]
-    R = edge["R"]
+    theta_1 = arc["theta_1"]
+    theta_2 = arc["theta_2"]
+    R = arc["R"]
 
     D_uv = norm(d_u - d_v)
     phi_uv = atan2((d_u - d_v)[1], (d_u - d_v)[0])
@@ -70,20 +128,20 @@ def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     return primitive(theta_2) - primitive(theta_1)
 
 
-def I_v(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
+def I_uincv_segment(segment, d_inc: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
     
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
 
-    l = edge["l"]
-    M = edge["M"]
-    T = edge["T"]
+    l = segment["l"]
+    M = segment["M"]
+    T = segment["T"]
 
     return l*exp(1j*k*dot((d_inc - d_v), M))*sinc(k*l/(2*pi)*dot(d_inc - d_v, T))
 
-def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
+def I_uincv_arc(arc, d_inc: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
@@ -91,9 +149,9 @@ def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is an arc of circunference.'''
 
     
-    theta_1 = edge["theta_1"]
-    theta_2 = edge["theta_2"]
-    R = edge["R"]
+    theta_1 = arc["theta_1"]
+    theta_2 = arc["theta_2"]
+    R = arc["R"]
 
     D_iv = norm(d_inc - d_v)
     phi_iv = atan2((d_inc - d_v)[1], (d_inc - d_v)[0])
@@ -103,7 +161,22 @@ def I_v_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
                     for t in range(1, JAC_ANGER_MODES)))
 
 
-def I_dv_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
+def I_uincdv_segment(segment, d_inc: float_array, d_v: float_array, k: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u_{\mathrm{inc}} \overline{\nabla v \cdot \mathbf{n}}\,\mathrm{d}\ell
+    
+    where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
+
+    l = segment["l"]
+    M = segment["M"]
+    T = segment["T"]
+    N = segment["N"]
+
+    return -1j*k*l*exp(1j*k*dot((d_inc - d_v), M))*dot(d_v, N)*sinc(k*l/(2*pi)*dot(d_inc - d_v, T))
+
+
+def I_uincdv_arc(arc, d_inc: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{nabla(v)\cdot\mathbf{n}}\,\mathrm{d}\ell
@@ -111,9 +184,9 @@ def I_dv_arc(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is an arc of circunference.'''
 
     
-    theta_1 = edge["theta_1"]
-    theta_2 = edge["theta_2"]
-    R = edge["R"]
+    theta_1 = arc["theta_1"]
+    theta_2 = arc["theta_2"]
+    R = arc["R"]
 
     D_iv = norm(d_inc - d_v)
     phi_iv = atan2((d_inc - d_v)[1], (d_inc - d_v)[0])

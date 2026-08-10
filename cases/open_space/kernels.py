@@ -1,6 +1,5 @@
 from trefftz.numpy_types import float_array
-from numpy import pi, exp, conj, atan2, sin, cos
-from numpy.linalg import norm
+from numpy import pi, exp, conj, atan2
 from numpy.lib.scimath import sqrt
 from scipy.special import jv, jvp, hankel1, h1vp
 
@@ -46,9 +45,7 @@ class NtDLocal_circle:
         d_2 = self.d_2
         d_n = d_phi
         d_m = d_psi
-        R = self.R
 
-        #I = -I_duv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=JAC_ANGER_MODES) - d_2*1j*k*I_uv(edge=edge, d_u=d_phi, d_v=d_psi, k=k, R=R, N_modes=JAC_ANGER_MODES)
         I = -I_duv_arc(edge, d_n, d_m, k) -1j*k*d_2*I_uv_arc(edge, d_n, d_m, k)
 
         return I
@@ -58,12 +55,9 @@ class NtDLocal_circle:
 
 
 def Fdudn(edge, d: float_array, k: float, t: int, N_modes: int) -> complex:
-    # P = edge["P"] 
-    # Q = edge["Q"]
-
-    # theta_2 = atan2(Q[1], Q[0])
-    # theta_1 = atan2(P[1], P[0])
-
+    r'''
+    Fourier coefficients of du/dn
+    '''
     theta_1 = edge["theta_1"]
     theta_2 = edge["theta_2"]
     R = edge["R"]
@@ -80,11 +74,10 @@ def Fdudn(edge, d: float_array, k: float, t: int, N_modes: int) -> complex:
     return I
 
 def Fu(edge, d: float_array, k: float, t: int, N_modes: int) -> complex:
-    # P = edge["P"] 
-    # Q = edge["Q"]
+    r'''
+    Fourier coefficients of u
+    '''
 
-    # theta_2 = atan2(Q[1], Q[0])
-    # theta_1 = atan2(P[1], P[0])
     theta_1 = edge["theta_1"]
     theta_2 = edge["theta_2"]
     R = edge["R"]
@@ -102,8 +95,7 @@ def Fu(edge, d: float_array, k: float, t: int, N_modes: int) -> complex:
 
 def NtD_coeff(edge, d: float_array, k: float, t: int, N_modes: int) -> complex:
     R = edge["R"]
-    NtD_t = Fdudn(edge, d, k, t, N_modes)
-    return 1/k*NtD_t*hankel1(t, k*R)/h1vp(t, k*R)
+    return 1/k*Fdudn(edge, d, k, t, N_modes)*hankel1(t, k*R)/h1vp(t, k*R)
 
 
 def I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, NtD_modes: int, N_modes: int) -> complex:

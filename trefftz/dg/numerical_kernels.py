@@ -1,125 +1,58 @@
-from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
-from numpy.lib.scimath import sqrt
-from numpy.linalg import norm
-from numpy import trapezoid as Int
 import numpy as np
-from scipy.special import hankel1, h1vp
-from trefftz.numpy_types import float_array, complex_array
+from trefftz.numpy_types import float_array
 
 N_POINTS = int(1E5)
-NtD_MODES = 20
 
 
-class NeumannKernel:
-
-    r"""Implements the integral: 
-    .. math ::
-
-        \int_{E}\left(u+\frac{\mathfrak{d}_{1}}{ik}\nabla u\cdot\mathbf{n}\right)\overline{\nabla v\cdot n}d\ell
-    
-    """
-    def __init__(self, d_1: float):
-        self.d_1 = d_1
-
-    
-    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-        d1 = self.d_1
-        d_n = d_phi
-        d_m = d_psi
-
-        t = linspace(0, 1, N_POINTS)
-        P = edge["P"]
-        T = edge["T"]
-        l = edge["l"]
-        N = edge["N"]
-        x = P + outer(t, T)*l
-        u = exp(1j*k*dot(x, d_n))
-        v = exp(1j*k*dot(x, d_m))
-        du_dn = 1j*k*dot(N, d_n)*u
-        dv_dn = 1j*k*dot(N, d_m)*v
-
-        I = l*Int((u + d1/(1j*k)*du_dn)*conj(dv_dn), t)
-        return I
-
-    def RHS(self) -> complex:
-        raise NotImplementedError
-        
-class UltraWeakKernel:
-
-    r"""Implements the integral: 
-    .. math ::
-
-        \int_{E}\left(\left(u +\frac{\mathfrak{b}}{ik}\nabla u\cdot\mathbf{n}\right)\overline{\nabla v\cdot\mathbf{n}}-\left(\mathfrak{a}iku +\nabla u \cdot \mathbf{n}\right)\overline{v}\right)d\ell
-    
-    """
-    def __init__(self, a: float, b: float):
-        self.a = a
-        self.b = b
-
-    
-    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-        a = self.a
-        b = self.b
-
-        d_n = d_phi
-        d_m = d_psi
-
-        t = linspace(0, 1, N_POINTS)
-        P = edge["P"]
-        T = edge["T"]
-        l = edge["l"]
-        N = edge["N"]
-        x = P + outer(t, T)*l
-        u = exp(1j*k*dot(x, d_n))
-        v = exp(1j*k*dot(x, d_m))
-        du_dn = 1j*k*dot(N, d_n)*u
-        dv_dn = 1j*k*dot(N, d_m)*v
-
-        I = l*Int((u/2 + b/(1j*k)*du_dn)*conj(dv_dn) - (a*1j*k*u + du_dn/2)*conj(v), t)
-        return I
+def create_numerical_functions(x: float_array, k: float, d_u: float_array, d_v: float_array, N: float_array):
+    u = np.exp(1j*k*np.dot(x, d_u))
+    v = np.exp(1j*k*np.dot(x, d_v))
+    du_dn = 1j*k*np.dot(N, d_u)*u
+    dv_dn = 1j*k*np.dot(N, d_v)*v
+    return u, v, du_dn, dv_dn
 
 
-def I_uv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
-    theta_1 = edge["theta_1"]
-    theta_2 = edge["theta_2"]
-    R = edge["R"]
-    
-    theta = np.linspace(theta_1, theta_2, N_POINTS)
-    u_r = np.column_stack([np.cos(theta), np.sin(theta)])
-    x = R*u_r
-    u = exp(1j*k*dot(x, d_u))
-    v = exp(1j*k*dot(x, d_v))
-    I = Int(u*conj(v), theta)*R  # int u*conj(v) dl 
-    return I
+def I_uv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> complex:
+    P = segment["P"]
+    T = segment["T"]
+    l = segment["l"]
+    N = segment["N"]
 
-
-def I_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
-    P = edge["P"]
-    T = edge["T"]
-    l = edge["l"]
     t = np.linspace(0, 1, N_POINTS)
+    x = P + l*np.outer(t, T)
+    J = l
 
-    x = P + l*outer(t,T)
-    u = exp(1j*k*dot(x, d_u))
-    v = exp(1j*k*dot(x, d_v))
-    I = Int(u*conj(v), t)*l  # int u*conj(v) dl 
+    u, v, _, _ = create_numerical_functions(x, k, d_u, d_v, N)
+    I = np.trapezoid(u*np.conj(v), t)*J  # int u*conj(v) dl 
     return I
 
 
-def I_duv_arc(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
-    theta_1 = edge["theta_1"]
-    theta_2 = edge["theta_2"]
-    R = edge["R"]
 
-    theta = np.linspace(theta_1, theta_2, N_POINTS)
-    u_r = np.column_stack([np.cos(theta), np.sin(theta)])
-    N = u_r
+def I_uv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
+    theta_1 = arc["theta_1"]
+    theta_2 = arc["theta_2"]
+    R = arc["R"]
+    
+    t = np.linspace(theta_1, theta_2, N_POINTS)
+    u_r = np.column_stack([np.cos(t), np.sin(t)])
     x = R*u_r
+    J = R
 
-    u = exp(1j*k*dot(x, d_u))
-    v = exp(1j*k*dot(x, d_v))
+    u, v, _, _ = create_numerical_functions(x, k, d_u, d_v, u_r)
+    I = np.trapezoid(u*np.conj(v), t)*J  # int u*conj(v) dl 
+    return I
 
-    du_dn = 1j*k*dot(N, d_u)*u
 
-    I = Int(du_dn*conj(v), theta)*R  # int du/dn*conj(v) dl 
+def I_duv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
+    theta_1 = arc["theta_1"]
+    theta_2 = arc["theta_2"]
+    R = arc["R"]
+
+    t = np.linspace(theta_1, theta_2, N_POINTS)
+    u_r = np.column_stack([np.cos(t), np.sin(t)])
+    x = R*u_r
+    J = R
+    _, v, du_dn, _ = create_numerical_functions(x, k, d_u, d_v, u_r)
+
+    I = np.trapezoid(du_dn*np.conj(v), t)*J  # int du/dn*conj(v) dl 
     return I

@@ -3,7 +3,8 @@ from trefftz.numpy_types import float_array
 from enum import Enum
 from typing import Protocol
 
-from trefftz.dg.serial_kernels import I_uv, I_uv_arc, I_duv_arc, I_v_arc, I_dv_arc, I_v
+# from trefftz.dg.serial_kernels import I_uv, I_duv, I_uv_arc, I_duv_arc, I_v_arc, I_dv_arc, I_v
+from trefftz.dg.serial_kernels import I_uv, I_duv, I_uincdv, I_uincv
 
 
 JAC_ANGER_MODES = 80
@@ -105,7 +106,7 @@ class UltraWeakFlux:
                 I = -I
         return I
 
-
+# RIGHT NOW RHS only does plane waves as RHS
 class DirichletFlux:
     '''Serial Dirichlet kernel'''
     def __init__(self, a: float, data = None):
@@ -114,34 +115,29 @@ class DirichletFlux:
     
     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
         a = self.a
-        d_n = d_phi
-        N = edge["N"]
-
-        return -1j*k*(dot(d_n, N) + a)*I_uv(edge, d_phi, d_psi, k)
+        return -I_duv(edge, d_phi, d_psi, k) - 1j*k*a*I_uv(edge, d_phi, d_psi, k)
         
     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
         d_inc = self.data["d_inc"]
         a = self.a
-        d_v = d_psi
-        N = edge["N"]
-        return (-1j*k*dot(d_v, N) + 1j*a*k)*I_v(edge, d_inc, d_psi, k)
+        return I_uincdv(edge, d_inc, d_psi, k) + 1j*a*k*I_uincv(edge, d_inc, d_psi, k)
 
 
 
-class CircularDirichletFlux:
-    '''Serial Dirichlet kernel'''
-    def __init__(self, a: float, data = None):
-        self.a = a
-        self.data = data
+# class CircularDirichletFlux:
+#     '''Serial Dirichlet kernel'''
+#     def __init__(self, a: float, data = None):
+#         self.a = a
+#         self.data = data
     
-    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-        a = self.a
+#     def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+#         a = self.a
 
-        return -I_duv_arc(edge, d_phi, d_psi, k) - 1j*k*a*I_uv_arc(edge, d_phi, d_psi, k)
+#         return -I_duv_arc(edge, d_phi, d_psi, k) - 1j*k*a*I_uv_arc(edge, d_phi, d_psi, k)
         
-    def RHS(self, edge, d_psi: float_array, k: float) -> complex:
-        d_inc = self.data["d_inc"]
-        a = self.a
-        return I_dv_arc(edge, d_inc, d_psi, k) + 1j*a*k*I_v_arc(edge, d_inc, d_psi, k)
+#     def RHS(self, edge, d_psi: float_array, k: float) -> complex:
+#         d_inc = self.data["d_inc"]
+#         a = self.a
+#         return I_dv_arc(edge, d_inc, d_psi, k) + 1j*a*k*I_v_arc(edge, d_inc, d_psi, k)
 
 
