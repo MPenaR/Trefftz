@@ -15,7 +15,7 @@ def I_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.'''
     if edge.dtype == edge_dtype:
         return I_uv_segment(edge, d_u, d_v, k)
-    elif edge_dtype == arc_dtype:
+    elif edge.dtype == arc_dtype:
         return I_uv_arc(edge, d_u, d_v, k)
 
 
@@ -27,7 +27,7 @@ def I_duv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
     where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.'''
     if edge.dtype == edge_dtype:
         return I_duv_segment(edge, d_u, d_v, k)
-    elif edge_dtype == arc_dtype:
+    elif edge.dtype == arc_dtype:
         return I_duv_arc(edge, d_u, d_v, k)
 
 
@@ -39,7 +39,7 @@ def I_uincv(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is either an arc of circunference or a segment.'''
     if edge.dtype == edge_dtype:
         return I_uincv_segment(edge, d_inc, d_v, k)
-    elif edge_dtype == arc_dtype:
+    elif edge.dtype == arc_dtype:
         return I_uincv_arc(edge, d_inc, d_v, k)
 
 
@@ -51,7 +51,7 @@ def I_uincdv(edge, d_inc: float_array, d_v: float_array, k: float) -> complex:
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is either an arc of circunference or a segment.'''
     if edge.dtype == edge_dtype:
         return I_uincdv_segment(edge, d_inc, d_v, k)
-    elif edge_dtype == arc_dtype:
+    elif edge.dtype == arc_dtype:
         return I_uincdv_arc(edge, d_inc, d_v, k)
 
 

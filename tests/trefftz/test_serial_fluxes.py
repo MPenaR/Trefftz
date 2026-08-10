@@ -47,7 +47,7 @@ def test_DirichletRHS(d_m, d_inc):
 @pytest.mark.parametrize('d_n', DIRECTIONS)
 def test_CircularDirichletLHS(d_m, d_n):
     a = 0.5
-    I_exact = exact.CircularDirichletFlux(a=a).LHS(edge=ARC_1, d_phi=d_n, d_psi=d_m, k=k)
+    I_exact = exact.DirichletFlux(a=a).LHS(edge=ARC_1, d_phi=d_n, d_psi=d_m, k=k)
     I_num = numerical.CircularDirichletFlux(a=a).LHS(edge=ARC_1, d_phi=d_n, d_psi=d_m, k=k)
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
 
@@ -57,6 +57,6 @@ def test_CircularDirichletLHS(d_m, d_n):
 def test_CircularDirichletRHS(d_m, d_inc):
     a = 0.5
     data = {"d_inc": d_inc}
-    I_exact = exact.CircularDirichletFlux(a=a, data=data).RHS(edge=ARC_1, d_psi=d_m, k=k)
+    I_exact = exact.DirichletFlux(a=a, data=data).RHS(edge=ARC_1, d_psi=d_m, k=k)
     I_num = numerical.CircularDirichletFlux(a=a, data=data).RHS(edge=ARC_1, d_psi=d_m, k=k)
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
