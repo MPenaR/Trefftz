@@ -30,6 +30,8 @@ extensions = [
     "sphinx.ext.mathjax"
 ]
 
+
+
 myst_enable_extensions = [
     "amsmath",     #  block math environments
     "dollarmath",  #  $...$ and $$...$$
@@ -37,6 +39,9 @@ myst_enable_extensions = [
 
 # Type hints in documentation
 autodoc_typehints = "description"
+
+napoleon_numpy_docstring = True
+napoleon_google_docstring = False
 
 # Templates
 templates_path = ["_templates"]
@@ -56,7 +61,6 @@ html_static_path = ["_static"]
 
 autodoc_member_order = "bysource"
 autodoc_default_options = {
-    "members": True,
     "show-inheritance": True,
 }
 
@@ -74,5 +78,5 @@ intersphinx_mapping = {
 todo_include_todos = True
 
 
-autoclass_content = "both"
+#autoclass_content = "both"
 

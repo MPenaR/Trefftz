@@ -1,17 +1,33 @@
 # Discontinuous Galerkin
 
-```{automodule} trefftz.dg
-:members:
-:show-inheritance:
+The discontinuous Galerkin implementation.
+
+## Fluxes
+
+Boundary and transmission fluxes.
+
+```{toctree}
+:maxdepth: 2
+
+fluxes
 ```
 
+## Kernels
 
-```{automodule} trefftz.dg.serial_kernels
-:members:
-:show-inheritance:
+Local and non-local DG kernels.
+
+```{toctree}
+:maxdepth: 2
+
+kernels
 ```
 
-```{automodule} trefftz.dg.serial_fluxes
-:members:
-:show-inheritance:
+## Assembly
+
+Assembly of the global DG system.
+
+```{toctree}
+:maxdepth: 2
+
+assembly
 ```

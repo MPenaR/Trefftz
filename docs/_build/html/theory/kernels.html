@@ -2,10 +2,11 @@
 <html class="no-js" lang="en" data-content_root="../">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Fluxes" href="fluxes.html"><link rel="prev" title="Overview" href="overview.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Overview: module code - Trefftz 0.1.0 documentation</title>
+        <title>Kernels - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -171,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -190,13 +191,13 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Theory</span></p>
-<ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../theory/index.html">Theory</a><input aria-label="Toggle navigation of Theory" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../theory/overview.html">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../theory/kernels.html">Kernels</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html">Fluxes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../theory/dg_trefftz.html">DG Trefftz</a></li>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Theory</a><input aria-label="Toggle navigation of Theory" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fluxes.html">Fluxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fluxes.html#notation">Notation:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dg_trefftz.html">DG Trefftz</a></li>
 </ul>
 </li>
 </ul>
@@ -245,7 +246,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/theory/kernels.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -253,21 +260,163 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>All modules for which code is available</h1>
-<ul><li><a href="trefftz/dg/serial_fluxes.html">trefftz.dg.serial_fluxes</a></li>
+          <section class="tex2jax_ignore mathjax_ignore" id="kernels">
+<h1>Kernels<a class="headerlink" href="#kernels" title="Link to this heading">¶</a></h1>
+<p>This page describes the mathematical expressions used to evaluate the edge
+integrals appearing in the Trefftz-DG formulation.</p>
+<p>The kernels considered in the library are</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">I_uv</span></code>: the integral of the product of two basis functions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">I_duv</span></code>: the integral involving the normal derivative of one of the
+basis functions.</p></li>
 </ul>
+<p>Both kernels are defined for the two types of edges supported by the library:</p>
+<ul class="simple">
+<li><p>straight <strong>segments</strong>;</p></li>
+<li><p><strong>circular arcs</strong>.</p></li>
+</ul>
+<p>The resulting expressions are summarized below.</p>
+<section id="kernel-notation">
+<h2>Kernel notation<a class="headerlink" href="#kernel-notation" title="Link to this heading">¶</a></h2>
+<p>Introduce here the general notation used throughout this page, including:</p>
+<ul class="simple">
+<li><p>the two functions <span class="math notranslate nohighlight">\(u=e^{ik\mathbf{d}_u\cdot\mathbf{x}}\)</span> and <span class="math notranslate nohighlight">\(v=e^{ik\mathbf{d}_v\cdot\mathbf{x}}\)</span>;</p></li>
+<li><p>the edge <span class="math notranslate nohighlight">\(E\)</span> where the functions are supported;</p></li>
+<li><p>the  normal <span class="math notranslate nohighlight">\(\mathbf{n}\)</span>;</p></li>
+<li><p>the midpoint of the edge <span class="math notranslate nohighlight">\(\mathbf{M}\)</span></p></li>
+<li><p>the tangent vector <span class="math notranslate nohighlight">\(\boldsymbol{\tau}\)</span>.</p></li>
+<li><p>the length <span class="math notranslate nohighlight">\(l\)</span>.</p></li>
+</ul>
+<p>The kernels are defined as</p>
+<section id="i-uv">
+<h3><code class="docutils literal notranslate"><span class="pre">I_uv</span></code><a class="headerlink" href="#i-uv" title="Link to this heading">¶</a></h3>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+I_{uv} := \int_E u(\mathbf{x})\overline{v(\mathbf{x})}\,\mathrm{d}\ell
+\]</div>
+</div>
+</section>
+<section id="i-duv">
+<h3><code class="docutils literal notranslate"><span class="pre">I_duv</span></code><a class="headerlink" href="#i-duv" title="Link to this heading">¶</a></h3>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+I_{duv} := \int_E \nabla u(\mathbf{x})\cdot{\mathbf{n}}\overline{v(\mathbf{x})}\,\mathrm{d}\ell
+\]</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="kernels-on-straight-segments">
+<h2>Kernels on straight segments<a class="headerlink" href="#kernels-on-straight-segments" title="Link to this heading">¶</a></h2>
+<p>For a straight segment, the integrals can be evaluated analytically.</p>
+<section id="id1">
+<h3><code class="docutils literal notranslate"><span class="pre">I_uv</span></code><a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+I_{uv} = le^{ik\left(\mathbf{d}_u-\mathbf{d}_v\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_u-\mathbf{d}_v\right)\cdot\boldsymbol{\tau}\right)
+\]</div>
+</div>
+<p>[Brief explanation of the notation appearing in the formula.]</p>
+</section>
+<section id="id2">
+<h3><code class="docutils literal notranslate"><span class="pre">I_duv</span></code><a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+I_{duv} = ikl\mathbf{d}_u\cdot\mathbf{n}e^{ik\left(\mathbf{d}_u-\mathbf{d}_v\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_u-\mathbf{d}_v\right)\cdot\boldsymbol{\tau}\right)=ik\mathbf{d}_u\cdot\mathbf{n}I_{uv}
+\]</div>
+</div>
+<p>[Brief explanation of the notation appearing in the formula.]</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="kernels-on-circular-arcs">
+<h2>Kernels on circular arcs<a class="headerlink" href="#kernels-on-circular-arcs" title="Link to this heading">¶</a></h2>
+<p>For a circular arc, the corresponding integrals are evaluated using the
+series representation derived for the circular geometry.</p>
+<section id="id3">
+<h3><span class="math notranslate nohighlight">\(I_{uv}\)</span><a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<p>[Latex formula for <span class="math notranslate nohighlight">\(I_{uv}\)</span> on a circular arc]</p>
+<p>[Brief explanation of the notation and the series.]</p>
+</section>
+<section id="id4">
+<h3><span class="math notranslate nohighlight">\(I_{duv}\)</span><a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<p>[Latex formula for <span class="math notranslate nohighlight">\(I_{duv}\)</span> on a circular arc]</p>
+<p>[Brief explanation of the notation and the series.]</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>The four kernel/geometry combinations implemented in the library are:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Geometry</p></th>
+<th class="head"><p>Kernel</p></th>
+<th class="head"><p>Evaluation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Segment</p></td>
+<td><p><span class="math notranslate nohighlight">\(I_{uv}\)</span></p></td>
+<td><p>Exact</p></td>
+</tr>
+<tr class="row-odd"><td><p>Segment</p></td>
+<td><p><span class="math notranslate nohighlight">\(I_{duv}\)</span></p></td>
+<td><p>Exact</p></td>
+</tr>
+<tr class="row-even"><td><p>Circular arc</p></td>
+<td><p><span class="math notranslate nohighlight">\(I_{uv}\)</span></p></td>
+<td><p>Truncated series</p></td>
+</tr>
+<tr class="row-odd"><td><p>Circular arc</p></td>
+<td><p><span class="math notranslate nohighlight">\(I_{duv}\)</span></p></td>
+<td><p>Truncated series</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The mathematical expressions described here form the basis for the generic
+kernel implementations in <code class="docutils literal notranslate"><span class="pre">trefftz</span></code>. Their numerical implementations are
+tested independently against numerical integration; see
+<a class="reference internal" href="#../design/testing.md"><span class="xref myst">Testing</span></a> for details.</p>
+</section>
+</section>
+
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="fluxes.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Fluxes</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="overview.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Overview</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -286,8 +435,42 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Kernels</a><ul>
+<li><a class="reference internal" href="#kernel-notation">Kernel notation</a><ul>
+<li><a class="reference internal" href="#i-uv"><code class="docutils literal notranslate"><span class="pre">I_uv</span></code></a></li>
+<li><a class="reference internal" href="#i-duv"><code class="docutils literal notranslate"><span class="pre">I_duv</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kernels-on-straight-segments">Kernels on straight segments</a><ul>
+<li><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">I_uv</span></code></a></li>
+<li><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">I_duv</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kernels-on-circular-arcs">Kernels on circular arcs</a><ul>
+<li><a class="reference internal" href="#id3"><span class="math notranslate nohighlight">\(I_{uv}\)</span></a></li>
+<li><a class="reference internal" href="#id4"><span class="math notranslate nohighlight">\(I_{duv}\)</span></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -296,5 +479,7 @@
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

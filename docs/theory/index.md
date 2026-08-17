@@ -7,6 +7,7 @@ discontinuous Galerkin method implemented in this package.
 :maxdepth: 2
 
 overview
+kernels
 fluxes
 dg_trefftz
 ```

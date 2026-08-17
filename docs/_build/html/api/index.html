@@ -194,6 +194,7 @@
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../theory/index.html">Theory</a><input aria-label="Toggle navigation of Theory" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../theory/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/kernels.html">Kernels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html">Fluxes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../theory/dg_trefftz.html">DG Trefftz</a></li>
@@ -218,7 +219,11 @@
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="dg.html">Discontinuous Galerkin</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="fluxes.html">Fluxes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fluxes.html">Fluxes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
 </ul>
 </li>
@@ -242,7 +247,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/api/index.md.txt" title="View this page">
+  <a class="muted-link" href="../_sources/api/index.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -260,12 +265,24 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="api-reference">
+          <section id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h1>
-<p>Reference documentation generated from the Python source code.</p>
+<p>This section contains the reference documentation for the Trefftz
+Python package.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="dg.html">Discontinuous Galerkin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dg.html">Discontinuous Galerkin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dg.html#fluxes">Fluxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dg.html#kernels">Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dg.html#assembly">Assembly</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fluxes.html">Fluxes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fluxes.html#dirichlet-flux">Dirichlet flux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fluxes.html#neumann-flux">Neumann flux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fluxes.html#transmission-flux">Transmission flux</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="mesh.html">Mesh</a></li>
 </ul>
 </div>

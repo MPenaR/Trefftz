@@ -194,6 +194,7 @@
 <ul class="current">
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Theory</a><input aria-label="Toggle navigation of Theory" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernels.html">Kernels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fluxes.html">Fluxes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fluxes.html#notation">Notation:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dg_trefftz.html">DG Trefftz</a></li>
@@ -204,6 +205,7 @@
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../design/index.html">Design</a><input aria-label="Toggle navigation of Design" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../design/data_structures.html">Data Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design/workflow.html">Workflow</a></li>
 </ul>
 </li>
 </ul>
@@ -217,7 +219,12 @@
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api/dg.html">Discontinuous Galerkin</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/fluxes.html">Fluxes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/fluxes.html">Fluxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/mesh.html">Mesh</a></li>
 </ul>
 </li>
 </ul>
@@ -265,6 +272,13 @@ discontinuous Galerkin method implemented in this package.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernels.html">Kernels</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="kernels.html#kernel-notation">Kernel notation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernels.html#kernels-on-straight-segments">Kernels on straight segments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernels.html#kernels-on-circular-arcs">Kernels on circular arcs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kernels.html#summary">Summary</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="fluxes.html">Fluxes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fluxes.html#notation">Notation:</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="fluxes.html#sound-hard-boundary-condition">Sound-hard boundary condition</a></li>

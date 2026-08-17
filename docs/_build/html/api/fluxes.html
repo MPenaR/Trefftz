@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Fluxes" href="fluxes.html"><link rel="prev" title="API Reference" href="index.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Mesh" href="mesh.html"><link rel="prev" title="Discontinuous Galerkin" href="dg.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Discontinuous Galerkin - Trefftz 0.1.0 documentation</title>
+        <title>Fluxes - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -219,11 +219,11 @@
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="fluxes.html">Fluxes</a></li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Fluxes</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="fluxes.html">Fluxes</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Fluxes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
 </ul>
 </li>
@@ -247,7 +247,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/api/dg.md.txt" title="View this page">
+  <a class="muted-link" href="../_sources/api/fluxes.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -265,34 +265,112 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section class="tex2jax_ignore mathjax_ignore" id="discontinuous-galerkin">
-<h1>Discontinuous Galerkin<a class="headerlink" href="#discontinuous-galerkin" title="Link to this heading">¶</a></h1>
-<p>The discontinuous Galerkin implementation.</p>
-<section id="fluxes">
-<h2>Fluxes<a class="headerlink" href="#fluxes" title="Link to this heading">¶</a></h2>
-<p>Boundary and transmission fluxes.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="fluxes.html">Fluxes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="fluxes.html#dirichlet-flux">Dirichlet flux</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fluxes.html#neumann-flux">Neumann flux</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fluxes.html#transmission-flux">Transmission flux</a></li>
+          <section id="fluxes">
+<h1>Fluxes<a class="headerlink" href="#fluxes" title="Link to this heading">¶</a></h1>
+<section id="dirichlet-flux">
+<h2>Dirichlet flux<a class="headerlink" href="#dirichlet-flux" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.DirichletFlux">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">DirichletFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#DirichletFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.DirichletFlux" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Computes the flux on a Neumann boundary condition, that is:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}\]</div>
+</div>
+<p>This quantity can be exactly evaluated as:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\boxed{a}\]</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edge</strong> (<em>Edge</em><em> or </em><em>Arc</em>) – Edge parameters.</p></li>
+<li><p><strong>d_u</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>) </em><em>array</em>) – Propatagion direction of the trial function.</p></li>
+<li><p><strong>d_v</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>) </em><em>array</em>) – Propatagion direction of the test function.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Wavenumber.</p></li>
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Stabilyzing parameter.</p></li>
 </ul>
-</li>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>I</strong> – The integral.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="neumann-flux">
+<h2>Neumann flux<a class="headerlink" href="#neumann-flux" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.NeumannFlux">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">NeumannFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d_1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#NeumannFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.NeumannFlux" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Computes the flux on a Neumann boundary condition, that is:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}\]</div>
+</div>
+<p>This quantity can be exactly evaluated as:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\boxed{-ikl\left(1+d_{1}\mathbf{d}_{n}\cdot\mathbf{n}\right)\mathbf{d}_{m}\cdot\mathbf{n}e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\boldsymbol{\tau}\right)}\]</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edge</strong> (<em>Edge</em><em> or </em><em>Arc</em>) – Edge parameters.</p></li>
+<li><p><strong>d_u</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>) </em><em>array</em>) – Propatagion direction of the trial function.</p></li>
+<li><p><strong>d_v</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>) </em><em>array</em>) – Propatagion direction of the test function.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Wavenumber.</p></li>
+<li><p><strong>d_1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Stabilyzing parameter.</p></li>
 </ul>
-</div>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>I</strong> – The integral.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="kernels">
-<h2>Kernels<a class="headerlink" href="#kernels" title="Link to this heading">¶</a></h2>
-<p>Local and non-local DG kernels.</p>
-<div class="toctree-wrapper compound">
+<section id="transmission-flux">
+<h2>Transmission flux<a class="headerlink" href="#transmission-flux" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="trefftz.dg.serial_fluxes.UltraWeakFlux">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.serial_fluxes.</span></span><span class="sig-name descname"><span class="pre">UltraWeakFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/serial_fluxes.html#UltraWeakFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.serial_fluxes.UltraWeakFlux" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Computes the flux on a inner facet with respect to the degrees
+of freedom from the same cell, that is:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\int_E \left(\left(\varphi_n(\mathbf{x})+\frac{b}{ik}\nabla\varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla\psi_m(\mathbf{x})\cdot\mathbf{n}}- \left(\vphantom{\frac{1}{2}}aik\varphi_n(\mathbf{x})+\nabla\varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\psi_m(\mathbf{x})}\right) \,\mathrm{d}S_\mathbf{x}\]</div>
 </div>
-</section>
-<section id="assembly">
-<h2>Assembly<a class="headerlink" href="#assembly" title="Link to this heading">¶</a></h2>
-<p>Assembly of the global DG system.</p>
-<div class="toctree-wrapper compound">
-</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edge</strong> (<em>Edge</em><em> or </em><em>Arc</em>) – Edge parameters.</p></li>
+<li><p><strong>d_u</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>) </em><em>array</em>) – Propatagion direction of the trial function.</p></li>
+<li><p><strong>d_v</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>) </em><em>array</em>) – Propatagion direction of the test function.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Wavenumber.</p></li>
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Stabilyzing parameter.</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Stabilyzing parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>I</strong> – The integral.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
@@ -301,23 +379,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="fluxes.html">
+          <a class="next-page" href="mesh.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Fluxes</div>
+                <div class="title">Mesh</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="dg.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">API Reference</div>
+                <div class="title">Discontinuous Galerkin</div>
                 
               </div>
             </a>
@@ -351,10 +429,19 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Discontinuous Galerkin</a><ul>
-<li><a class="reference internal" href="#fluxes">Fluxes</a></li>
-<li><a class="reference internal" href="#kernels">Kernels</a></li>
-<li><a class="reference internal" href="#assembly">Assembly</a></li>
+<li><a class="reference internal" href="#">Fluxes</a><ul>
+<li><a class="reference internal" href="#dirichlet-flux">Dirichlet flux</a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.DirichletFlux"><code class="docutils literal notranslate"><span class="pre">DirichletFlux</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#neumann-flux">Neumann flux</a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.NeumannFlux"><code class="docutils literal notranslate"><span class="pre">NeumannFlux</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#transmission-flux">Transmission flux</a><ul>
+<li><a class="reference internal" href="#trefftz.dg.serial_fluxes.UltraWeakFlux"><code class="docutils literal notranslate"><span class="pre">UltraWeakFlux</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -370,5 +457,7 @@
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

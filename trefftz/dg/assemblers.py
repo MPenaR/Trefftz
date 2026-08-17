@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from trefftz.dg.boundary_conditions import BoundaryCondition
 from abc import ABC, abstractmethod
 from enum import IntEnum, StrEnum
+from tqdm import tqdm
 
 ## THIS IS WRONG, CHECK IT LATER FOR THE BLOCK KERNELS 
 @dataclass
@@ -68,14 +69,16 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                           rows: list[int],
                           cols: list[int],
                           values: list[complex]):
-   
-        for edge in edges_on_region:
+        verbose = True
+        for edge in tqdm(edges_on_region,
+                         disable=not verbose,
+                         unit="edge"):
             T, _ = edge["triangles"]
             for i in basis.dofs_on_element(T):
                 for j in basis.dofs_on_element(T):
                     d_psi = basis.global_direction(i)
                     d_phi = basis.global_direction(j)
-                    value = kernel.LHS(edge=edge, d_phi=d_phi, d_psi=d_psi, k=basis.k)
+                    value = kernel.LHS(edge=edge, d_u=d_phi, d_v=d_psi, k=basis.k)
                     rows.append(i)
                     cols.append(j)
                     values.append(value)
@@ -96,7 +99,11 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
 
         # interior edges
         interior_kernel = numerics.interior_kernel
-        for edge in mesh.interior_edges:
+        verbose = True
+        for edge in tqdm(mesh.interior_edges,
+                         desc="Interior",
+                         disable=not verbose,
+                         unit="edge"):
             for (i_v, T_v) in enumerate(edge["triangles"]):
                 for (i_u, T_u) in enumerate(edge["triangles"]):
                     sign = SIGN((i_u, i_v))
@@ -104,26 +111,31 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                         for j in basis.dofs_on_element(T_u):
                             d_phi = basis.global_direction(j)
                             d_psi = basis.global_direction(i)
-                            val = interior_kernel.LHS(edge=edge, d_phi=d_phi, d_psi=d_psi, k=basis.k, sign=sign)
+                            val = interior_kernel.LHS(edge=edge, d_u=d_phi, d_v=d_psi, k=basis.k, sign=sign)
                             rows.append(i)
                             cols.append(j)
                             values.append(val)
 
         # boundary conditions implemented as local operators
+        if verbose: 
+            print('assembling local operators')
         for region in regions_local_kernel:
-            #edges_on_region = mesh.edges_on(region)
+            if verbose: 
+                print(f'region: {region}')
             edges_on_region = mesh.boundary_Edges[region]
             bc = boundary_conditions[region]
             kernel = numerics.local_boundary_kernels[type(bc)]
             self.assemble_local_bc(edges_on_region, kernel, basis, rows, cols, values)
 
-
+        print("assembling non-local operators")
         # boundary conditions implemented as non-local operators
         for region in regions_nonlocal_kernel:
             bc = boundary_conditions[region]
             non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
-            #for edge_1 in mesh.edges_on(region):
-            for edge_1 in mesh.boundary_Edges[region]:
+            for edge_1 in tqdm(mesh.boundary_Edges[region],
+                               desc="NtD",
+                               disable=not verbose,
+                               unit="edge"):
                 T_1, _ = edge_1["triangles"]
                 for edge_2 in mesh.boundary_Edges[region]:
                     T_2, _ = edge_2["triangles"]
@@ -133,7 +145,7 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                             d_psi = basis.global_direction(i)
                             value = non_local_kernel.LHS(edge_u=edge_1,
                                                          edge_v=edge_2,
-                                                         d_phi=d_phi, d_psi=d_psi, k=basis.k)
+                                                         d_u=d_phi, d_v=d_psi, k=basis.k)
                             rows.append(i)
                             cols.append(j)
                             values.append(value)
@@ -159,7 +171,7 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                 T, _ = edge["triangles"]
                 for i in basis.dofs_on_element(T):
                     d_psi = basis.global_direction(i)
-                    value = local_kernel.RHS(edge=edge, d_psi=d_psi, k=basis.k)
+                    value = local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
                     rows.append(i)
                     values.append(value)
 
