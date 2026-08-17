@@ -68,23 +68,44 @@ from pathlib import Path
 
 DIM: Final = 2
 
-edge_dtype = [("P", np.float64, DIM),
-              ("Q", np.float64, DIM),
-              ("T", np.float64, DIM),
-              ("N", np.float64, DIM),
-              ("M", np.float64, DIM),
-              ("l", float),
-              ("on_boundary", np.bool),
-              ("region", np.int8),
-              ("triangles", np.int32, 2)]
+# edge_dtype = [("P", np.float64, DIM),
+#               ("Q", np.float64, DIM),
+#               ("T", np.float64, DIM),
+#               ("N", np.float64, DIM),
+#               ("M", np.float64, DIM),
+#               ("l", float),
+#               ("on_boundary", np.bool),
+#               ("region", np.int8),
+#               ("triangles", np.int32, 2)]
 
-arc_dtype = [("theta_1", np.float64),
-                  ("theta_2", np.float64),
-                  ("l", np.float64),
-                  ("R", np.float64),
-                  ("O", np.float64, 2),
-                  ("on_boundary", np.bool),
-                  ("triangles", np.int32, 2)]
+
+edge_dtype = np.dtype([("P", np.float64, DIM),
+                       ("Q", np.float64, DIM),
+                       ("T", np.float64, DIM),
+                       ("N", np.float64, DIM),
+                       ("M", np.float64, DIM),
+                       ("l", float),
+                       ("on_boundary", np.bool),
+                       ("region", np.int8),
+                       ("triangles", np.int32, 2)])
+
+
+# arc_dtype = [("theta_1", np.float64),
+#                   ("theta_2", np.float64),
+#                   ("l", np.float64),
+#                   ("R", np.float64),
+#                   ("O", np.float64, 2),
+#                   ("on_boundary", np.bool),
+#                   ("triangles", np.int32, 2)]
+
+arc_dtype = np.dtype([("theta_1", np.float64),
+                      ("theta_2", np.float64),
+                      ("l", np.float64),
+                      ("R", np.float64),
+                      ("O", np.float64, 2),
+                      ("on_boundary", np.bool),
+                      ("triangles", np.int32, 2)])
+
 
 
 def fill_edge_geometry(P: float_array, Q: float_array):

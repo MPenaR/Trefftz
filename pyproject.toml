@@ -23,6 +23,7 @@ gmsh = [
 
 [dependency-groups]
 dev = [
+    "flake8>=7.3.0",
     "furo>=2025.12.19",
     "ipykernel>=7.1.0",
     "mypy>=1.18.2",
@@ -48,8 +49,8 @@ include = ["trefftz*", "problems*", "cases*"]
 [tool.ruff]
 target-version = "py312"
 
-[tool.flake8]
-extend-ignore = ["E501"]
+[tool.ruff.lint]
+ignore = ["E501", "E741", "E743"]
 
 [tool.pytest.ini_options]
 markers = [
