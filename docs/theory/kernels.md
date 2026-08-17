@@ -45,7 +45,7 @@ $$
 
 ## Kernels on straight segments
 
-For a straight segment, the integrals can be evaluated analytically.
+For a straight segment, the integrals can be evaluated analytically and both of them are indeed proportional.
 
 ### `I_uv`
 
@@ -53,7 +53,11 @@ $$
 I_{uv} = le^{ik\left(\mathbf{d}_u-\mathbf{d}_v\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_u-\mathbf{d}_v\right)\cdot\boldsymbol{\tau}\right)
 $$
 
-[Brief explanation of the notation appearing in the formula.]
+where $\mathrm{sinc}$ stands for the _sinus cardinalis_ function: 
+
+$$
+\mathrm{sinc}(x) = \frac{\sin(\pi x)}{\pi x}
+$$
 
 ### `I_duv`
 
@@ -61,26 +65,40 @@ $$
 I_{duv} = ik\mathbf{d}_u\cdot\mathbf{n}I_{uv}
 $$
 
-[Brief explanation of the notation appearing in the formula.]
+Just written for analogy with the arcs.
 
 ---
 
 ## Kernels on circular arcs
 
 For a circular arc, the corresponding integrals are evaluated using the
-series representation derived for the circular geometry.
+series representation of a plane wave given by the Jacobi-Angers expansion.
 
-### $I_{uv}$
+### `I_uv`
 
-[Latex formula for $I_{uv}$ on a circular arc]
+$$
+I_{uv}=R\left(J_{0}\left(kRD_{uv}\right)\left(\theta_{2}-\theta_{1}\right)+2\sum_{t=1}^{\infty}\frac{i^{t}}{t}J_{t}\left(kRD_{uv}\right)\left(\sin\left(t\left(\theta_{2}-\phi_{uv}\right)\right)-\sin\left(t\left(\theta_{1}-\phi_{uv}\right)\right)\right)\right)
+$$
 
-[Brief explanation of the notation and the series.]
+where $J_v$ stands for the $v$ order Bessel function of the first kind, $R$ is the radius of the arc and $D_{uv}$ and $\phi_{uv}$ are defined such that:
 
-### $I_{duv}$
+$$
+\mathbf{d}_u - \mathbf{d}_v = D_{uv}\left(\cos(\phi_{uv})\mathbf{i} + \sin(\phi_{uv})\mathbf{j}\right)
+$$
 
-[Latex formula for $I_{duv}$ on a circular arc]
+### `I_duv`
 
-[Brief explanation of the notation and the series.]
+$$
+I_{duv} = I(\theta_2) - I(\theta_1)
+$$
+
+where the primitive $I$ is
+
+$$
+I(\theta)=kR\left(-J_{1}\left(kRD_{uv}\right)\cos\left(\phi_{uv}-\phi_{u}\right)\theta+\sum_{p=1}^{\infty}\frac{i^{p}}{p}\left(J_{p-1}\left(kRD_{uv}\right)\sin\left(p\left(\theta-\phi_{uv}\right)+\left(\phi_{uv}-\phi_{u}\right)\right)-J_{p+1}\left(kRD_{uv}\right)\sin\left(p\left(\theta-\phi_{uv}\right)-\left(\phi_{uv}-\phi_{u}\right)\right)\right)\right)
+$$
+
+and $\phi_u$ is defined such that $\mathbf{d}_u = \left(\cos(\phi_{u})\mathbf{i} + \sin(\phi_{u})\mathbf{j}\right)$.
 
 ---
 

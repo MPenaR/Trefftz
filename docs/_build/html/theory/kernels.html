@@ -315,7 +315,7 @@ I_{duv} := \int_E \nabla u(\mathbf{x})\cdot{\mathbf{n}}\overline{v(\mathbf{x})}\
 <hr class="docutils" />
 <section id="kernels-on-straight-segments">
 <h2>Kernels on straight segments<a class="headerlink" href="#kernels-on-straight-segments" title="Link to this heading">¶</a></h2>
-<p>For a straight segment, the integrals can be evaluated analytically.</p>
+<p>For a straight segment, the integrals can be evaluated analytically and both of them are indeed proportional.</p>
 <section id="id1">
 <h3><code class="docutils literal notranslate"><span class="pre">I_uv</span></code><a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
 <div class="math-wrapper docutils container">
@@ -324,7 +324,13 @@ I_{duv} := \int_E \nabla u(\mathbf{x})\cdot{\mathbf{n}}\overline{v(\mathbf{x})}\
 I_{uv} = le^{ik\left(\mathbf{d}_u-\mathbf{d}_v\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_u-\mathbf{d}_v\right)\cdot\boldsymbol{\tau}\right)
 \]</div>
 </div>
-<p>[Brief explanation of the notation appearing in the formula.]</p>
+<p>where <span class="math notranslate nohighlight">\(\mathrm{sinc}\)</span> stands for the <em>sinus cardinalis</em> function:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+\mathrm{sinc}(x) = \frac{\sin(\pi x)}{\pi x}
+\]</div>
+</div>
 </section>
 <section id="id2">
 <h3><code class="docutils literal notranslate"><span class="pre">I_duv</span></code><a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
@@ -334,23 +340,46 @@ I_{uv} = le^{ik\left(\mathbf{d}_u-\mathbf{d}_v\right)\cdot\mathbf{M}}\mathrm{sin
 I_{duv} = ik\mathbf{d}_u\cdot\mathbf{n}I_{uv}
 \]</div>
 </div>
-<p>[Brief explanation of the notation appearing in the formula.]</p>
+<p>Just written for analogy with the arcs.</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="kernels-on-circular-arcs">
 <h2>Kernels on circular arcs<a class="headerlink" href="#kernels-on-circular-arcs" title="Link to this heading">¶</a></h2>
 <p>For a circular arc, the corresponding integrals are evaluated using the
-series representation derived for the circular geometry.</p>
+series representation of a plane wave given by the Jacobi-Angers expansion.</p>
 <section id="id3">
-<h3><span class="math notranslate nohighlight">\(I_{uv}\)</span><a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
-<p>[Latex formula for <span class="math notranslate nohighlight">\(I_{uv}\)</span> on a circular arc]</p>
-<p>[Brief explanation of the notation and the series.]</p>
+<h3><code class="docutils literal notranslate"><span class="pre">I_uv</span></code><a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+I_{uv}=R\left(J_{0}\left(kRD_{uv}\right)\left(\theta_{2}-\theta_{1}\right)+2\sum_{t=1}^{\infty}\frac{i^{t}}{t}J_{t}\left(kRD_{uv}\right)\left(\sin\left(t\left(\theta_{2}-\phi_{uv}\right)\right)-\sin\left(t\left(\theta_{1}-\phi_{uv}\right)\right)\right)\right)
+\]</div>
+</div>
+<p>where <span class="math notranslate nohighlight">\(J_v\)</span> stands for the <span class="math notranslate nohighlight">\(v\)</span> order Bessel function of the first kind, <span class="math notranslate nohighlight">\(R\)</span> is the radius of the arc and <span class="math notranslate nohighlight">\(D_{uv}\)</span> and <span class="math notranslate nohighlight">\(\phi_{uv}\)</span> are defined such that:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+\mathbf{d}_u - \mathbf{d}_v = D_{uv}\left(\cos(\phi_{uv})\mathbf{i} + \sin(\phi_{uv})\mathbf{j}\right)
+\]</div>
+</div>
 </section>
 <section id="id4">
-<h3><span class="math notranslate nohighlight">\(I_{duv}\)</span><a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
-<p>[Latex formula for <span class="math notranslate nohighlight">\(I_{duv}\)</span> on a circular arc]</p>
-<p>[Brief explanation of the notation and the series.]</p>
+<h3><code class="docutils literal notranslate"><span class="pre">I_duv</span></code><a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+I_{duv} = I(\theta_2) - I(\theta_1)
+\]</div>
+</div>
+<p>where the primitive <span class="math notranslate nohighlight">\(I\)</span> is</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[
+I(\theta)=kR\left(-J_{1}\left(kRD_{uv}\right)\cos\left(\phi_{uv}-\phi_{u}\right)\theta+\sum_{p=1}^{\infty}\frac{i^{p}}{p}\left(J_{p-1}\left(kRD_{uv}\right)\sin\left(p\left(\theta-\phi_{uv}\right)+\left(\phi_{uv}-\phi_{u}\right)\right)-J_{p+1}\left(kRD_{uv}\right)\sin\left(p\left(\theta-\phi_{uv}\right)-\left(\phi_{uv}-\phi_{u}\right)\right)\right)\right)
+\]</div>
+</div>
+<p>and <span class="math notranslate nohighlight">\(\phi_u\)</span> is defined such that <span class="math notranslate nohighlight">\(\mathbf{d}_u = \left(\cos(\phi_{u})\mathbf{i} + \sin(\phi_{u})\mathbf{j}\right)\)</span>.</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -459,8 +488,8 @@ tested independently against numerical integration; see
 </ul>
 </li>
 <li><a class="reference internal" href="#kernels-on-circular-arcs">Kernels on circular arcs</a><ul>
-<li><a class="reference internal" href="#id3"><span class="math notranslate nohighlight">\(I_{uv}\)</span></a></li>
-<li><a class="reference internal" href="#id4"><span class="math notranslate nohighlight">\(I_{duv}\)</span></a></li>
+<li><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">I_uv</span></code></a></li>
+<li><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">I_duv</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#summary">Summary</a></li>
