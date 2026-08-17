@@ -279,8 +279,9 @@ def I_uincdv_arc(arc, d_inc: float_array, d_v: float_array, k: float) -> complex
 
     phi_v = atan2(d_v[1], d_v[0])
 
-    primitive = lambda theta: -k*R*(-jv(1, k*R*D_iv)*cos(phi_iv - phi_v)* theta + sum(1j**p/p*(jv(p-1, k*R*D_iv)*sin(p*(theta-phi_iv)+(phi_iv-phi_v))-
-                                                                                               jv(p+1, k*R*D_iv)*sin(p*(theta-phi_iv)-(phi_iv-phi_v)))
+    def I(theta: float) -> complex:
+        return -k*R*(-jv(1, k*R*D_iv)*cos(phi_iv - phi_v)* theta + sum(1j**p/p*(jv(p-1, k*R*D_iv)*sin(p*(theta-phi_iv)+(phi_iv-phi_v))-
+                                                                                jv(p+1, k*R*D_iv)*sin(p*(theta-phi_iv)-(phi_iv-phi_v)))
                                                                                               for p in range(1, JAC_ANGER_MODES)))
 
-    return primitive(theta_2) - primitive(theta_1)
+    return I(theta_2) - I(theta_1)
