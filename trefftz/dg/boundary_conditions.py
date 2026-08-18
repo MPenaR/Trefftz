@@ -34,11 +34,3 @@ class NtDBC:
     def __init__(self, truncating_radius: float, data: object | None = None):
         self.truncating_radius = truncating_radius
         self.data = data
-
-
-# class CircularNtD:
-#     ...
-
-
-# class WaveguideNtD:
-#     ...

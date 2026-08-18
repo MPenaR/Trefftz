@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from trefftz.mesh.core2 import TrefftzMesh, edge_dtype, arc_dtype
+from trefftz.mesh.core import TrefftzMesh, edge_dtype, arc_dtype
 def plot_openspace(mesh: TrefftzMesh, plot_tangents: bool = False, plot_normals: bool = False):
     from matplotlib.collections import LineCollection
     _, ax = plt.subplots(figsize=(8,8))

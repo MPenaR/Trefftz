@@ -5,7 +5,7 @@ from trefftz.mesh import TrefftzMesh
 from enum import IntEnum
 
 
-from trefftz.mesh.from_pygmsh import Mesh_from_meshio
+from trefftz.mesh.from_pygmsh_old import Mesh_from_meshio
 from pygmsh.geo import Geometry
 
 import gmsh

@@ -6,7 +6,7 @@ from numpy.lib.scimath import sqrt
 from numpy.linalg import norm
 from numpy import trapezoid as Int
 import numpy as np
-from trefftz.mesh.core2 import edge_dtype
+from trefftz.mesh.core import edge_dtype
 
 TOL = 1E-7
 N_POINTS = int(1E5)

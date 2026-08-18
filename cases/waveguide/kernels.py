@@ -1,5 +1,5 @@
 from trefftz.numpy_types import float_array
-from trefftz.dg.serial_kernels import I_uv, I_duv
+from trefftz.dg.kernels.serial_kernels import I_uv, I_duv
 from cases.waveguide.NeumanToDirichlet import I_Nuv, I_uNv, I_Nudv, I_NuNv
 
 
@@ -40,8 +40,6 @@ class NtDLocal_circle:
         """
 
         d_2 = self.d_2
-        # N = edge["N"]
-        # I = -(1j*k)*(dot(d_u, N) + d_2)*I_uv(edge, d_u, d_v, k)
         I = -I_duv(edge, d_u, d_v, k) -1j*k*d_2*I_uv(edge, d_u, d_v, k)
         return I
 

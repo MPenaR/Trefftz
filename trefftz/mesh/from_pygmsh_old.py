@@ -30,7 +30,7 @@ This module is primarily intended for meshes generated through:
 
 
 import numpy as np
-from .core import TrefftzMesh
+from .core_old import TrefftzMesh
 from .locators import KDTreeLocator
 
 try:

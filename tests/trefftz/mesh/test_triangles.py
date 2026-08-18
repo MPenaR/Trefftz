@@ -1,4 +1,4 @@
-from trefftz.mesh.from_pygmsh import Mesh_from_meshio
+from trefftz.mesh.from_pygmsh_old import Mesh_from_meshio
 import numpy as np
 
 def test_triangle_area():

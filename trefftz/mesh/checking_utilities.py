@@ -1,5 +1,5 @@
 import matplotlib.axes
-from .core2 import TrefftzMesh
+from .core import TrefftzMesh
 import matplotlib.pyplot as plt 
 from matplotlib.collections import LineCollection
 from matplotlib.patches import Polygon

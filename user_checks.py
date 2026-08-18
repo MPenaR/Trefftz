@@ -1,5 +1,5 @@
 from trefftz.mesh.checking_utilities import explore_edges
-from trefftz.mesh.from_pygmsh import CleanWaveGuide
+from trefftz.mesh.from_pygmsh_old import CleanWaveGuide
 
 
 # def Unbounded(r: float = 0.5, R: float = 5, lc: float = 0.2) -> Mesh:

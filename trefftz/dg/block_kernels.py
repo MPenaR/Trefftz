@@ -1,7 +1,7 @@
 from numpy import dot, exp, sinc, pi, atan2, sin, cos
 from numpy.linalg import norm
 from trefftz.numpy_types import float_array
-from trefftz.mesh.core2 import edge_dtype, arc_dtype
+from trefftz.mesh.core import edge_dtype, arc_dtype
 from scipy.special import jv
 from enum import Enum, auto
 
@@ -17,8 +17,8 @@ EDGE_TYPE = {edge_dtype: EdgeType.SEGMENT,
              arc_dtype: EdgeType.ARC}
 
 
-def I_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
-    r'''Computes the integral:
+def I_uv(edge, D_u: float_array, D_v: float_array, k: float) -> complex:
+    r'''Computes the integrals:
     .. math ::
         \int_E u \overline{v}\,\mathrm{d}\ell
 
@@ -26,9 +26,9 @@ def I_uv(edge, d_u: float_array, d_v: float_array, k: float) -> complex:
 
     match EDGE_TYPE[edge.dtype]:
         case EdgeType.SEGMENT:
-            I = I_uv_segment(edge, d_u, d_v, k)
+            I = I_uv_segment(edge, D_u, D_v, k)
         case EdgeType.ARC:
-            I = I_uv_arc(edge, d_u, d_v, k)
+            I = I_uv_arc(edge, D_u, D_v, k)
 
     return I
 
@@ -289,9 +289,6 @@ def I_uincdv_segment(segment, d_inc: float_array, d_v: float_array, k: float) ->
 
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
 
-    l = segment["l"]
-    M = segment["M"]
-    T = segment["T"]
     N = segment["N"]
     return -1j*k*dot(d_v, N)*I_uv_segment(segment, d_inc, d_v, k)
 

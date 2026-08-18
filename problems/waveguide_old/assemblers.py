@@ -10,7 +10,7 @@ import numpy as np
 from typing import Mapping
 
 from .RHS_types import RHS_type
-from trefftz.mesh.core import EdgeType
+from trefftz.mesh.core_old import EdgeType
 
 d_1 = 0.5
 d_2 = 0.5

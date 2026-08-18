@@ -43,7 +43,7 @@ class WaveguideRegions(IntEnum):
 #     SOUNDSOFT = 2
 #     RADIATION = 3
 
-from trefftz.mesh.core import EdgeType
+from trefftz.mesh.core_old import EdgeType
 from .assemblers import SerialAssembleMatrix, SerialAssembleRHS, SerialAssembleMatrix2
 
 

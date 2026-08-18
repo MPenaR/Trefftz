@@ -6,7 +6,7 @@ from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
 from numpy.linalg import norm
 from numpy import trapezoid as Int
 import numpy as np
-from trefftz.mesh.core2 import edge_dtype
+from trefftz.mesh.core import edge_dtype
 
 from collections import namedtuple
 TOL = 1E-7

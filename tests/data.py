@@ -1,5 +1,5 @@
 import numpy as np
-from trefftz.mesh.core2 import fill_arc_geometry, fill_edge_geometry
+from trefftz.mesh.core import fill_arc_geometry, fill_edge_geometry
 
 # tolerance 
 TOL = 1E-5

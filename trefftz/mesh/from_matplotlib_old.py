@@ -38,7 +38,7 @@ Gmsh-based workflows are generally preferred.
 import numpy as np
 from matplotlib.tri import Triangulation
 from trefftz.numpy_types import float_array, int_array
-from .core import CellLocator, TrefftzMesh
+from .core_old import CellLocator, TrefftzMesh
 
 
 class MatplotlibLocator(CellLocator):
