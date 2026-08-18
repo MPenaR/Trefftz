@@ -4,8 +4,6 @@ from cases.waveguide.NeumanToDirichlet import Fdudn, Fu, ntd
 
 
 def I_Nuv(segment_u, segment_v, d_u: float_array, d_v: float_array, k: float, H: float, NtD_modes: int) -> complex:
-    # I = ntd(segment_u, d_u, k, H, 0)*conj(Fu(segment_v, d_v, k, H, 0))
-    # I += sum(ntd(segment_u, d_u, k, H, 0)*conj(Fu(segment_v, d_v, k, H, 0)) for t in range(1, NtD_modes))
     I = sum(ntd(segment_u, d_u, k, H, t)*conj(Fu(segment_v, d_v, k, H, t)) for t in range(0, NtD_modes))
 
     return I

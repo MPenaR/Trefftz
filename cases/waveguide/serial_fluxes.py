@@ -1,6 +1,6 @@
 from trefftz.numpy_types import float_array
 from trefftz.dg.kernels.serial import I_uv, I_duv
-from cases.waveguide.NeumanToDirichlet import I_Nuv, I_uNv, I_Nudv, I_NuNv
+from cases.waveguide.serial_kernels import I_Nuv, I_uNv, I_Nudv, I_NuNv
 
 
 class NtDLocal:
