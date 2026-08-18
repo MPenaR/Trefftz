@@ -10,10 +10,8 @@ class NeumannFlux:
     def __init__(self, d_1: float):
         self.d_1 = d_1
     
-    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
         d_1 = self.d_1
-        d_v = d_psi
-        d_u = d_phi
 
         N = edge["N"]
         l = edge["l"]
@@ -30,7 +28,7 @@ class NeumannFlux:
         return Int((u + d_1/(1j*k)*du_dn)*conj(dv_dn), t)*l
 
 
-    def RHS(self, edge, d_psi: float_array, k: float) -> complex:
+    def RHS(self, edge, d_v: float_array, k: float) -> complex:
         raise NotImplementedError("Not implemented yet")
 
 def avg(w):
@@ -46,12 +44,9 @@ class UltraWeakFlux:
         self.a = a 
         self.b = b
     
-    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float, sign: SIGN) -> complex:
+    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float, sign: SIGN) -> complex:
         a = self.a
         b = self.b
-
-        d_v = d_psi
-        d_u = d_phi
 
         N = edge["N"]
         l = edge["l"]
@@ -75,10 +70,8 @@ class DirichletFlux:
         self.a = a
         self.data = data
     
-    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
         a = self.a
-        d_v = d_psi
-        d_u = d_phi
 
         N = edge["N"]
         l = edge["l"]
@@ -93,10 +86,9 @@ class DirichletFlux:
 
         return -Int((du_dn + 1j*a*k*u)*conj(v), t)*l
         
-    def RHS(self, edge, d_psi: float_array, k: float) -> complex:
+    def RHS(self, edge, d_v: float_array, k: float) -> complex:
         d_inc = self.data["d_inc"]
         a = self.a
-        d_v = d_psi
 
         N = edge["N"]
         l = edge["l"]
@@ -119,11 +111,8 @@ class CircularDirichletFlux:
         self.a = a
         self.data = data
     
-    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
+    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
         a = self.a
-
-        d_v = d_psi
-        d_u = d_phi
 
         R = edge["R"]
 
@@ -141,11 +130,10 @@ class CircularDirichletFlux:
 
         return -Int((du_dn + 1j*a*k*u)*conj(v), theta)*R
         
-    def RHS(self, edge, d_psi: float_array, k: float) -> complex:
+    def RHS(self, edge, d_v: float_array, k: float) -> complex:
         d_inc = self.data["d_inc"]
         a = self.a
 
-        d_v = d_psi
         R = edge["R"]
 
         theta_1 = edge["theta_1"]

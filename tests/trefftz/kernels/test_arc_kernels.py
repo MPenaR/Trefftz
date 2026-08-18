@@ -1,8 +1,8 @@
 import pytest
 from numpy.testing import assert_allclose
-import trefftz.dg.kernels.arc_kernels as exact
+import trefftz.dg.kernels.serial.arc_kernels as exact
 import trefftz.dg.numerical_kernels as numerical
-from ..data import TOL, DIRECTIONS, ARC_1, k
+from ...data import TOL, DIRECTIONS, ARC_1, k
 
 
 @pytest.mark.parametrize('d_m', DIRECTIONS)

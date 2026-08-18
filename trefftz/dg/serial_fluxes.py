@@ -12,7 +12,7 @@ from trefftz.numpy_types import float_array
 from enum import Enum
 from typing import Protocol
 
-from trefftz.dg.kernels.serial_kernels import I_uv, I_duv, I_udv, I_dudv, I_uincdv, I_uincv
+from trefftz.dg.kernels.serial import I_uv, I_duv, I_udv, I_dudv, I_uincdv, I_uincv
 
 
 JAC_ANGER_MODES = 80
