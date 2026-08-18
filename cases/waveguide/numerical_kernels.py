@@ -1,65 +1,110 @@
 from trefftz.numpy_types import float_array    
-from trefftz.dg.numerical_kernels import N_POINTS, create_numerical_functions
+from trefftz.dg.numerical_kernels import N_POINTS
 import numpy as np
-
+from cases.waveguide.numerical_NtD import NtD
+from numpy import trapezoid, conj, dot
 
 def I_uNv(segment_u, segment_v, d_u: float_array, d_v: float_array, k: float, H: float, NtD_modes: int) -> complex:
 
+    x = segment_u["P"][0]
+    # T = segment_u["T"]
+    N = segment_u["N"]
+    t = np.linspace(0., 1., N_POINTS)
+    y = H*t
+    J = H
 
-    P = segment["P"]
-    T = segment["T"]
-    l = segment["l"]
-    N = segment["N"]
+    r = np.column_stack((x*np.ones_like(y), y))
 
-    t = np.linspace(0, 1, N_POINTS)
-    x = P + l*np.outer(t, T)
-    J = l
+    mask_u = (y>=segment_u["P"][1]) & (y<=segment_u["Q"][1])
+    u = np.where(mask_u, np.exp(1j*k*dot(r, d_u)), 0.)
 
-    u, v, _, _ = create_numerical_functions(x, k, d_u, d_v, N)
-    I = np.trapezoid(u*np.conj(v), t)*J  # int u*conj(v) dl 
+    mask_v = (y>=segment_v["P"][1]) & (y<=segment_v["Q"][1])
+    v = np.where(mask_v, np.exp(1j*k*dot(r, d_v)), 0.)
 
-
-
-        P = edge_u["P"]
-
-        t = np.linspace(0, 1, N_POINTS)
-        N = edge_u["N"]
-        T = edge_u["T"]
-        l = edge_u["l"]
-        x = P + np.outer(t,T)*l
+    dv_dn = 1j*k*dot(d_v, N)*v
+    Nv = NtD(y, dv_dn, k, H, NtD_modes)
+    
+    I = trapezoid(u*conj(Nv), t)*J
         
-        P_v = edge["P"]
+    return I
 
-        t = np.linspace(0, 1, N_POINTS)
-        N = edge["N"]
-        T = edge["T"]
-        l = edge["l"]
-        x = P + np.outer(t,T)*l
+def I_Nuv(segment_u, segment_v, d_u: float_array, d_v: float_array, k: float, H: float, NtD_modes: int) -> complex:
 
-        theta = np.linspace(0, 2*np.pi, N_POINTS, endpoint=False)
-        u_r = np.column_stack([np.cos(theta), np.sin(theta)])
-        N = u_r
-        x = R*u_r
+    x = segment_u["P"][0]
+    # T = segment_u["T"]
+    N = segment_u["N"]
+    t = np.linspace(0., 1., N_POINTS)
+    y = H*t
+    J = H
 
-        # u = np.where(theta_1_u < theta < theta_2_u, exp(1j*k*dot(x, d_n)), 0)
-        mask_u = (theta_1_u <= theta) & (theta <= theta_2_u)
-        u = np.zeros_like(theta, dtype=np.complex128)
-        u[mask_u] = exp(1j*k*dot(x[mask_u, :], d_n))
-        # v = np.where(theta_1_v < theta < theta_2_v, exp(1j*k*dot(x, d_m)), 0)
-        mask_v = (theta_1_v <= theta) & (theta <= theta_2_v)
-        v = np.zeros_like(theta, dtype=np.complex128)
-        v[mask_v] = exp(1j*k*dot(x[mask_v, :], d_m))
+    r = np.column_stack((x*np.ones_like(y), y))
 
-        du_dn = 1j*k*dot(N, d_n)*u
-        dv_dn = 1j*k*dot(N, d_m)*v
+    mask_u = (y>=segment_u["P"][1]) & (y<=segment_u["Q"][1])
+    u = np.where(mask_u, np.exp(1j*k*dot(r, d_u)), 0.)
 
-        NtD_du = NewmanntoDirichlet(y, du_dn, k, R, N_MODES)
-        NtD_dv = NewmanntoDirichlet(y, dv_dn, k, R, N_MODES)
+    mask_v = (y>=segment_v["P"][1]) & (y<=segment_v["Q"][1])
+    v = np.where(mask_v, np.exp(1j*k*dot(r, d_v)), 0.)
+
+    du_dn = 1j*k*dot(d_u, N)*u
+    Nu = NtD(y, du_dn, k, H, NtD_modes)
+    
+    I = trapezoid(Nu*conj(v), t)*J
         
-        I_Nudv = Int(NtD_du*conj(dv_dn), theta)*R
-        I_NuNv = Int(NtD_du*conj(NtD_dv), theta)*R
-        I_uNv  = Int(u*conj(NtD_dv), theta)*R
-        I_Nuv  = Int(NtD_du*conj(v), theta)*R
+    return I
+
+
+def I_NuNv(segment_u, segment_v, d_u: float_array, d_v: float_array, k: float, H: float, NtD_modes: int) -> complex:
+
+    x = segment_u["P"][0]
+    # T = segment_u["T"]
+    N = segment_u["N"]
+    t = np.linspace(0., 1., N_POINTS)
+    y = H*t
+    J = H
+
+    r = np.column_stack((x*np.ones_like(y), y))
+
+    mask_u = (y>=segment_u["P"][1]) & (y<=segment_u["Q"][1])
+    u = np.where(mask_u, np.exp(1j*k*dot(r, d_u)), 0.)
+
+    mask_v = (y>=segment_v["P"][1]) & (y<=segment_v["Q"][1])
+    v = np.where(mask_v, np.exp(1j*k*dot(r, d_v)), 0.)
+
+    du_dn = 1j*k*dot(d_u, N)*u
+    Nu = NtD(y, du_dn, k, H, NtD_modes)
+
+
+    dv_dn = 1j*k*dot(d_v, N)*v
+    Nv = NtD(y, dv_dn, k, H, NtD_modes)
+    
+    I = trapezoid(Nu*conj(Nv), t)*J
         
-        I = I_Nudv - d2*1j*k*(I_NuNv - I_Nuv - I_uNv)
-        return I
+    return I
+
+
+def I_Nudv(segment_u, segment_v, d_u: float_array, d_v: float_array, k: float, H: float, NtD_modes: int) -> complex:
+
+    x = segment_u["P"][0]
+    # T = segment_u["T"]
+    N = segment_u["N"]
+    t = np.linspace(0., 1., N_POINTS)
+    y = H*t
+    J = H
+
+    r = np.column_stack((x*np.ones_like(y), y))
+
+    mask_u = (y>=segment_u["P"][1]) & (y<=segment_u["Q"][1])
+    u = np.where(mask_u, np.exp(1j*k*dot(r, d_u)), 0.)
+
+    mask_v = (y>=segment_v["P"][1]) & (y<=segment_v["Q"][1])
+    v = np.where(mask_v, np.exp(1j*k*dot(r, d_v)), 0.)
+
+    du_dn = 1j*k*dot(d_u, N)*u
+    Nu = NtD(y, du_dn, k, H, NtD_modes)
+
+
+    dv_dn = 1j*k*dot(d_v, N)*v
+    
+    I = trapezoid(Nu*conj(dv_dn), t)*J
+        
+    return I
