@@ -7,5 +7,6 @@ choices behind the Trefftz package.
 :maxdepth: 2
 
 data_structures
+problem
 workflow
 ```

@@ -8,5 +8,4 @@ Python package.
    :maxdepth: 2
 
    dg
-   fluxes
    mesh

@@ -205,6 +205,7 @@
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="design/index.html">Design</a><input aria-label="Toggle navigation of Design" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="design/data_structures.html">Data Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/problem.html">Problem object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design/workflow.html">Workflow</a></li>
 </ul>
 </li>
@@ -221,9 +222,9 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="api/dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/fluxes.html">Fluxes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/kernels.html">Kernels</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api/fluxes.html">Fluxes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/mesh.html">Mesh</a></li>
 </ul>
 </li>
@@ -270,6 +271,12 @@
 <p>Documentation for the <strong>Trefftz</strong> Python package.</p>
 <p>Trefftz is a Python implementation of Trefftz discontinuous Galerkin
 methods for the Helmholtz equation.</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">trefftz</span></code> is a Python library implementing a discontinuous Galerkin Trefftz method for the numerical solution of the Helmholtz equation.</p>
+<p>The project separates the general numerical machinery from problem-specific components. The <code class="docutils literal notranslate"><span class="pre">trefftz</span></code> package contains the reusable components required to discretize and solve Helmholtz problems, while the <code class="docutils literal notranslate"><span class="pre">cases</span></code> directory contains implementations specific to particular physical configurations, currently open-space and waveguide problems.</p>
+<p>This separation allows the same numerical machinery to be reused across different physical configurations and makes it possible to test general components independently of any particular application.</p>
+</section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -290,6 +297,7 @@ methods for the Helmholtz equation.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="design/index.html">Design</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="design/data_structures.html">Data Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/problem.html">Problem object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design/workflow.html">Workflow</a></li>
 </ul>
 </li>
@@ -309,7 +317,6 @@ methods for the Helmholtz equation.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/dg.html">Discontinuous Galerkin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/fluxes.html">Fluxes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/mesh.html">Mesh</a></li>
 </ul>
 </li>
@@ -372,6 +379,7 @@ methods for the Helmholtz equation.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Trefftz</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
 <li><a class="reference internal" href="#documentation">Documentation</a><ul>
 </ul>
 </li>
