@@ -1,273 +1,92 @@
-from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
-from numpy.lib.scimath import sqrt
-from numpy.linalg import norm
-from numpy import trapezoid as Int
+from numpy import exp, dot, conj
+from numpy import trapezoid
 import numpy as np
-from scipy.special import hankel1, h1vp
-from trefftz.numpy_types import float_array, complex_array
+from trefftz.numpy_types import float_array
+from trefftz.dg.numerical_kernels import N_POINTS
+from cases.open_space.numerical_NtD import NtD
 
-N_POINTS = int(1E5)
-NtD_MODES = 20
-
-
-
-class NtDLocal_circle:
-    def __init__(self, R: float, d_2: float, n: int):
-        self.R = R
-        self.mode_n = n
-        self.d_2 = d_2
-
-    
-    def LHS(self, edge, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-        d2 = self.d_2
-        d_n = d_phi
-        d_m = d_psi
-        R = self.R
-
-        P = edge["P"]
-        Q = edge["Q"]
-        theta_1 = np.atan2(P[1], P[0])
-        theta_2 = np.atan2(Q[1], Q[0])
-
-        theta = np.linspace(theta_1, theta_2, N_POINTS)
-        u_r = np.column_stack([np.cos(theta), np.sin(theta)])
-        N = u_r
-        x = R*u_r
-        u = exp(1j*k*dot(x, d_n))
-        v = exp(1j*k*dot(x, d_m))
-        du_dn = 1j*k*dot(N, d_n)*u
-        I_uv = -1j*k*d2*Int(u*conj(v), theta)*R  # int -i*k*d_2*u*conj(v) dl 
-        I_duv = -Int(du_dn*conj(v), theta)*R  # int -du/dn *conj(v) dl
-        I = I_uv + I_duv
-        return I
-
-    def RHS(self) -> complex:
-        raise NotImplementedError
-        
-
-class NtDNon_Local_circle:
-    def __init__(self, R: float, d_2: float, n: int, N_MODES: int):
-        self.R = R
-        self.mode_n = n
-        self.d_2 = d_2
-        self.N_MODES = N_MODES
-    
-    def LHS(self, edge_u, edge_v, d_phi: float_array, d_psi: float_array, k: float) -> complex:
-        d2 = self.d_2
-        d_n = d_phi
-        d_m = d_psi
-        R = self.R
-        N_MODES = self.N_MODES
-
-        P_u = edge_u["P"]
-        Q_u = edge_u["Q"]
-        theta_1_u = np.atan2(P_u[1], P_u[0])
-        theta_2_u = np.atan2(Q_u[1], Q_u[0])
-        
-        P_v = edge_v["P"]
-        Q_v = edge_v["Q"]
-        theta_1_v = np.atan2(P_v[1], P_v[0])
-        theta_2_v = np.atan2(Q_v[1], Q_v[0])
-
-        theta = np.linspace(0, 2*np.pi, N_POINTS, endpoint=False)
-        u_r = np.column_stack([np.cos(theta), np.sin(theta)])
-        N = u_r
-        x = R*u_r
-
-        # u = np.where(theta_1_u < theta < theta_2_u, exp(1j*k*dot(x, d_n)), 0)
-        mask_u = (theta_1_u <= theta) & (theta <= theta_2_u)
-        u = np.zeros_like(theta, dtype=np.complex128)
-        u[mask_u] = exp(1j*k*dot(x[mask_u, :], d_n))
-        # v = np.where(theta_1_v < theta < theta_2_v, exp(1j*k*dot(x, d_m)), 0)
-        mask_v = (theta_1_v <= theta) & (theta <= theta_2_v)
-        v = np.zeros_like(theta, dtype=np.complex128)
-        v[mask_v] = exp(1j*k*dot(x[mask_v, :], d_m))
-
-        du_dn = 1j*k*dot(N, d_n)*u
-        dv_dn = 1j*k*dot(N, d_m)*v
-
-        NtD_du = NewmanntoDirichlet(theta, du_dn, k, R, N_MODES)
-        NtD_dv = NewmanntoDirichlet(theta, dv_dn, k, R, N_MODES)
-        
-        I_Nudv = Int(NtD_du*conj(dv_dn), theta)*R
-        I_NuNv = Int(NtD_du*conj(NtD_dv), theta)*R
-        I_uNv  = Int(u*conj(NtD_dv), theta)*R
-        I_Nuv  = Int(NtD_du*conj(v), theta)*R
-        
-        I = I_Nudv - d2*1j*k*(I_NuNv - I_Nuv - I_uNv)
-        return I
-
-def num_I_Nuv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int) -> complex:
+def I_Nuv(arc_u, arc_v, d_u: float_array, d_v: float_array, k: float, NtD_modes: int) -> complex:
        
-    P_u = edge_u["P"]
-    Q_u = edge_u["Q"]
-    theta_1_u = np.atan2(P_u[1], P_u[0])
-    theta_2_u = np.atan2(Q_u[1], Q_u[0])
+    theta_1_u = arc_u["theta_1"]
+    theta_2_u = arc_u["theta_2"]
     
-    P_v = edge_v["P"]
-    Q_v = edge_v["Q"]
-    theta_1_v = np.atan2(P_v[1], P_v[0])
-    theta_2_v = np.atan2(Q_v[1], Q_v[0])
+    theta_1_v = arc_v["theta_1"]
+    theta_2_v = arc_v["theta_2"]
 
-    theta = np.linspace(0, 2*np.pi, N_POINTS*80, endpoint=False)
+    R = arc_u["R"]
+
+    theta = np.linspace(0, 2*np.pi, N_POINTS, endpoint=False)
     u_r = np.column_stack([np.cos(theta), np.sin(theta)])
     N = u_r
     x = R*u_r
 
-    # u = np.where(theta_1_u < theta < theta_2_u, exp(1j*k*dot(x, d_n)), 0)
     mask_u = (theta_1_u <= theta) & (theta <= theta_2_u)
-    u = np.zeros_like(theta, dtype=np.complex128)
-    u[mask_u] = exp(1j*k*dot(x[mask_u, :], d_u))
-    # v = np.where(theta_1_v < theta < theta_2_v, exp(1j*k*dot(x, d_m)), 0)
+    u = np.where(mask_u, exp(1j*k*dot(x, d_u)), 0.)
+    
     mask_v = (theta_1_v <= theta) & (theta <= theta_2_v)
-    v = np.zeros_like(theta, dtype=np.complex128)
-    v[mask_v] = exp(1j*k*dot(x[mask_v, :], d_v))
+    v = np.where(mask_v, exp(1j*k*dot(x, d_v)), 0)
 
     du_dn = 1j*k*dot(N, d_u)*u
 
-    NtD_du = NewmanntoDirichlet(theta, du_dn, k, R, NtD_modes)   
-    I = Int(NtD_du*conj(v), theta)*R
-
+    Nu = NtD(theta, du_dn, k, R, NtD_modes)   
+    I = trapezoid(Nu*conj(v), theta)*R
     return I
 
-def num_I_uNv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int) -> complex:
+def I_uNv(arc_u, arc_v, d_u: float_array, d_v: float_array, k: float, NtD_modes: int) -> complex:
        
-    P_u = edge_u["P"]
-    Q_u = edge_u["Q"]
-    theta_1_u = np.atan2(P_u[1], P_u[0])
-    theta_2_u = np.atan2(Q_u[1], Q_u[0])
+    theta_1_u = arc_u["theta_1"]
+    theta_2_u = arc_u["theta_2"]
     
-    P_v = edge_v["P"]
-    Q_v = edge_v["Q"]
-    theta_1_v = np.atan2(P_v[1], P_v[0])
-    theta_2_v = np.atan2(Q_v[1], Q_v[0])
+    theta_1_v = arc_v["theta_1"]
+    theta_2_v = arc_v["theta_2"]
+
+    R = arc_u["R"]
 
     theta = np.linspace(0, 2*np.pi, N_POINTS*80, endpoint=False)
     u_r = np.column_stack([np.cos(theta), np.sin(theta)])
     N = u_r
     x = R*u_r
 
-    # u = np.where(theta_1_u < theta < theta_2_u, exp(1j*k*dot(x, d_n)), 0)
     mask_u = (theta_1_u <= theta) & (theta <= theta_2_u)
-    u = np.zeros_like(theta, dtype=np.complex128)
-    u[mask_u] = exp(1j*k*dot(x[mask_u, :], d_u))
-    # v = np.where(theta_1_v < theta < theta_2_v, exp(1j*k*dot(x, d_m)), 0)
+    u = np.where(mask_u, exp(1j*k*dot(x, d_u)), 0.)
+    
     mask_v = (theta_1_v <= theta) & (theta <= theta_2_v)
-    v = np.zeros_like(theta, dtype=np.complex128)
-    v[mask_v] = exp(1j*k*dot(x[mask_v, :], d_v))
+    v = np.where(mask_v, exp(1j*k*dot(x, d_v)), 0)
 
     dv_dn = 1j*k*dot(N, d_v)*v
 
-    NtD_dv = NewmanntoDirichlet(theta, dv_dn, k, R, NtD_modes)   
-    I = Int(u*conj(NtD_dv), theta)*R
+    Nv = NtD(theta, dv_dn, k, R, NtD_modes)   
+    I = trapezoid(u*conj(Nv), theta)*R
 
     return I
 
-def num_I_NuNv(edge_u, edge_v, d_u: float_array, d_v: float_array, k: float, R: float, NtD_modes: int) -> complex:
+def num_I_NuNv(arc_u, arc_v, d_u: float_array, d_v: float_array, k: float, NtD_modes: int) -> complex:
        
-    P_u = edge_u["P"]
-    Q_u = edge_u["Q"]
-    theta_1_u = np.atan2(P_u[1], P_u[0])
-    theta_2_u = np.atan2(Q_u[1], Q_u[0])
+    theta_1_u = arc_u["theta_1"]
+    theta_2_u = arc_u["theta_2"]
     
-    P_v = edge_v["P"]
-    Q_v = edge_v["Q"]
-    theta_1_v = np.atan2(P_v[1], P_v[0])
-    theta_2_v = np.atan2(Q_v[1], Q_v[0])
+    theta_1_v = arc_v["theta_1"]
+    theta_2_v = arc_v["theta_2"]
+
+    R = arc_u["R"]
 
     theta = np.linspace(0, 2*np.pi, N_POINTS*80, endpoint=False)
     u_r = np.column_stack([np.cos(theta), np.sin(theta)])
     N = u_r
     x = R*u_r
 
-    # u = np.where(theta_1_u < theta < theta_2_u, exp(1j*k*dot(x, d_n)), 0)
     mask_u = (theta_1_u <= theta) & (theta <= theta_2_u)
-    u = np.zeros_like(theta, dtype=np.complex128)
-    u[mask_u] = exp(1j*k*dot(x[mask_u, :], d_u))
-    # v = np.where(theta_1_v < theta < theta_2_v, exp(1j*k*dot(x, d_m)), 0)
+    u = np.where(mask_u, exp(1j*k*dot(x, d_u)), 0.)
+    
     mask_v = (theta_1_v <= theta) & (theta <= theta_2_v)
-    v = np.zeros_like(theta, dtype=np.complex128)
-    v[mask_v] = exp(1j*k*dot(x[mask_v, :], d_v))
+    v = np.where(mask_v, exp(1j*k*dot(x, d_v)), 0)
 
     du_dn = 1j*k*dot(N, d_u)*u
     dv_dn = 1j*k*dot(N, d_v)*v
 
-    NtD_du = NewmanntoDirichlet(theta, du_dn, k, R, NtD_modes)   
-    NtD_dv = NewmanntoDirichlet(theta, dv_dn, k, R, NtD_modes)   
+    Nu = NtD(theta, du_dn, k, R, NtD_modes)   
+    Nv = NtD(theta, dv_dn, k, R, NtD_modes)   
 
-    I = Int(NtD_du*conj(NtD_dv), theta)*R
-
-    return I
-
-
-
-def FourierCoefficient(theta: float_array, f: float_array, t: int) -> complex:
-    r'''Computes the t Fourier coefficient defined as:
-    
-    .. math ::
-        \frac{1}{2\pi}*\int_0^{2\pi}f(\theta)e^{-it\theta}\,\mathrm{d}\theta
-    '''
-    return 1/sqrt(2*np.pi)*Int(f*exp(-1j*t*theta), theta)
-
-
-def num_Fdudn(edge, d: float_array, k: float, R: float, t: int) -> complex:
-    r'''Computes the t Fourier coefficient of 
-    .. math ::
-    \nabla u\cdot \mathbf{n} 
-    supported at a single edge.
-    '''
-    P = edge["P"]
-    Q = edge["Q"]
-    theta_1 = np.atan2(P[1], P[0])
-    theta_2 = np.atan2(Q[1], Q[0])
-
-    theta = np.linspace(theta_1, theta_2, N_POINTS)
-    u_r = np.column_stack([np.cos(theta), np.sin(theta)])
-    N = u_r
-    x = R*u_r
-
-    u = exp(1j*k*dot(x, d))
-    du_dn = 1j*k*dot(N, d)*u
-
-    I = FourierCoefficient(theta, du_dn, t)
+    I = trapezoid(Nu*conj(Nv), theta)*R
 
     return I
-
-def num_Fu(edge, d: float_array, k: float, R: float, t: int) -> complex:
-    r'''Computes the t Fourier coefficient of 
-    .. math ::
-    \nabla u\cdot \mathbf{n} 
-    supported at a single edge.
-    '''
-    P = edge["P"]
-    Q = edge["Q"]
-    theta_1 = np.atan2(P[1], P[0])
-    theta_2 = np.atan2(Q[1], Q[0])
-
-    theta = np.linspace(theta_1, theta_2, N_POINTS)
-    u_r = np.column_stack([np.cos(theta), np.sin(theta)])
-    x = R*u_r
-
-    u = exp(1j*k*dot(x, d))
-    I = FourierCoefficient(theta, u, t)
-
-    return I
-
-def NewmanntoDirichlet(theta: float_array, df_dn: complex_array, k: float, R: float, M: int) -> complex_array:
-    L = 2*np.pi
-    # dfn = np.zeros(M, dtype=np.complex128)
-    # dfn[0] = R*Int( df_dn*1/np.sqrt(L), theta )
-    # for n in range(1,M):
-    #     dfn[n] = Int( df_dy*cos(n*pi*y/H)/np.sqrt(H/2), y )
-
-    # f_y = 1/(1j*k)*dfn[0]/np.sqrt(H)*np.ones_like(y) + sum([ 1/(1j*np.sqrt(complex(k**2 - (n*pi/H)**2)))*dfn[n]*cos(n*pi*y/H)/np.sqrt(H/2) for n in range(1,M)])
-
-    dfn = np.zeros(2*M+1, dtype=np.complex128)
-    for n in range(-M, M+1):
-        i = n+M
-        dfn[i] = Int(df_dn*exp(-1j*n*theta)/np.sqrt(L), theta)
-
-    f = 1/k*sum((hankel1(n, k*R)/h1vp(n, k*R)*dfn[n+M]*exp(1j*n*theta)/np.sqrt(L) for n in range(-M, M+1)))
-
-    return f
-

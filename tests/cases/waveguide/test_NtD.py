@@ -1,6 +1,6 @@
 from ...data import DIRECTIONS, TOL, k
-from .data import NTD_MODES, H, EDGE1_SIGMA_L, EDGE1_SIGMA_R
-import cases.waveguide.NeumanToDirichlet as exact
+from .data import NTD_MODES, H, SEGMENT1_SIGMA_L, SEGMENT1_SIGMA_R
+import cases.waveguide.NeumannToDirichlet as exact
 import cases.waveguide.numerical_NtD as numerical
 from numpy.testing import assert_allclose
 import numpy as np
@@ -8,7 +8,7 @@ import pytest
 
 N_POINTS = 10**5
 
-@pytest.mark.parametrize('edge', (EDGE1_SIGMA_L, EDGE1_SIGMA_R))
+@pytest.mark.parametrize('edge', (SEGMENT1_SIGMA_L, SEGMENT1_SIGMA_R))
 @pytest.mark.parametrize('d', DIRECTIONS)
 @pytest.mark.parametrize('t', range(NTD_MODES))
 def test_ntd(edge, d, t):
@@ -25,7 +25,7 @@ def test_ntd(edge, d, t):
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
 
 
-@pytest.mark.parametrize('edge', (EDGE1_SIGMA_L, EDGE1_SIGMA_R))
+@pytest.mark.parametrize('edge', (SEGMENT1_SIGMA_L, SEGMENT1_SIGMA_R))
 @pytest.mark.parametrize('t', range(NTD_MODES))
 def test_block_ntd(edge, t):
     I_exact = exact.ntd(edge=edge, d=DIRECTIONS, k=k, H=H, t=t)

@@ -3,10 +3,10 @@ import cases.waveguide.numerical_kernels as numerical
 import pytest
 from numpy.testing import assert_allclose
 from ...data import TOL, DIRECTIONS, k
-from .data import EDGE1_SIGMA_L,EDGE2_SIGMA_L, EDGE1_SIGMA_R, EDGE2_SIGMA_R, H, NTD_MODES
+from .data import SEGMENT1_SIGMA_L, SEGMENT2_SIGMA_L, SEGMENT1_SIGMA_R, SEGMENT2_SIGMA_R, H, NTD_MODES
 
-@pytest.mark.parametrize('edges', [(EDGE1_SIGMA_L, EDGE2_SIGMA_L),
-                                   (EDGE1_SIGMA_R, EDGE2_SIGMA_R)])
+@pytest.mark.parametrize('edges', [(SEGMENT1_SIGMA_L, SEGMENT2_SIGMA_L),
+                                   (SEGMENT1_SIGMA_R, SEGMENT2_SIGMA_R)])
 @pytest.mark.parametrize('d_m', DIRECTIONS)
 @pytest.mark.parametrize('d_n', DIRECTIONS)
 def test_IuNv(edges, d_m, d_n):
@@ -16,8 +16,8 @@ def test_IuNv(edges, d_m, d_n):
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
 
 
-@pytest.mark.parametrize('edges', [(EDGE1_SIGMA_L, EDGE2_SIGMA_L),
-                                   (EDGE1_SIGMA_R, EDGE2_SIGMA_R)])
+@pytest.mark.parametrize('edges', [(SEGMENT1_SIGMA_L, SEGMENT2_SIGMA_L),
+                                   (SEGMENT1_SIGMA_R, SEGMENT2_SIGMA_R)])
 @pytest.mark.parametrize('d_m', DIRECTIONS)
 @pytest.mark.parametrize('d_n', DIRECTIONS)
 def test_INuv(edges, d_m, d_n):
@@ -27,8 +27,8 @@ def test_INuv(edges, d_m, d_n):
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
 
 
-@pytest.mark.parametrize('edges', [(EDGE1_SIGMA_L, EDGE2_SIGMA_L),
-                                   (EDGE1_SIGMA_R, EDGE2_SIGMA_R)])
+@pytest.mark.parametrize('edges', [(SEGMENT1_SIGMA_L, SEGMENT2_SIGMA_L),
+                                   (SEGMENT1_SIGMA_R, SEGMENT2_SIGMA_R)])
 @pytest.mark.parametrize('d_m', DIRECTIONS)
 @pytest.mark.parametrize('d_n', DIRECTIONS)
 def test_INuNv(edges, d_m, d_n):
@@ -38,8 +38,8 @@ def test_INuNv(edges, d_m, d_n):
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
 
 
-@pytest.mark.parametrize('edges', [(EDGE1_SIGMA_L, EDGE2_SIGMA_L),
-                                   (EDGE1_SIGMA_R, EDGE2_SIGMA_R)])
+@pytest.mark.parametrize('edges', [(SEGMENT1_SIGMA_L, SEGMENT2_SIGMA_L),
+                                   (SEGMENT1_SIGMA_R, SEGMENT2_SIGMA_R)])
 @pytest.mark.parametrize('d_m', DIRECTIONS)
 @pytest.mark.parametrize('d_n', DIRECTIONS)
 def test_INudv(edges, d_m, d_n):

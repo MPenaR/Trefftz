@@ -2,7 +2,7 @@ import numpy as np
 from numpy import pi, cos, sqrt
 from numpy import trapezoid
 from trefftz.numpy_types import complex_array, float_array
-from cases.waveguide.NeumanToDirichlet import beta
+from cases.waveguide.NeumannToDirichlet import beta
 
 
 def ntd(y: float_array, du_dn: complex_array, k: float, H: float, t: int) -> complex:

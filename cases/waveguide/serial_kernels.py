@@ -1,6 +1,6 @@
 from trefftz.numpy_types import float_array
 from numpy import conj
-from cases.waveguide.NeumanToDirichlet import Fdudn, Fu, ntd
+from cases.waveguide.NeumannToDirichlet import Fdudn, Fu, ntd
 
 
 def I_Nuv(segment_u, segment_v, d_u: float_array, d_v: float_array, k: float, H: float, NtD_modes: int) -> complex:
