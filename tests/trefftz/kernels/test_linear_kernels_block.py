@@ -1,4 +1,3 @@
-import pytest
 from numpy.testing import assert_allclose
 import numpy as np
 import trefftz.dg.kernels.serial as serial

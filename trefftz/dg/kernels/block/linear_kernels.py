@@ -50,7 +50,7 @@ def I_dudv(segment, D_u: float_array, D_v: float_array, k: float) -> complex:
     return k**2*dot(D_u, N)[None, :]*dot(D_v, N)[:, None]*I_uv(segment, D_u, D_v, k)
 
 
-def I_uincv(segment, d_inc: float_array, d_v: float_array, k: float) -> complex:
+def I_uincv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
@@ -61,10 +61,12 @@ def I_uincv(segment, d_inc: float_array, d_v: float_array, k: float) -> complex:
     M = segment["M"]
     T = segment["T"]
 
-    return l*exp(1j*k*dot((d_inc - d_v), M))*sinc(k*l/(2*pi)*dot(d_inc - d_v, T))
+    d_incv = d_inc[None, : ] - D_v[ :, : ]
+
+    return l*exp(1j*k*dot(d_incv, M))*sinc(k*l/(2*pi)*dot(d_incv, T))
 
 
-def I_uincdv(segment, d_inc: float_array, d_v: float_array, k: float) -> complex:
+def I_uincdv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{\nabla v \cdot \mathbf{n}}\,\mathrm{d}\ell
@@ -72,5 +74,5 @@ def I_uincdv(segment, d_inc: float_array, d_v: float_array, k: float) -> complex
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
 
     N = segment["N"]
-    return -1j*k*dot(d_v, N)*I_uv(segment, d_inc, d_v, k)
+    return -1j*k*dot(D_v, N)*I_uincv(segment, d_inc, D_v, k)
 

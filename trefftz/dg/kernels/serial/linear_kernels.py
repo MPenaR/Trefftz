@@ -68,5 +68,5 @@ def I_uincdv(segment, d_inc: float_array, d_v: float_array, k: float) -> complex
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
 
     N = segment["N"]
-    return -1j*k*dot(d_v, N)*I_uv(segment, d_inc, d_v, k)
+    return -1j*k*dot(d_v, N)*I_uincv(segment, d_inc, d_v, k)
 

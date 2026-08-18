@@ -1,9 +1,9 @@
 from trefftz.numpy_types import float_array
-from trefftz.dg.kernels.serial_kernels import I_uv, I_duv
+from trefftz.dg.kernels.serial import I_uv, I_duv
 from cases.waveguide.NeumanToDirichlet import I_Nuv, I_uNv, I_Nudv, I_NuNv
 
 
-class NtDLocal_circle:
+class NtDLocal:
     def __init__(self, R: float, d_2: float, data=None):
         self.data = data
         self.d_2 = d_2
@@ -50,7 +50,7 @@ class NtDLocal_circle:
         return I
 
 
-class NtDNonLocal_circle:
+class NtDNonLocal:
     def __init__(self, H: float, d_2: float, NtD_modes: int, data=None):
         self.H = H
         self.data = data
