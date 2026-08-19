@@ -15,7 +15,7 @@ from typing import Protocol
 from trefftz.dg.kernels.serial import I_uv, I_duv, I_udv, I_dudv, I_uincdv, I_uincv
 
 
-JAC_ANGER_MODES = 80
+JAC_ANGER_MODES = 60
 
 class SIGN(Enum):
     '''Sign for the transmission kernel
@@ -56,13 +56,6 @@ class NeumannFlux:
     
         \int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}
 
-    This quantity can be exactly evaluated as:
-
-    .. math::
-    
-        \boxed{-ikl\left(1+d_{1}\mathbf{d}_{n}\cdot\mathbf{n}\right)\mathbf{d}_{m}\cdot\mathbf{n}e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\boldsymbol{\tau}\right)}
-
-
     Parameters
     ----------
     edge : Edge or Arc
@@ -87,10 +80,6 @@ class NeumannFlux:
     
     def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
         d_1 = self.d_1
-        d_m = d_v
-        d_n = d_u
-
-        N = edge["N"]
 
         return I_udv(edge, d_u, d_v, k) + d_1/(1j*k)*I_dudv(edge, d_u, d_v, k)
 
@@ -173,13 +162,6 @@ class DirichletFlux:
     
         \int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}
 
-    This quantity can be exactly evaluated as:
-
-    .. math::
-    
-        \boxed{a}
-
-
     Parameters
     ----------
     edge : Edge or Arc
@@ -206,9 +188,9 @@ class DirichletFlux:
     
     def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
         a = self.a
-        return -I_duv(edge, d_u, d_v, k) - 1j*k*a*I_uv(edge, d_u, d_v, k)
+        return -I_duv(edge, d_u, d_v, k) + 1j*k*a*I_uv(edge, d_u, d_v, k)
         
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
         d_inc = self.data["d_inc"]
         a = self.a
-        return I_uincdv(edge, d_inc, d_v, k) + 1j*a*k*I_uincv(edge, d_inc, d_v, k)
+        return I_uincdv(edge, d_inc, d_v, k) - 1j*a*k*I_uincv(edge, d_inc, d_v, k)

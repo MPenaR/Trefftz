@@ -1,6 +1,11 @@
-from numpy import pi, exp, sinc, dot
+from numpy import pi, exp, sinc, dot, array
 from numpy.lib.scimath import sqrt
 from trefftz.numpy_types import float_array
+from enum import IntEnum
+
+class PropagationDirection(IntEnum): 
+    LEFT = -1
+    RIGHT = +1
 
 def Fu(edge, d: float_array, k: float, H: float, t: int) -> complex:
     r'''
@@ -31,3 +36,16 @@ def beta(k: float, H: float, t: int) -> complex | float:
 
 def ntd(edge, d: float_array, k: float, H: float, t: int) -> complex:
     return 1/(1j*beta(k, H, t))*Fdudn(edge, d, k, H, t)
+
+
+class Mode:
+    def __init__(self, k: float, H: float, t: int, direction: PropagationDirection):
+        self.k = k
+        self.H = H
+        self.t = t
+        self.beta = beta(k, H, t)
+        self.d_1 = array((direction*sqrt(1 - (t*pi/(k*H))**2), t*pi/(k*H)))
+        self.d_2 = array((direction*sqrt(1 - (t*pi/(k*H))**2),-t*pi/(k*H)))
+
+
+

@@ -1,4 +1,4 @@
-class NtDLocal_circle:
+class NtDLocal:
     def __init__(self, R: float, d_2: float, n: int):
         self.R = R
         self.mode_n = n
@@ -32,7 +32,7 @@ class NtDLocal_circle:
         raise NotImplementedError
         
 
-class NtDNon_Local_circle:
+class NtDNonLocal:
     def __init__(self, R: float, d_2: float, n: int, N_MODES: int):
         self.R = R
         self.mode_n = n

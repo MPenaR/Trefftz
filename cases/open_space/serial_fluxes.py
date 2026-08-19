@@ -1,11 +1,11 @@
 from trefftz.numpy_types import float_array
-from cases.open_space.NeumannToDirichlet import I_Nuv, I_Nudv, I_NuNv, I_uNv, I_Nuincv, I_Nuincdv, I_NuincNv, I_uincNv
+from cases.open_space.serial_kernels import I_Nuv, I_Nudv, I_NuNv, I_uNv, I_Nuincv, I_Nuincdv, I_NuincNv, I_uincNv
 
 from trefftz.dg.kernels.serial import I_uv, I_duv
 
 JACOBI_ANGER_MODES = 30
-class NtDLocal_circle:
-    def __init__(self, R: float, d_2: float, data = None):
+class NtDLocal:
+    def __init__(self, d_2: float, data = None):
         self.data = data
         self.d_2 = d_2
     
@@ -51,7 +51,7 @@ class NtDLocal_circle:
         I = -I_duv(edge, d_inc, d_v, k) -1j*k*d_2*I_uv(edge, d_inc, d_v, k)
         return I
 
-class NtDNonLocal_circle:
+class NtDNonLocal:
     def __init__(self, d_2: float, NtD_modes: int, data = None):
         self.data = data
         self.d_2 = d_2
