@@ -1,7 +1,7 @@
 import numpy as np
 from trefftz.numpy_types import float_array
 
-N_POINTS = int(1E5)
+N_POINTS = int(1E6)
 
 
 def create_numerical_functions(x: float_array, k: float, d_u: float_array, d_v: float_array, N: float_array):

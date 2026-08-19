@@ -1,5 +1,5 @@
 import numpy as np 
-from numpy import sqrt, exp, dot, trapezoid
+from numpy import sqrt, exp, pi, trapezoid
 from trefftz.numpy_types import float_array, complex_array
 from scipy.special import hankel1, h1vp
 
@@ -7,7 +7,7 @@ def ntd(theta: float_array, du_dn: complex_array, k: float, R: float, t: int) ->
     return 1/k*hankel1(t, k*R)/h1vp(t, k*R)*trapezoid(du_dn*exp(-1j*t*theta)/np.sqrt(2*np.pi), theta)
 
 def NtD(theta: float_array, du_dn: complex_array, k: float, R: float, M: int) -> complex_array:
-    return sum(ntd(theta, du_dn, k, R, t)*exp(1j*t*theta) for t in range(-M, M+1))
+    return sum(ntd(theta, du_dn, k, R, t)*exp(1j*t*theta)/sqrt(2*pi) for t in range(-M, M+1))
 
 
 # def FourierCoefficient(theta: float_array, f: float_array, t: int) -> complex:
