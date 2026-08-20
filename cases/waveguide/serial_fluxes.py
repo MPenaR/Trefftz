@@ -1,6 +1,7 @@
 from trefftz.numpy_types import float_array
 from trefftz.dg.kernels.serial import I_uv, I_duv
 from cases.waveguide.serial_kernels import I_Nuv, I_uNv, I_Nudv, I_NuNv, I_mode_v, I_mode_dv
+from cases.waveguide.serial_kernels import I_Nmodedv, I_Nmodev, I_modeNv, I_NmodeNv
 
 
 class NtDLocal:
@@ -98,12 +99,12 @@ class NtDNonLocal:
         return I
 
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
-        d_inc = self.data["d_inc"]
+        mode = self.data
         d_2 = self.d_2
         H = self.H
         NtD_modes = self.NtD_modes
 
-        I = I_Nuincdv(edge, d_inc, d_v, k, H, NtD_modes) - d_2*1j*k*(I_NuincNv(edge, d_inc, d_v, k, H, NtD_modes)
-                                                                          -I_Nuincv(edge, d_inc, d_v, k, H, NtD_modes)
-                                                                          -I_uincNv(edge, d_inc, d_v, k, H, NtD_modes))
+        I = I_Nmodedv(edge, mode, d_v, k, H, NtD_modes) - d_2*1j*k*(I_NmodeNv(edge, mode, d_v, k, H, NtD_modes)
+                                                                          -I_Nmodev(edge, mode, d_v, k, H, NtD_modes)
+                                                                          -I_modeNv(edge, mode, d_v, k, H, NtD_modes))
         return I
