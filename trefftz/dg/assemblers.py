@@ -133,7 +133,7 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
             bc = boundary_conditions[region]
             non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
             for edge_1 in tqdm(mesh.boundary_Edges[region],
-                               desc="NtD",
+                               desc=f"NtD, {region}",
                                disable=not verbose,
                                unit="edge"):
                 T_1, _ = edge_1["triangles"]
@@ -166,6 +166,7 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
         for region in regions_RHS_term:  # I should check redefining this lists as sets or something like that, because of the local AND RHS
             bc = boundary_conditions[region]
             local_kernel = numerics.local_boundary_kernels[type(bc)]
+            print(local_kernel)
             # for edge in mesh.edges_on(region):
             for edge in mesh.boundary_Edges[region]:
                 T, _ = edge["triangles"]
@@ -174,6 +175,18 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                     value = local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
                     rows.append(i)
                     values.append(value)
+
+            non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
+            print(non_local_kernel)
+            # for edge in mesh.edges_on(region):
+            for edge in mesh.boundary_Edges[region]:
+                T, _ = edge["triangles"]
+                for i in basis.dofs_on_element(T):
+                    d_psi = basis.global_direction(i)
+                    value = non_local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
+                    rows.append(i)
+                    values.append(value)
+
 
         b = np.zeros((basis.N_DOF,), dtype=np.complex128)
         np.add.at(b, rows, values)

@@ -5,7 +5,7 @@ from cases.waveguide.serial_kernels import I_Nmodedv, I_Nmodev, I_modeNv, I_Nmod
 
 
 class NtDLocal:
-    def __init__(self, R: float, d_2: float, data=None):
+    def __init__(self, d_2: float, data=None):
         self.data = data
         self.d_2 = d_2
     
@@ -105,6 +105,6 @@ class NtDNonLocal:
         NtD_modes = self.NtD_modes
 
         I = I_Nmodedv(edge, mode, d_v, k, H, NtD_modes) - d_2*1j*k*(I_NmodeNv(edge, mode, d_v, k, H, NtD_modes)
-                                                                          -I_Nmodev(edge, mode, d_v, k, H, NtD_modes)
-                                                                          -I_modeNv(edge, mode, d_v, k, H, NtD_modes))
+                                                                    -I_Nmodev(edge, mode, d_v, k, H, NtD_modes)
+                                                                    -I_modeNv(edge, mode, d_v, k, H, NtD_modes))
         return I
