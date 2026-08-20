@@ -166,16 +166,14 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
         for region in regions_RHS_term:  # I should check redefining this lists as sets or something like that, because of the local AND RHS
             bc = boundary_conditions[region]
             local_kernel = numerics.local_boundary_kernels[type(bc)]
-            print(local_kernel)
-            # for edge in mesh.edges_on(region):
             for edge in mesh.boundary_Edges[region]:
-                if edge["N"][0]>0:
-                    continue
                 T, _ = edge["triangles"]
                 for i in basis.dofs_on_element(T):
                     d_psi = basis.global_direction(i)
                     value = local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
                     rows.append(i)
+                    print(f'{region=}, {value=}')
+
                     values.append(value)
 
             # non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]

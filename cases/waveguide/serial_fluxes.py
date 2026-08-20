@@ -45,19 +45,24 @@ class NtDLocal:
         I = -I_duv(edge, d_u, d_v, k) -1j*k*d_2*I_uv(edge, d_u, d_v, k)
         return I
 
-    # def RHS(self, edge, d_v: float_array, k: float) -> complex:
-    #     d_2 = self.d_2
-    #     mode = self.data
-    #     I = -I_mode_dv(edge, mode, d_v, k) -1j*k*d_2*I_mode_v(edge, mode, d_v, k)
-    #     return I
-
-# specialized one, just for testing
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
         d_2 = self.d_2
         mode = self.data
+        H = mode.H 
         NtD_modes = self.NtD_modes
-        I = -2*I_mode_dv(edge, mode, d_v, k) + 2j*k*d_2*(I_modeNv(edge, mode, d_v, k, mode.H, NtD_modes=NtD_modes) - I_mode_v(edge, mode, d_v, k))
+        I = -I_mode_dv(edge, mode, d_v, k) + I_Nmodedv(edge, mode, d_v, k, H, NtD_modes) -1j*k*d_2*( I_NmodeNv(edge, mode, d_v, k, H, NtD_modes)
+                                                                                                     -I_Nmodev(edge, mode, d_v, k, H, NtD_modes)
+                                                                                                     -I_modeNv(edge, mode, d_v, k, H, NtD_modes)
+                                                                                                     +I_mode_v(edge, mode, d_v, k))
         return I
+
+# specialized one, just for testing
+    # def RHS(self, edge, d_v: float_array, k: float) -> complex:
+    #     d_2 = self.d_2
+    #     mode = self.data
+    #     NtD_modes = self.NtD_modes
+    #     I = -2*I_mode_dv(edge, mode, d_v, k) + 2j*k*d_2*(I_modeNv(edge, mode, d_v, k, mode.H, NtD_modes=NtD_modes) - I_mode_v(edge, mode, d_v, k))
+    #     return I
 
 
 class NtDNonLocal:
