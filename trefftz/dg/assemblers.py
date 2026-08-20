@@ -169,6 +169,8 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
             print(local_kernel)
             # for edge in mesh.edges_on(region):
             for edge in mesh.boundary_Edges[region]:
+                if edge["N"][0]>0:
+                    continue
                 T, _ = edge["triangles"]
                 for i in basis.dofs_on_element(T):
                     d_psi = basis.global_direction(i)
@@ -176,16 +178,16 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                     rows.append(i)
                     values.append(value)
 
-            non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
-            print(non_local_kernel)
-            # for edge in mesh.edges_on(region):
-            for edge in mesh.boundary_Edges[region]:
-                T, _ = edge["triangles"]
-                for i in basis.dofs_on_element(T):
-                    d_psi = basis.global_direction(i)
-                    value = non_local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
-                    rows.append(i)
-                    values.append(value)
+            # non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
+            # print(non_local_kernel)
+            # # for edge in mesh.edges_on(region):
+            # for edge in mesh.boundary_Edges[region]:
+            #     T, _ = edge["triangles"]
+            #     for i in basis.dofs_on_element(T):
+            #         d_psi = basis.global_direction(i)
+            #         value = non_local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
+            #         rows.append(i)
+            #         values.append(value)
 
 
         b = np.zeros((basis.N_DOF,), dtype=np.complex128)

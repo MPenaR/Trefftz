@@ -49,18 +49,30 @@ class Mode:
         self.d_2 = array((direction*sqrt(1 - (t*pi/(k*H))**2),-t*pi/(k*H)))
 
 
+# def Fmode(segment, mode: Mode, t: int) -> complex:
+#     N = segment["N"]
+#     x = segment["P"][0]
+#     beta = mode.beta 
+#     H = mode.H
+#     if mode.t != t:
+#         return 0
+#     else:
+#         if t == 0:
+#             return mode.direction*N[0]*sqrt(H)*exp(1j*beta*x)
+#         else:
+#             return mode.direction*N[0]*sqrt(H/2)*exp(1j*beta*x)
+
+#specific one
 def Fmode(segment, mode: Mode, t: int) -> complex:
-    N = segment["N"]
-    x = segment["P"][0]
-    beta = mode.beta 
     H = mode.H
     if mode.t != t:
         return 0
     else:
         if t == 0:
-            return mode.direction*N[0]*sqrt(H)*exp(1j*beta*x)
+            return sqrt(H)
         else:
-            return mode.direction*N[0]*sqrt(H/2)*exp(1j*beta*x)
+            return sqrt(H/2)
+
 
 
 def ntd_mode(segment, mode: Mode, t: int) -> complex:
