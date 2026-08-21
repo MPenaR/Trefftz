@@ -2,7 +2,7 @@
 from typing import TYPE_CHECKING, Optional, Callable, TypeVar, Generic
 
 if TYPE_CHECKING:
-    from trefftz.dg.functions import ComplexFunction  # consider changing it to "field"
+    from trefftz.dg.functions_old import ComplexFunction  # consider changing it to "field"
 
 from trefftz.mesh import TrefftzMesh
 

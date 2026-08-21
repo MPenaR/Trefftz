@@ -193,6 +193,7 @@ class TrefftzMesh[BR: Enum]:
         self._edges_on = cell_sets
         # I DONT LIKE THIS, MOVING TOWARDS TWO TYPES OF EDGES, and HAVE THEM SEPARATED IN THE MESH
         self.boundary_Edges = {}
+        self.curved_regions = []
         for reg in self.boundary_regions:
             self.boundary_Edges[reg] = self.edges_on(reg)
 
@@ -283,21 +284,24 @@ class TrefftzMesh[BR: Enum]:
         edges["N"][~edges["on_boundary"]] = inner_normals
 
 
-    def get_cell(self, p: float_array) -> int_array | int:
+    def get_cell(self, x: float_array, y: float_array) -> int_array | int:
         """
         Find the mesh cell containing a point.
 
         Parameters
         ----------
         p : float_array
-            Query point or points coordinates.
+            x-coordinate of query point or points.
+
+        p : float_array
+            y-coordinate of quety point or points.
 
         Returns
         -------
         int or int_array
             Index (or indices) of the containing cell(s).
         """
-        return self.locator.find_cell(p)
+        return self.locator.find_cell(x, y)
 
     @property
     def n_points(self) -> int:
@@ -429,3 +433,4 @@ class TrefftzMesh[BR: Enum]:
             curved_edges[i] = (theta_1, theta_2, l, R, O, edge["on_boundary"], edge["triangles"])
 
         self.boundary_Edges[region] = curved_edges
+        self.curved_regions.append(region)

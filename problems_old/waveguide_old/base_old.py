@@ -24,7 +24,7 @@ from trefftz.numpy_types import float_array, complex_array
 # from problems.base import AbstractProblem
 from enum import IntEnum
 from trefftz.dg.basis import PlanewaveBasis, LinearlySpacedBasis
-from trefftz.dg.functions import TrefftzFunction
+from trefftz.dg.functions_old import TrefftzFunction
 from scipy.sparse.linalg import spsolve
 from .RHS_types import RHS_type
 

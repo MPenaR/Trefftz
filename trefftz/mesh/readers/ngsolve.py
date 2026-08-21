@@ -57,17 +57,28 @@ except ImportError as e:
     ) from e
 
 
+# class NGsolveLocator:
+#     def __init__(self, mesh: ngsolve.comp.Mesh):
+#         self._mesh = mesh
+#         self._elem_to_faces = np.array([E.faces[0].nr for E in mesh.Elements()])
+
+#     def find_cell(self, p: float_array) -> int_array:
+#         x = p[:, 0]
+#         y = p[:, 1]
+#         mp = self._mesh(x, y)
+#         nr = mp["nr"]
+#         return self._elem_to_faces[nr]
+
+
 class NGsolveLocator:
     def __init__(self, mesh: ngsolve.comp.Mesh):
         self._mesh = mesh
         self._elem_to_faces = np.array([E.faces[0].nr for E in mesh.Elements()])
 
-    def find_cell(self, p: float_array) -> int_array:
-        x = p[:, 0]
-        y = p[:, 1]
+    def find_cell(self, x: float_array, y: float_array) -> int_array:
         mp = self._mesh(x, y)
         nr = mp["nr"]
-        return self._elem_to_faces[nr]
+        return np.where(nr >=0, self._elem_to_faces[nr], -1)
 
 
 def NGsolveReader(mesh: ngsolve.comp.Mesh, boundary_regions: StrEnum) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array]]:

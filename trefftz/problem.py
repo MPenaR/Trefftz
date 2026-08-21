@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from scipy.sparse.linalg import spsolve, gmres, bicgstab
 from scipy.sparse import coo_array, csr_array, csc_array
 from trefftz.numpy_types import complex_array
-from trefftz.dg.functions2 import TrefftzFunction
+from trefftz.dg.functions import TrefftzFunction
 from trefftz.dg.assemblers import Assembler, SerialAssembler, SerialNumerics, Numerics
 from trefftz.dg.boundary_conditions import BoundaryCondition
 from enum import Enum

@@ -56,14 +56,17 @@ class CellLocator(Protocol):
     - bounding volume hierarchies
     - geometric predicates
     """
-    def find_cell(self, p: float_array) -> int_array | int:
+    def find_cell(self, x: float_array, y: float_array) -> int_array | int:
         """
         Find the mesh cell containing one or more query points.
 
         Parameters
         ----------
-        p : float_array
-            Query point(s).
+        x : float_array
+            x-coordinate of the query point(s).
+
+        y : float_array
+            y-coordinate of the query point(s).
 
         Returns
         -------
@@ -122,19 +125,22 @@ class KDTreeLocator(CellLocator):
         self.tree = cKDTree(centroids)
         self.radius = np.max(np.linalg.norm(self.points[self.triangles] - centroids[:, np.newaxis, :], axis=-1))
 
-    def find_cell(self, p: float_array) -> int_array | int:
+    def find_cell(self, x: float_array, y: float_array) -> int_array | int:
         """
         Find the triangle containing one or more query points.
 
         Parameters
         ----------
-        p : float_array
-            Query point(s).
+        x : float_array
+            x-coordinate of the query point(s).
+
+        y : float_array
+            y-coordinate of the query point(s).
 
             Accepted shapes are:
 
-            - ``(2,)`` for a single point
-            - ``(M, 2)`` for multiple points
+            - ``(1,)`` for a single point
+            - ``(M, N)`` for multiple points
 
         Returns
         -------
@@ -156,7 +162,12 @@ class KDTreeLocator(CellLocator):
         2. Exact geometric containment test using
            :func:`trefftz.mesh.geometry.in_triangle`
         """
-        p = np.asarray(p)
+
+        x = np.asarray(x)
+        y = np.asarray(y)
+
+        p = np.column_stack([x.ravel(), y.ravel()])
+        
         candidates = self.tree.query_ball_point(p, self.radius)
 
         if p.shape == (2,):
@@ -171,6 +182,6 @@ class KDTreeLocator(CellLocator):
                 for i in candidates_:
                     if in_triangle(p_, *self.points[self.triangles[i]]):
                         indexes[j] = i
-            return indexes
+            return indexes.reshape(x.shape)
         else:
             raise ValueError("Input must have shape (2,) or (M, 2)")
