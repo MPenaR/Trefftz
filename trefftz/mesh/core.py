@@ -413,7 +413,7 @@ class TrefftzMesh[BR: Enum]:
             Q = edge["Q"]
 
             OP = P - O
-            OQ = P - Q
+            OQ = Q - O
 
             theta_1 = np.atan2(OP[1], OP[0])
             theta_2 = np.atan2(OQ[1], OQ[0])
