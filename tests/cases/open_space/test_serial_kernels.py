@@ -1,5 +1,5 @@
 import cases.open_space.serial_kernels as exact
-import cases.open_space.numerical_kernels as numerical
+import cases.open_space.numerical.kernels as numerical
 import pytest
 from numpy.testing import assert_allclose
 from ...data import TOL, DIRECTIONS, k

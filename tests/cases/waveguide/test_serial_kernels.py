@@ -1,5 +1,5 @@
 import cases.waveguide.serial_kernels as exact
-import cases.waveguide.numerical_kernels as numerical
+import cases.waveguide.numerical.kernels as numerical
 import pytest
 from numpy.testing import assert_allclose
 from ...data import TOL, DIRECTIONS, k

@@ -1,7 +1,7 @@
 from ...data import DIRECTIONS, TOL, k
 from .data import NTD_MODES, H, SEGMENT1_SIGMA_L, SEGMENT1_SIGMA_R
 import cases.waveguide.NeumannToDirichlet as exact
-import cases.waveguide.numerical_NtD as numerical
+import cases.waveguide.numerical.NtD as numerical
 from numpy.testing import assert_allclose
 import numpy as np
 import pytest

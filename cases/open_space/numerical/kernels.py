@@ -2,8 +2,8 @@ from numpy import exp, dot, conj
 from numpy import trapezoid
 import numpy as np
 from trefftz.numpy_types import float_array
-from trefftz.dg.numerical_kernels import N_POINTS
-from cases.open_space.numerical_NtD import NtD
+from trefftz.dg.numerical.kernels import N_POINTS
+from cases.open_space.numerical.NtD import NtD
 
 
 def I_Nuv(arc_u, arc_v, d_u: float_array, d_v: float_array, k: float, NtD_modes: int) -> complex:

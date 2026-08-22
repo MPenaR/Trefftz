@@ -1,7 +1,7 @@
 from ...data import DIRECTIONS, TOL, k
 from .data import NTD_MODES,  ARC1_SIGMA, JACOBI_ANGER_MODES
 import cases.open_space.NeumannToDirichlet as exact
-import cases.open_space.numerical_NtD as numerical
+import cases.open_space.numerical.NtD as numerical
 from numpy.testing import assert_allclose
 import numpy as np
 from numpy import exp, dot

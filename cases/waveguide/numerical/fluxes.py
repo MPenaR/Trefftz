@@ -1,12 +1,9 @@
-from numpy import linspace, outer, sin, cos, pi, exp, dot, conj, isclose, array
-from numpy.lib.scimath import sqrt
-from numpy.linalg import norm
+from numpy import exp, dot, conj
 from numpy import trapezoid as Int
 import numpy as np
-from scipy.special import hankel1, h1vp
-from trefftz.numpy_types import float_array, complex_array
+from trefftz.numpy_types import float_array
+from trefftz.dg.numerical.kernels import N_POINTS
 
-N_POINTS = int(1E5)
 NtD_MODES = 20
 
 

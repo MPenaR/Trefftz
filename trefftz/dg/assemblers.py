@@ -172,133 +172,101 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                     d_psi = basis.global_direction(i)
                     value = local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
                     rows.append(i)
-                    # print(f'{region=}, {value=}')
-
                     values.append(value)
-
-            # non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
-            # print(non_local_kernel)
-            # # for edge in mesh.edges_on(region):
-            # for edge in mesh.boundary_Edges[region]:
-            #     T, _ = edge["triangles"]
-            #     for i in basis.dofs_on_element(T):
-            #         d_psi = basis.global_direction(i)
-            #         value = non_local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
-            #         rows.append(i)
-            #         values.append(value)
-
 
         b = np.zeros((basis.N_DOF,), dtype=np.complex128)
         np.add.at(b, rows, values)
         return b
 
 
-# class BlockAssembler(Assembler[Any, BlockNumerics]):
-
-#     # def assemble_local_bc(self,
-#     #                       edges_on_region,
-#     #                       kernel: SerialLocalKernel,
-#     #                       basis: TrefftzBasis,
-#     #                       rows: list[int],
-#     #                       cols: list[int],
-#     #                       values: list[complex]):
-   
-#     #     for edge in edges_on_region:
-#     #         T, _ = edge["triangles"]
-#     #         for i in basis.dofs_on_element(T):
-#     #             for j in basis.dofs_on_element(T):
-#     #                 d_psi = basis.global_direction(i)
-#     #                 d_phi = basis.global_direction(j)
-#     #                 value = kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, basis.k)
-#     #                 rows.append(i)
-#     #                 cols.append(j)
-#     #                 values.append(value)
-
-#     def assemble_LHS(self) -> coo_array:
-#         raise NotImplementedError("Yet")
-
-#         regions_local_kernel = self._regions_local_kernel
-#         regions_nonlocal_kernel = self._regions_nonlocal_kernel
-#         mesh = self._mesh
-#         boundary_conditions = self._boundary_conditions
-#         numerics = self._numerics
-#         basis = self._basis
+class BlockAssembler(Assembler[Any, Any]):
 
 
-#         # interior edges
-#         interior_kernel = numerics.interior_kernel
-#         for edge in mesh.interior_edges:
-#             for (i_v, T_v) in enumerate(edge["triangles"]):
-#                 for (i_u, T_u) in enumerate(edge["triangles"]):
-#                     sign = SIGN((i_u, i_v))
-#                     for i in basis.dofs_on_element(T_v):
-#                         for j in basis.dofs_on_element(T_u):
-#                             d_phi = basis.global_direction(j)
-#                             d_psi = basis.global_direction(i)
-#                             val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, basis.k, sign=sign)
-#                             rows.append(i)
-#                             cols.append(j)
-#                             values.append(val)
+    def assemble_LHS(self) -> coo_array:
 
 
-#         # boundary conditions implemented as local operators  #this should be generalized for a plane wave basis with non homogeneous number of waves
-#         # that imples that basis.D is a function on the element ID as well as D_D
-#         # only for homogeneous P makes sense to precompute D_D as it is reused everywhere. For non homogeneous D_D there is a D_D per pair of T's and
-#         # they are not reused in general.
-#         for region in regions_local_kernel:
-#             bc = boundary_conditions[region]
-#             kernel = numerics.local_boundary_kernels[type(bc)]
-#             for edge in mesh.edges_on(region):
-#                 T, _ = edge["triangles"]
-#                 block = kernel.LHS(edge, basis.D, basis.D_D, basis.k)
+        regions_local_kernel = self._regions_local_kernel
+        regions_nonlocal_kernel = self._regions_nonlocal_kernel
+        mesh = self._mesh
+        boundary_conditions = self._boundary_conditions
+        numerics = self._numerics
+        basis = self._basis
+
+
+        # interior edges
+        interior_kernel = numerics.interior_kernel
+        for edge in mesh.interior_edges:
+            for (i_v, T_v) in enumerate(edge["triangles"]):
+                for (i_u, T_u) in enumerate(edge["triangles"]):
+                    sign = SIGN((i_u, i_v))
+                    for i in basis.dofs_on_element(T_v):
+                        for j in basis.dofs_on_element(T_u):
+                            d_phi = basis.global_direction(j)
+                            d_psi = basis.global_direction(i)
+                            val = interior_kernel.LHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_phi, d_psi, basis.k, sign=sign)
+                            rows.append(i)
+                            cols.append(j)
+                            values.append(val)
+
+
+        # boundary conditions implemented as local operators  #this should be generalized for a plane wave basis with non homogeneous number of waves
+        # that imples that basis.D is a function on the element ID as well as D_D
+        # only for homogeneous P makes sense to precompute D_D as it is reused everywhere. For non homogeneous D_D there is a D_D per pair of T's and
+        # they are not reused in general.
+        for region in regions_local_kernel:
+            bc = boundary_conditions[region]
+            kernel = numerics.local_boundary_kernels[type(bc)]
+            for edge in mesh.edges_on(region):
+                T, _ = edge["triangles"]
+                block = kernel.LHS(edge, basis.D, basis.D_D, basis.k)
                 
 
 
-#         # boundary conditions implemented as non-local operators
-#         for region in regions_nonlocal_kernel:
-#             bc = boundary_conditions[region]
-#             non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
-#             for edge_1 in mesh.edges_on(region):
-#                 T_1, _ = edge_1["triangles"]
-#                 for edge_2 in mesh.edges_on(region):
-#                     T_2, _ = edge_2["triangles"]
-#                     for i in basis.dofs_on_element(T_1):
-#                         for j in basis.dofs_on_element(T_2):
-#                             d_phi = basis.global_direction(j)
-#                             d_psi = basis.global_direction(i)
-#                             value = non_local_kernel.LHS(Edge(edge_1["M"], edge_1["l"], edge_1["N"], edge_1["T"]),
-#                                                          Edge(edge_2["M"], edge_2["l"], edge_2["N"], edge_2["T"]),
-#                                                          d_phi, d_psi, basis.k)
-#                             rows.append(i)
-#                             cols.append(j)
-#                             values.append(value)
+        # boundary conditions implemented as non-local operators
+        for region in regions_nonlocal_kernel:
+            bc = boundary_conditions[region]
+            non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
+            for edge_1 in mesh.edges_on(region):
+                T_1, _ = edge_1["triangles"]
+                for edge_2 in mesh.edges_on(region):
+                    T_2, _ = edge_2["triangles"]
+                    for i in basis.dofs_on_element(T_1):
+                        for j in basis.dofs_on_element(T_2):
+                            d_phi = basis.global_direction(j)
+                            d_psi = basis.global_direction(i)
+                            value = non_local_kernel.LHS(Edge(edge_1["M"], edge_1["l"], edge_1["N"], edge_1["T"]),
+                                                         Edge(edge_2["M"], edge_2["l"], edge_2["N"], edge_2["T"]),
+                                                         d_phi, d_psi, basis.k)
+                            rows.append(i)
+                            cols.append(j)
+                            values.append(value)
 
-#         return coo_array((np.asarray(values), (np.asarray(rows), np.asarray(cols))), shape=(basis.N_DOF, basis.N_DOF))
+        return coo_array((np.asarray(values), (np.asarray(rows), np.asarray(cols))), shape=(basis.N_DOF, basis.N_DOF))
 
-#     def assemble_RHS(self) -> complex_array:
-#         raise NotImplementedError
+    def assemble_RHS(self) -> complex_array:
+        raise NotImplementedError
 
-#         rows: list[int] = []
-#         values: list[complex] = []
+        rows: list[int] = []
+        values: list[complex] = []
 
-#         regions_RHS_term = self._regions_RHS_term
-#         mesh = self._mesh
-#         boundary_conditions = self._boundary_conditions
-#         numerics = self._numerics
-#         basis = self._basis
+        regions_RHS_term = self._regions_RHS_term
+        mesh = self._mesh
+        boundary_conditions = self._boundary_conditions
+        numerics = self._numerics
+        basis = self._basis
 
-#         for region in regions_RHS_term:  # I should check redefining this lists as sets or something like that, because of the local AND RHS
-#             bc = boundary_conditions[region]
-#             local_kernel = numerics.local_boundary_kernels[type(bc)]
-#             # for edge in p.mesh.edges_on_region(region):
-#             for edge in mesh.edges_on(region):
-#                 T, _ = edge["triangles"]
-#                 for i in basis.dofs_on_element(T):
-#                     d_psi = basis.global_direction(i)
-#                     value = local_kernel.RHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_psi, basis.k)
-#                     rows.append(i)
-#                     values.append(value)
+        for region in regions_RHS_term:  # I should check redefining this lists as sets or something like that, because of the local AND RHS
+            bc = boundary_conditions[region]
+            local_kernel = numerics.local_boundary_kernels[type(bc)]
+            # for edge in p.mesh.edges_on_region(region):
+            for edge in mesh.edges_on(region):
+                T, _ = edge["triangles"]
+                for i in basis.dofs_on_element(T):
+                    d_psi = basis.global_direction(i)
+                    value = local_kernel.RHS(Edge(edge["M"], edge["l"], edge["N"], edge["T"]), d_psi, basis.k)
+                    rows.append(i)
+                    values.append(value)
 
-#         b = np.zeros((basis.N_DOF,), dtype=np.complex128)
-#         np.add.at(b, rows, values)
-#         return b
+        b = np.zeros((basis.N_DOF,), dtype=np.complex128)
+        np.add.at(b, rows, values)
+        return b

@@ -1,7 +1,7 @@
 from trefftz.numpy_types import float_array    
-from trefftz.dg.numerical_kernels import N_POINTS
+from trefftz.dg.numerical.kernels import N_POINTS
 import numpy as np
-from cases.waveguide.numerical_NtD import NtD
+from cases.waveguide.numerical.NtD import NtD
 from numpy import trapezoid, conj, dot
 
 def I_uNv(segment_u, segment_v, d_u: float_array, d_v: float_array, k: float, H: float, NtD_modes: int) -> complex:
