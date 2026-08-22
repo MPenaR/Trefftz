@@ -86,9 +86,10 @@ def I_uincv(arc, d_inc: float_array, D_v: float_array, k: float) -> complex_arra
     theta_1 = arc["theta_1"]
     theta_2 = arc["theta_2"]
     R = arc["R"]
-
-    D_iv = norm(d_inc - D_v)
-    phi_iv = atan2((d_inc - D_v)[1], (d_inc - D_v)[0])
+    
+    d_iv = d_inc - D_v 
+    D_iv = norm(d_iv, -1)
+    phi_iv = atan2(d_iv[:, 1], d_iv[:, 0])
 
     return R*(jv(0, k*R*D_iv)*(theta_2-theta_1) +
               2*sum(1j**t/t*jv(t, k*R*D_iv)*(sin(t*(theta_2 - phi_iv)) - sin(t*(theta_1 - phi_iv)))
@@ -106,10 +107,11 @@ def I_uincdv(arc, d_inc: float_array, D_v: float_array, k: float) -> complex_arr
     theta_2 = arc["theta_2"]
     R = arc["R"]
 
-    D_iv = norm(d_inc - D_v)
-    phi_iv = atan2((d_inc - D_v)[1], (d_inc - D_v)[0])
+    d_iv = d_inc - D_v 
+    D_iv = norm(d_iv, -1)
+    phi_iv = atan2(d_iv[:, 1], d_iv[:, 0])
 
-    phi_v = atan2(D_v[1], D_v[0])
+    phi_v = atan2(D_v[:, 1], D_v[:, 0])
 
     def I(theta: float) -> complex_array:
         return -k*R*(-jv(1, k*R*D_iv)*cos(phi_iv - phi_v)*theta + sum(1j**p/p*(jv(p-1, k*R*D_iv)*sin(p*(theta-phi_iv)+(phi_iv-phi_v))-

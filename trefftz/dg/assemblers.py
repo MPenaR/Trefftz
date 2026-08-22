@@ -280,8 +280,8 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
 
     def assemble_RHS(self) -> complex_array:
 
-        rows: list[int] = []
-        values: list[complex] = []
+        rows_dof: list[int_array] = []
+        blocks: list[complex_array] = []
 
         regions_RHS_term = self._regions_RHS_term
         mesh = self._mesh
@@ -291,15 +291,17 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
 
         for region in regions_RHS_term:  # I should check redefining this lists as sets or something like that, because of the local AND RHS
             bc = boundary_conditions[region]
-            local_kernel = numerics.local_boundary_kernels[type(bc)]
+            flux = numerics.local_boundary_kernels[type(bc)]
             for edge in mesh.boundary_Edges[region]:
                 T, _ = edge["triangles"]
-                for i in basis.dofs_on_element(T):
-                    d_psi = basis.global_direction(i)
-                    value = local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
-                    rows.append(i)
-                    values.append(value)
-
+                v_dof = basis.dofs_on_element(T)
+                rows_dof.append(v_dof)
+                D_v = basis.global_direction(v_dof)
+                block = flux.RHS(edge=edge, D_v=D_v, k=basis.k)
+                blocks.append(block)
+            
+        rows = np.concatenate(rows_dof)
+        values = np.concatenate(blocks)
         b = np.zeros((basis.N_DOF,), dtype=np.complex128)
         np.add.at(b, rows, values)
         return b
