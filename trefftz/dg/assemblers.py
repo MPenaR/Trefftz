@@ -172,7 +172,7 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                     d_psi = basis.global_direction(i)
                     value = local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
                     rows.append(i)
-                    print(f'{region=}, {value=}')
+                    # print(f'{region=}, {value=}')
 
                     values.append(value)
 

@@ -5,9 +5,10 @@ from trefftz.dg.kernels.serial import I_uv, I_duv
 
 JACOBI_ANGER_MODES = 30
 class NtDLocal:
-    def __init__(self, d_2: float, data = None):
+    def __init__(self, d_2: float, NtD_modes: int, data = None):
         self.data = data
         self.d_2 = d_2
+        self.NtD_modes = NtD_modes
     
     def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
         r"""
@@ -48,7 +49,12 @@ class NtDLocal:
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
         d_inc = self.data["d_inc"]
         d_2 = self.d_2
-        I = -I_duv(edge, d_inc, d_v, k) -1j*k*d_2*I_uv(edge, d_inc, d_v, k)
+        NtD_modes = self.NtD_modes
+        I = -I_duv(edge, d_inc, d_v, k) +  I_Nuincdv(edge, d_inc, d_v, k, NtD_modes, JACOBI_ANGER_MODES) -1j*k*d_2*(
+             I_NuincNv(edge, d_inc, d_v, k, NtD_modes, JACOBI_ANGER_MODES)
+            -I_Nuincv(edge, d_inc, d_v, k, NtD_modes, JACOBI_ANGER_MODES)
+            -I_uincNv(edge, d_inc, d_v, k, NtD_modes, JACOBI_ANGER_MODES)
+            +I_uv(edge, d_inc, d_v, k))
         return I
 
 class NtDNonLocal:
@@ -94,14 +100,3 @@ class NtDNonLocal:
                                                                        -I_Nuv(edge_u, edge_v, d_u, d_v, k, NtD_modes, JACOBI_ANGER_MODES)
                                                                        -I_uNv(edge_u, edge_v, d_u, d_v, k, NtD_modes, JACOBI_ANGER_MODES))
         return I
-
-    def RHS(self, edge_v, d_v: float_array, k: float) -> complex:
-        d_inc = self.data["d_inc"]
-        d_2 = self.d_2
-        NtD_modes = self.NtD_modes
-
-        I = I_Nuincdv(edge_v, d_inc, d_v, k, NtD_modes, JACOBI_ANGER_MODES) - d_2*1j*k*(I_NuincNv(edge_v, d_inc, d_v, k, NtD_modes, JACOBI_ANGER_MODES)
-                                                                                       -I_Nuincv(edge_v, d_inc, d_v, k, NtD_modes, JACOBI_ANGER_MODES)
-                                                                                       -I_uincNv(edge_v, d_inc, d_v, k, NtD_modes, JACOBI_ANGER_MODES))
-        return I
-
