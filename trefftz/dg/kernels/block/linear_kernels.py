@@ -1,8 +1,8 @@
 from numpy import dot, exp, sinc, pi
-from trefftz.numpy_types import float_array
+from trefftz.numpy_types import float_array, complex_array
 
 
-def I_uv(segment, D_u: float_array, D_v: float_array, k: float) -> complex:
+def I_uv(segment, D_u: float_array, D_v: float_array, k: float) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{v}\,\mathrm{d}\ell
@@ -17,7 +17,7 @@ def I_uv(segment, D_u: float_array, D_v: float_array, k: float) -> complex:
     return l*exp(1j*k*dot(d_uv, M))*sinc(k*l/(2*pi)*dot(d_uv, T))
 
 
-def I_duv(segment, D_u: float_array, D_v: float_array, k: float) -> complex:
+def I_duv(segment, D_u: float_array, D_v: float_array, k: float) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E nabla(u)\cdot\mathbf{n} \overline{v}\,\mathrm{d}\ell
@@ -29,7 +29,7 @@ def I_duv(segment, D_u: float_array, D_v: float_array, k: float) -> complex:
     return 1j*k*dot(D_u, N)[None, :]*I_uv(segment, D_u, D_v, k)
 
 
-def I_udv(segment, D_u: float_array, D_v: float_array, k: float) -> complex:
+def I_udv(segment, D_u: float_array, D_v: float_array, k: float) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
@@ -40,7 +40,7 @@ def I_udv(segment, D_u: float_array, D_v: float_array, k: float) -> complex:
     return -1j*k*dot(D_v, N)[:, None]*I_uv(segment, D_u, D_v, k)
 
 
-def I_dudv(segment, D_u: float_array, D_v: float_array, k: float) -> complex:
+def I_dudv(segment, D_u: float_array, D_v: float_array, k: float) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E nabla(u)\cdot\mathbf{n} \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
@@ -50,7 +50,7 @@ def I_dudv(segment, D_u: float_array, D_v: float_array, k: float) -> complex:
     return k**2*dot(D_u, N)[None, :]*dot(D_v, N)[:, None]*I_uv(segment, D_u, D_v, k)
 
 
-def I_uincv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex:
+def I_uincv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
@@ -66,7 +66,7 @@ def I_uincv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex:
     return l*exp(1j*k*dot(d_incv, M))*sinc(k*l/(2*pi)*dot(d_incv, T))
 
 
-def I_uincdv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex:
+def I_uincdv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{\nabla v \cdot \mathbf{n}}\,\mathrm{d}\ell

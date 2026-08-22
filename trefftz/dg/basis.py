@@ -160,7 +160,7 @@ class PlanewaveBasis:
         '''returns the global degrees of freedom belonging to element "t"'''
         return self._T_ID_to_DOFs[t, :]
         
-    def global_direction(self, n: int):
+    def global_direction(self, n: int | int_array):
         '''computes the direction of planewave corresponding global index n'''
         m = n % self.N_theta
         return self._D[m, :]

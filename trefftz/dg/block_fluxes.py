@@ -1,18 +1,12 @@
 r"""
-Module for the evaluation of fluxes for a single pair of test and trial functions. It was the initial
-implementation of the code and now serves as a test for the vectorized implementation. It is tested
-against numerical computations of the fluxes.
-
-All around this page, :math:`\Phi_{n}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_\varphi)` and :math:`\Psi_{m}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_\psi)` 
-are the trial and test functions. :math:`l` is the length of an edge, :math:`\mathbf{M}` its midpoint and :math:`\boldsymbol{\tau}` and :math:`\mathbf{n}` 
-its tangent and normal unitary vectors. 
+Module for the evaluation of fluxes in a vectorized manner over all the pair of test and trial functions corresponding to a given edge.
 """
 
-from trefftz.numpy_types import float_array
+from trefftz.numpy_types import float_array, complex_array
 from enum import Enum
 from typing import Protocol
+from trefftz.dg.kernels.block import I_uv, I_duv, I_udv, I_dudv, I_uincdv, I_uincv
 
-from trefftz.dg.kernels.serial import I_uv, I_duv, I_udv, I_dudv, I_uincdv, I_uincv
 
 class SIGN(Enum):
     '''Sign for the transmission kernel
@@ -27,21 +21,21 @@ class SIGN(Enum):
     MM = (1, 1)
 
 
-class SerialTransmissionKernel(Protocol):
-    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float, sign: SIGN) -> complex:
+class BlockTransmissionKernel(Protocol):
+    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float, sign: SIGN) -> complex_array:
         ...
 
 
-class SerialLocalKernel(Protocol):
-    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+class BlockLocalKernel(Protocol):
+    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float) -> complex_array:
         ...
 
-    def RHS(self, edge, d_v: float_array, k: float) -> complex:
+    def RHS(self, edge, D_v: float_array, k: float) -> complex_array:
         ...
 
 
-class SerialNonLocalKernel(Protocol):
-    def LHS(self, edge_u, edge_v, d_u: float_array, d_v: float_array, k: float) -> complex:
+class BlockNonLocalKernel(Protocol):
+    def LHS(self, edge_u, edge_v, D_u: float_array, D_v: float_array, k: float) -> complex_array:
         ...
 
 
@@ -57,9 +51,9 @@ class NeumannFlux:
     ----------
     edge : Edge or Arc
         Edge parameters.
-    d_u : (float, float) array
+    D_u : (float, float) array
         Propatagion direction of the trial function.
-    d_v : (float, float) array
+    D_v : (float, float) array
         Propatagion direction of the test function.
     k : float
         Wavenumber.
@@ -75,12 +69,12 @@ class NeumannFlux:
     def __init__(self, d_1: float):
         self.d_1 = d_1
     
-    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float) -> complex_array:
         d_1 = self.d_1
 
-        return I_udv(edge, d_u, d_v, k) + d_1/(1j*k)*I_dudv(edge, d_u, d_v, k)
+        return I_udv(edge, D_u, D_v, k) + d_1/(1j*k)*I_dudv(edge, D_u, D_v, k)
 
-    def RHS(self, edge, d_v: float_array, k: float) -> complex:
+    def RHS(self, edge, D_v: float_array, k: float) -> complex_array:
         raise NotImplementedError("Not implemented yet")
 
 
@@ -97,9 +91,9 @@ class UltraWeakFlux:
     ----------
     edge : Edge or Arc
         Edge parameters.
-    d_u : (float, float) array
+    D_u : (float, float) array
         Propatagion direction of the trial function.
-    d_v : (float, float) array
+    D_v : (float, float) array
         Propatagion direction of the test function.
     k : float
         Wavenumber.
@@ -120,7 +114,7 @@ class UltraWeakFlux:
         self.a = a 
         self.b = b
     
-    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float, sign: SIGN) -> complex:
+    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float, sign: SIGN) -> complex_array:
         match sign:
             case SIGN.PP:
                 a = self.a
@@ -138,7 +132,7 @@ class UltraWeakFlux:
         k_n = k
         k_m = k
 
-        I = 1/2*I_udv(edge, d_u, d_v, k) + b /(1j*k)*I_dudv(edge, d_u, d_v, k) - a*1j*k*I_uv(edge, d_u, d_v, k) - 1/2*I_duv(edge, d_u, d_v, k)
+        I = 1/2*I_udv(edge, D_u, D_v, k) + b /(1j*k)*I_dudv(edge, D_u, D_v, k) - a*1j*k*I_uv(edge, D_u, D_v, k) - 1/2*I_duv(edge, D_u, D_v, k)
         match sign:
             case SIGN.PP:
                 I = I
@@ -163,9 +157,9 @@ class DirichletFlux:
     ----------
     edge : Edge or Arc
         Edge parameters.
-    d_u : (float, float) array
+    D_u : (float, float) array
         Propatagion direction of the trial function.
-    d_v : (float, float) array
+    D_v : (float, float) array
         Propatagion direction of the test function.
     k : float
         Wavenumber.
@@ -183,11 +177,11 @@ class DirichletFlux:
         self.a = a
         self.data = data
     
-    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float) -> complex_array:
         a = self.a
-        return -I_duv(edge, d_u, d_v, k) + 1j*k*a*I_uv(edge, d_u, d_v, k)
+        return -I_duv(edge, D_u, D_v, k) + 1j*k*a*I_uv(edge, D_u, D_v, k)
         
-    def RHS(self, edge, d_v: float_array, k: float) -> complex:
+    def RHS(self, edge, D_v: float_array, k: float) -> complex_array:
         d_inc = self.data["d_inc"]
         a = self.a
-        return I_uincdv(edge, d_inc, d_v, k) - 1j*a*k*I_uincv(edge, d_inc, d_v, k)
+        return I_uincdv(edge, d_inc, D_v, k) - 1j*a*k*I_uincv(edge, d_inc, D_v, k)
