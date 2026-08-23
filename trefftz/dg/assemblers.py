@@ -274,7 +274,7 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
         for r, c, block in zip(rows_dof, cols_dof, blocks):
             rows.append(np.repeat(r, len(c)))  # 1 1 1 2 2 2 3 3 3...
             cols.append(np.tile(c, len(r)))  # 1 2 3 1 2 3 1 2 3...
-            values.append(np.ravel(block))  #C mayor order, i.e. column changes the fastest
+            values.append(np.ravel(block, order="C"))  #C mayor order, i.e. column changes the fastest
 
         return coo_array((np.concatenate(values), (np.concatenate(rows), np.concatenate(cols))), shape=(basis.N_DOF, basis.N_DOF))
 
