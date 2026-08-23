@@ -88,7 +88,7 @@ def I_uincv(arc, d_inc: float_array, D_v: float_array, k: float) -> complex_arra
     R = arc["R"]
     
     d_iv = d_inc - D_v 
-    D_iv = norm(d_iv, -1)
+    D_iv = norm(d_iv, axis=-1)
     phi_iv = atan2(d_iv[:, 1], d_iv[:, 0])
 
     return R*(jv(0, k*R*D_iv)*(theta_2-theta_1) +
@@ -108,7 +108,7 @@ def I_uincdv(arc, d_inc: float_array, D_v: float_array, k: float) -> complex_arr
     R = arc["R"]
 
     d_iv = d_inc - D_v 
-    D_iv = norm(d_iv, -1)
+    D_iv = norm(d_iv, axis=-1)
     phi_iv = atan2(d_iv[:, 1], d_iv[:, 0])
 
     phi_v = atan2(D_v[:, 1], D_v[:, 0])

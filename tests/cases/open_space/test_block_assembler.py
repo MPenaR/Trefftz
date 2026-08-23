@@ -45,17 +45,19 @@ s_assembler = SerialAssembler(mesh=mesh, boundary_conditions=boundary_conditions
 b_assembler = BlockAssembler(mesh=mesh, boundary_conditions=boundary_conditions, numerics=b_numerics, basis=basis)
 
 def test_A():
-    
-    print(f'{basis.N_DOF**2=}')
-
     P = Problem(mesh=mesh, wavenumber=k, basis=basis, boundary_conditions=boundary_conditions, assembler=s_assembler, direct_solver=True)
     A_serial = P.assemble_LHS()
-
-    print(f'{A_serial.count_nonzero()=}')
-    
     P = Problem(mesh=mesh, wavenumber=k, basis=basis, boundary_conditions=boundary_conditions, assembler=b_assembler, direct_solver=True)
     A_block = P.assemble_LHS()
-
-    print(f'{A_block.count_nonzero()=}')
-
     assert_allclose(A_block.toarray(), A_serial.toarray())
+
+
+def test_b():
+    P = Problem(mesh=mesh, wavenumber=k, basis=basis, boundary_conditions=boundary_conditions, assembler=s_assembler, direct_solver=True)
+    b_serial = P.assemble_RHS()
+
+    
+    P = Problem(mesh=mesh, wavenumber=k, basis=basis, boundary_conditions=boundary_conditions, assembler=b_assembler, direct_solver=True)
+    b_block = P.assemble_RHS()
+
+    assert_allclose(b_block, b_serial)
