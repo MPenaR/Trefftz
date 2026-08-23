@@ -136,26 +136,45 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
 
         print("assembling non-local operators")
         # boundary conditions implemented as non-local operators
-        # for region in regions_nonlocal_kernel:
-        #     bc = boundary_conditions[region]
-        #     non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
-        #     for edge_1 in tqdm(mesh.boundary_Edges[region],
-        #                        desc=f"NtD, {region}",
-        #                        disable=not verbose,
-        #                        unit="edge"):
-        #         T_1, _ = edge_1["triangles"]
-        #         for edge_2 in mesh.boundary_Edges[region]:
-        #             T_2, _ = edge_2["triangles"]
-        #             for i in basis.dofs_on_element(T_1):
-        #                 for j in basis.dofs_on_element(T_2):
-        #                     d_phi = basis.global_direction(j)
-        #                     d_psi = basis.global_direction(i)
-        #                     value = non_local_kernel.LHS(edge_u=edge_1,
-        #                                                  edge_v=edge_2,
-        #                                                  d_u=d_phi, d_v=d_psi, k=basis.k)
-        #                     rows.append(i)
-        #                     cols.append(j)
-        #                     values.append(value)
+        for region in regions_nonlocal_kernel:
+            bc = boundary_conditions[region]
+            non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
+            # for edge_1 in tqdm(mesh.boundary_Edges[region],
+            #                    desc=f"NtD, {region}",
+            #                    disable=not verbose,
+            #                    unit="edge"):
+            #     T_1, _ = edge_1["triangles"]
+            #     for edge_2 in mesh.boundary_Edges[region]:
+            #         T_2, _ = edge_2["triangles"]
+            #         for i in basis.dofs_on_element(T_1):
+            #             for j in basis.dofs_on_element(T_2):
+            #                 d_phi = basis.global_direction(j)
+            #                 d_psi = basis.global_direction(i)
+            #                 value = non_local_kernel.LHS(edge_u=edge_1,                       # ... esto es una liada...
+            #                                              edge_v=edge_2,                       # ... edge_u = edge_1, pero:
+            #                                              d_u=d_phi, d_v=d_psi, k=basis.k)     # d_phi = global_direction(i)
+            #                 rows.append(i)                                                    # i = dof on (T_1)
+            #                 cols.append(j)                                                    # T_1 = edge_1["Triangle"]
+            #                 values.append(value)
+
+            for edge_1 in tqdm(mesh.boundary_Edges[region],
+                               desc=f"NtD, {region}",
+                               disable=not verbose,
+                               unit="edge"):
+                T_1, _ = edge_1["triangles"]
+                for edge_2 in mesh.boundary_Edges[region]:
+                    T_2, _ = edge_2["triangles"]
+                    for j in basis.dofs_on_element(T_1):
+                        for i in basis.dofs_on_element(T_2):
+                            d_phi = basis.global_direction(j)
+                            d_psi = basis.global_direction(i)
+                            value = non_local_kernel.LHS(edge_u=edge_1,                       # ... esto es una liada...
+                                                         edge_v=edge_2,                       # ... edge_u = edge_1, pero:
+                                                         d_u=d_phi, d_v=d_psi, k=basis.k)     # d_phi = global_direction(i)
+                            rows.append(i)                                                    # i = dof on (T_1)
+                            cols.append(j)                                                    # T_1 = edge_1["Triangle"]
+                            values.append(value)
+
 
         return coo_array((np.asarray(values), (np.asarray(rows), np.asarray(cols))), shape=(basis.N_DOF, basis.N_DOF))
 
@@ -249,24 +268,24 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
 
         print("assembling non-local operators")
         # boundary conditions implemented as non-local operators
-        # for region in regions_nonlocal_kernel:
-        #     bc = boundary_conditions[region]
-        #     non_local_flux = numerics.nonlocal_boundary_kernels[type(bc)]
-        #     for edge_u in tqdm(mesh.boundary_Edges[region],
-        #                        desc=f"NtD, {region}",
-        #                        disable=not verbose,
-        #                        unit="edge"):
-        #         T_u, _ = edge_u["triangles"]
-        #         u_dof = basis.dofs_on_element(T_u)
-        #         D_u =  basis.global_direction(u_dof)
-        #         for edge_v in mesh.boundary_Edges[region]:
-        #             T_v, _ = edge_v["triangles"]
-        #             v_dof = basis.dofs_on_element(T_v)
-        #             D_v =  basis.global_direction(v_dof)
-        #             block = non_local_flux.LHS(edge_u=edge_u, edge_v=edge_v, D_u=D_u, D_v=D_v, k=basis.k)
-        #             rows_dof.append(v_dof)
-        #             cols_dof.append(u_dof)
-        #             blocks.append(block)
+        for region in regions_nonlocal_kernel:
+            bc = boundary_conditions[region]
+            non_local_flux = numerics.nonlocal_boundary_kernels[type(bc)]
+            for edge_u in tqdm(mesh.boundary_Edges[region],
+                               desc=f"NtD, {region}",
+                               disable=not verbose,
+                               unit="edge"):
+                T_u, _ = edge_u["triangles"]
+                u_dof = basis.dofs_on_element(T_u)
+                D_u =  basis.global_direction(u_dof)
+                for edge_v in mesh.boundary_Edges[region]:
+                    T_v, _ = edge_v["triangles"]
+                    v_dof = basis.dofs_on_element(T_v)
+                    D_v =  basis.global_direction(v_dof)
+                    block = non_local_flux.LHS(edge_u=edge_u, edge_v=edge_v, D_u=D_u, D_v=D_v, k=basis.k)
+                    rows_dof.append(v_dof)
+                    cols_dof.append(u_dof)
+                    blocks.append(block)
         rows: list[int_array] = []
         cols: list[int_array] = []
         values: list[complex_array] = []
