@@ -3,9 +3,9 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="TrefftzMesh" href="mesh.html"><link rel="prev" title="Data Structures" href="../design/data_structures.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Discontinuous Galerkin" href="dg.html"><link rel="prev" title="Quickstart" href="../tutorials/quickstart.html">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>API Reference - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
@@ -190,13 +190,43 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+  <p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../theory/index.html">Theory</a><input aria-label="Toggle navigation of Theory" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../theory/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/kernels.html">Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html">Fluxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/dg_trefftz.html">DG Trefftz</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../design/index.html">Design</a><input aria-label="Toggle navigation of Design" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../design/data_structures.html">Data Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design/problem.html">Problem object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design/workflow.html">Workflow</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input aria-label="Toggle navigation of Tutorials" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html">Fluxes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../design/data_structures.html">Data Structures</a></li>
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="mesh.html">TrefftzMesh</a></li>
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="fluxes.html">Fluxes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kernels.html">Kernels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="assembly.html">Assembly</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
 </ul>
 </li>
 </ul>
@@ -239,9 +269,17 @@
         <article role="main" id="furo-main-content">
           <section id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h1>
+<p>This section contains the reference documentation for the Trefftz
+Python package.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="mesh.html">TrefftzMesh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dg.html">Discontinuous Galerkin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dg.html#fluxes">Fluxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dg.html#kernels">Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dg.html#assembly">Assembly</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mesh.html">Mesh</a></li>
 </ul>
 </div>
 </section>
@@ -251,23 +289,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="mesh.html">
+          <a class="next-page" href="dg.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">TrefftzMesh</div>
+                <div class="title">Discontinuous Galerkin</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../design/data_structures.html">
+          <a class="prev-page" href="../tutorials/quickstart.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Data Structures</div>
+                <div class="title">Quickstart</div>
                 
               </div>
             </a>
@@ -296,8 +334,8 @@
     </aside>
   </div>
 </div><script src="../_static/documentation_options.js?v=01f34227"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

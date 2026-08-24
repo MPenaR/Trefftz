@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>trefftz.dg.serial_fluxes - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
@@ -189,13 +189,43 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+  <p class="caption" role="heading"><span class="caption-text">Theory</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../theory/fluxes.html">Fluxes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../theory/fluxes.html#notation">Notation:</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../design/data_structures.html">Data Structures</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">TrefftzMesh</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../theory/index.html">Theory</a><input aria-label="Toggle navigation of Theory" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/kernels.html">Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/fluxes.html">Fluxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/fluxes.html#notation">Notation:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/dg_trefftz.html">DG Trefftz</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../design/index.html">Design</a><input aria-label="Toggle navigation of Design" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/data_structures.html">Data Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/problem.html">Problem object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/workflow.html">Workflow</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../tutorials/index.html">Tutorials</a><input aria-label="Toggle navigation of Tutorials" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/quickstart.html">Quickstart</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../api/dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fluxes.html">Fluxes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/kernels.html">Kernels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/assembly.html">Assembly</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mesh.html">Mesh</a></li>
 </ul>
 </li>
 </ul>
@@ -236,64 +266,68 @@
 <span class="sd">implementation of the code and now serves as a test for the vectorized implementation. It is tested</span>
 <span class="sd">against numerical computations of the fluxes.</span>
 
-<span class="sd">All around this page, :math:`\Phi_{n}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_n)` and :math:`\Psi_{m}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_m)` </span>
+<span class="sd">All around this page, :math:`\Phi_{n}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_\varphi)` and :math:`\Psi_{m}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_\psi)` </span>
 <span class="sd">are the trial and test functions. :math:`l` is the length of an edge, :math:`\mathbf{M}` its midpoint and :math:`\boldsymbol{\tau}` and :math:`\mathbf{n}` </span>
 <span class="sd">its tangent and normal unitary vectors. </span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">dot</span><span class="p">,</span> <span class="n">sinc</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">conj</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.numpy_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">float_array</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">trefftz.dg.kernels.serial</span><span class="w"> </span><span class="kn">import</span> <span class="n">I_uv</span><span class="p">,</span> <span class="n">I_duv</span><span class="p">,</span> <span class="n">I_udv</span><span class="p">,</span> <span class="n">I_dudv</span><span class="p">,</span> <span class="n">I_pw_dv</span><span class="p">,</span> <span class="n">I_pw_v</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SIGN</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Sign for the transmission kernel</span>
+<span class="sd">    where PP (plus plus) stands for both trial</span>
+<span class="sd">    and test function coming from the plus triangle</span>
+<span class="sd">    whereas PM stands for the test function (psi) coming</span>
+<span class="sd">    from the + triangle and the trial function (phi) from</span>
+<span class="sd">    the - one.&#39;&#39;&#39;</span>
+    <span class="n">PP</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">PM</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">MP</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">MM</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
 
-<span class="c1"># @dataclass</span>
-<span class="c1"># class Function:</span>
-<span class="c1">#     d: np.ndarray[tuple[int], np.dtype[np.floating]]</span>
-<span class="c1">#     n: float</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SerialTransmissionKernel</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">LHS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">d_v</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sign</span><span class="p">:</span> <span class="n">SIGN</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+        <span class="o">...</span>
 
 
-<div class="viewcode-block" id="Edge">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.serial_fluxes.Edge">[docs]</a>
-<span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Edge</span><span class="p">:</span>
-    <span class="n">M</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">]]</span>
-    <span class="n">l</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">N</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">]]</span>
-    <span class="n">T</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">]]</span></div>
+<span class="k">class</span><span class="w"> </span><span class="nc">SerialLocalKernel</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">LHS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">d_v</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">RHS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">d_v</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+        <span class="o">...</span>
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">SerialNonLocalKernel</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">LHS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_u</span><span class="p">,</span> <span class="n">edge_v</span><span class="p">,</span> <span class="n">d_u</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">d_v</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+        <span class="o">...</span>
 
 
-<div class="viewcode-block" id="SoundHard">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.serial_fluxes.SoundHard">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">SoundHard</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">edge</span><span class="p">:</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">d_1</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+<div class="viewcode-block" id="NeumannFlux">
+<a class="viewcode-back" href="../../../api/fluxes.html#trefftz.dg.serial_fluxes.NeumannFlux">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NeumannFlux</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Computes the flux on a sound-hard boundary, that is:</span>
+<span class="sd">    Computes the flux on a Neumann boundary condition, that is:</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">    </span>
 <span class="sd">        \int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}</span>
 
-<span class="sd">    This quantity can be exactly evaluated as:</span>
-
-<span class="sd">    .. math::</span>
-<span class="sd">    </span>
-<span class="sd">        \boxed{-ikl\left(1+d_{1}\mathbf{d}_{n}\cdot\mathbf{n}\right)\mathbf{d}_{m}\cdot\mathbf{n}e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\boldsymbol{\tau}\right)}</span>
-
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    phi : Function</span>
-<span class="sd">        Trial function.</span>
-<span class="sd">    psi : Function</span>
-<span class="sd">        Test function.</span>
+<span class="sd">    edge : Edge or Arc</span>
+<span class="sd">        Edge parameters.</span>
+<span class="sd">    d_u : (float, float) array</span>
+<span class="sd">        Propatagion direction of the trial function.</span>
+<span class="sd">    d_v : (float, float) array</span>
+<span class="sd">        Propatagion direction of the test function.</span>
 <span class="sd">    k : float</span>
 <span class="sd">        Wavenumber.</span>
-<span class="sd">    edge : Edge</span>
-<span class="sd">        Edge parameters.</span>
 <span class="sd">    d_1 : float</span>
 <span class="sd">        Stabilyzing parameter.</span>
 
@@ -303,25 +337,23 @@
 <span class="sd">        The integral.</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">d_m</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">d</span>
-    <span class="n">d_n</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">d</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_1</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_1</span> <span class="o">=</span> <span class="n">d_1</span>
     
-    <span class="n">M</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">M</span>
-    <span class="n">l</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">l</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">N</span>
-    <span class="n">T</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">LHS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">d_v</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+        <span class="n">d_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_1</span>
 
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">l</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">d_1</span> <span class="o">*</span> <span class="n">dot</span><span class="p">(</span><span class="n">d_n</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_m</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_n</span> <span class="o">-</span> <span class="n">d_m</span><span class="p">,</span> <span class="n">M</span><span class="p">))</span> <span class="o">*</span> <span class="n">sinc</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">l</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_n</span><span class="o">-</span><span class="n">d_m</span><span class="p">,</span> <span class="n">T</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">I_udv</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="n">d_1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="p">)</span><span class="o">*</span><span class="n">I_dudv</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
-    
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">RHS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">d_v</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not implemented yet&quot;</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="Inner">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.serial_fluxes.Inner">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">Inner</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">edge</span> <span class="p">:</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">k</span> <span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">stabilizing_parameters</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+
+<div class="viewcode-block" id="UltraWeakFlux">
+<a class="viewcode-back" href="../../../api/fluxes.html#trefftz.dg.serial_fluxes.UltraWeakFlux">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UltraWeakFlux</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the flux on a inner facet with respect to the degrees</span>
 <span class="sd">    of freedom from the same cell, that is:</span>
@@ -331,14 +363,14 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    phi : Function</span>
-<span class="sd">        Trial function.</span>
-<span class="sd">    psi : Function</span>
-<span class="sd">        Test function.</span>
+<span class="sd">    edge : Edge or Arc</span>
+<span class="sd">        Edge parameters.</span>
+<span class="sd">    d_u : (float, float) array</span>
+<span class="sd">        Propatagion direction of the trial function.</span>
+<span class="sd">    d_v : (float, float) array</span>
+<span class="sd">        Propatagion direction of the test function.</span>
 <span class="sd">    k : float</span>
 <span class="sd">        Wavenumber.</span>
-<span class="sd">    edge : Edge</span>
-<span class="sd">        Edge parameters.</span>
 <span class="sd">    a : float</span>
 <span class="sd">        Stabilyzing parameter.</span>
 <span class="sd">    b : float</span>
@@ -351,58 +383,64 @@
 
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="n">stabilizing_parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">stabilizing_parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
     
+    <span class="k">def</span><span class="w"> </span><span class="nf">LHS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">d_v</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sign</span><span class="p">:</span> <span class="n">SIGN</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+        <span class="k">match</span> <span class="n">sign</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">SIGN</span><span class="o">.</span><span class="n">PP</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+            <span class="k">case</span> <span class="n">SIGN</span><span class="o">.</span><span class="n">PM</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+            <span class="k">case</span> <span class="n">SIGN</span><span class="o">.</span><span class="n">MP</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+            <span class="k">case</span> <span class="n">SIGN</span><span class="o">.</span><span class="n">MM</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span>
 
-    <span class="n">d_m</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">d</span>
-    <span class="n">d_n</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">d</span>
+        <span class="n">k_n</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="n">k_m</span> <span class="o">=</span> <span class="n">k</span>
 
-    <span class="n">k_n</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
-    <span class="n">k_m</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
-
-    
-    <span class="n">M</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">M</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">N</span>
-    <span class="n">T</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">l</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">l</span>
-
-    <span class="c1"># I = -1j*l/2*(2*a*k + k_n*dot(d_n, N) + k_m*dot(d_m, N) + 2*b/k*k_n*dot(d_n, N)*k_m*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">l</span><span class="o">*</span><span class="p">(</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span> <span class="n">k_n</span><span class="o">/</span><span class="n">k</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_n</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="n">k_m</span><span class="o">/</span><span class="n">k</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_m</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span> <span class="o">+</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">k_n</span><span class="o">/</span><span class="n">k</span><span class="o">*</span><span class="n">k_m</span><span class="o">/</span><span class="n">k</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_n</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_m</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span><span class="o">*</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">k_n</span><span class="o">*</span><span class="n">d_n</span> <span class="o">-</span> <span class="n">k_m</span><span class="o">*</span><span class="n">d_m</span><span class="p">,</span> <span class="n">M</span><span class="p">))</span><span class="o">*</span><span class="n">sinc</span><span class="p">(</span><span class="n">l</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">k_n</span><span class="o">*</span><span class="n">d_n</span> <span class="o">-</span> <span class="n">k_m</span><span class="o">*</span><span class="n">d_m</span><span class="p">,</span><span class="n">T</span><span class="p">))</span></div>
-
-
+        <span class="n">I</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">I_udv</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span> <span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="p">)</span><span class="o">*</span><span class="n">I_dudv</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">-</span> <span class="n">a</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">I_uv</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">I_duv</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">match</span> <span class="n">sign</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">SIGN</span><span class="o">.</span><span class="n">PP</span><span class="p">:</span>
+                <span class="n">I</span> <span class="o">=</span> <span class="n">I</span>
+            <span class="k">case</span> <span class="n">SIGN</span><span class="o">.</span><span class="n">PM</span><span class="p">:</span>
+                <span class="n">I</span> <span class="o">=</span> <span class="o">-</span><span class="n">I</span>
+            <span class="k">case</span> <span class="n">SIGN</span><span class="o">.</span><span class="n">MP</span><span class="p">:</span>
+                <span class="n">I</span> <span class="o">=</span> <span class="n">I</span>
+            <span class="k">case</span> <span class="n">SIGN</span><span class="o">.</span><span class="n">MM</span><span class="p">:</span>
+                <span class="n">I</span> <span class="o">=</span> <span class="o">-</span><span class="n">I</span>
+        <span class="k">return</span> <span class="n">I</span></div>
 
 
-<div class="viewcode-block" id="Radiating_local">
-<a class="viewcode-back" href="../../../api/trefftz.dg.html#trefftz.dg.serial_fluxes.Radiating_local">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">Radiating_local</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">k</span> <span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">edge</span> <span class="p">:</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">d_2</span> <span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+<span class="c1"># RIGHT NOW RHS only does plane waves as RHS</span>
+<div class="viewcode-block" id="DirichletFlux">
+<a class="viewcode-back" href="../../../api/fluxes.html#trefftz.dg.serial_fluxes.DirichletFlux">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DirichletFlux</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Computes the flux on a radiating boundary with respect to the degrees</span>
-<span class="sd">    of freedom from the same cell, that is:</span>
-
-<span class="sd">    TODO: it is assuming that the radiating boundary consists of a vertical segment. This should be easy to generalize.</span>
-<span class="sd">    </span>
-<span class="sd">    .. math::</span>
-<span class="sd">    </span>
-<span class="sd">        -\int_{E}\left(d_{2}ik\Phi_n(\mathbf{x})+\nabla \Phi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\Psi_n(\mathbf{x})}\,\mathrm{d}S_{\mathbf{x}}</span>
-
-<span class="sd">    which can be computed as:</span>
+<span class="sd">    Computes the flux on a Neumann boundary condition, that is:</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">    </span>
-<span class="sd">        \boxed{-ikl\left(d_{2}+\mathbf{d}_{n}\cdot\mathbf{n}\right)e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\mathbf{j}\right)}</span>
+<span class="sd">        \int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    phi : Function</span>
-<span class="sd">        Trial function.</span>
-<span class="sd">    psi : Function</span>
-<span class="sd">        Test function.</span>
-<span class="sd">    k : float</span>
-<span class="sd">        Wave number.</span>
-<span class="sd">    edge : Edge</span>
+<span class="sd">    edge : Edge or Arc</span>
 <span class="sd">        Edge parameters.</span>
-<span class="sd">    d_2 : float</span>
+<span class="sd">    d_u : (float, float) array</span>
+<span class="sd">        Propatagion direction of the trial function.</span>
+<span class="sd">    d_v : (float, float) array</span>
+<span class="sd">        Propatagion direction of the test function.</span>
+<span class="sd">    k : float</span>
+<span class="sd">        Wavenumber.</span>
+<span class="sd">    a : float</span>
 <span class="sd">        Stabilyzing parameter.</span>
 
 <span class="sd">    Returns</span>
@@ -412,86 +450,18 @@
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">d_n</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">d</span>
-    <span class="n">d_m</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">d</span>
-
-    <span class="n">l</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">l</span>
-    <span class="n">M</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">M</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">N</span>
-    <span class="n">T</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">T</span>
-
-
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">l</span><span class="o">*</span><span class="p">(</span><span class="n">d_2</span> <span class="o">+</span> <span class="n">dot</span><span class="p">(</span><span class="n">d_n</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span><span class="o">*</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_n</span> <span class="o">-</span> <span class="n">d_m</span><span class="p">,</span> <span class="n">M</span><span class="p">))</span><span class="o">*</span><span class="n">sinc</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">l</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">d_n</span><span class="o">-</span><span class="n">d_m</span><span class="p">,</span> <span class="n">T</span><span class="p">))</span></div>
-
-
-
-<span class="c1"># def Radiating_nonlocal(phi : Function, psi : Function, k : float, edge_u : Edge, edge_v : Edge, d_2 : float, N_modes : int, H : float) -&gt; complex:</span>
-<span class="c1">#     r&quot;&quot;&quot;</span>
-<span class="c1">#     Computes the flux on a radiating boundary with respect to the degrees</span>
-<span class="c1">#     of freedom from another cell, that is:</span>
-
-<span class="c1">#     TODO: it is assuming that the radiating boundary consists of a vertical segment. This should be easy to generalize.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
     
-<span class="c1">#     Parameters</span>
-<span class="c1">#     ----------</span>
-<span class="c1">#     phi : Function</span>
-<span class="c1">#         Trial function.</span>
-<span class="c1">#     psi : Function</span>
-<span class="c1">#         Test function.</span>
-<span class="c1">#     k : float</span>
-<span class="c1">#         Wave number.</span>
-<span class="c1">#     edge_u : Edge</span>
-<span class="c1">#         Edge of the triangle associated to the trial function.</span>
-<span class="c1">#     edge_v : Edge</span>
-<span class="c1">#         Edge of the triangle associated to the test function.</span>
-<span class="c1">#     d_2 : float</span>
-<span class="c1">#         Stabilyzing parameter.</span>
-<span class="c1">#     N_modes : int</span>
-<span class="c1">#         Number of modes for the approximation of the NtD map.</span>
-<span class="c1">#     H : float</span>
-<span class="c1">#         height of the waveguide. </span>
-
-<span class="c1">#     Returns</span>
-<span class="c1">#     -------</span>
-<span class="c1">#     I : complex</span>
-<span class="c1">#         The integral.</span>
-
-    
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     d_n = phi.d</span>
-<span class="c1">#     d_m = psi.d</span>
-     
-<span class="c1">#     l_u = edge_u.l</span>
-<span class="c1">#     M_u = edge_u.M</span>
-<span class="c1">#     l_v = edge_v.l</span>
-<span class="c1">#     M_v = edge_v.M</span>
-
-
-<span class="c1">#     N = edge_u.N</span>
-<span class="c1">#     T = edge_u.T</span>
-
-<span class="c1">#     I1 = -1j*k*H*dot(d_n,N)*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(</span>
-<span class="c1">#         sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k**2 / abs(sqrt(complex(k**2 - (s*pi/H)**2)))**2 * (</span>
-<span class="c1">#         exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(</span>
-<span class="c1">#         exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )</span>
-<span class="c1">#         for s in range(1,N_modes)]) )</span>
-    
-<span class="c1">#     I2 = -1j*k*H*dot(d_n,N)*(dot(d_m,N)-d_2)*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(</span>
-<span class="c1">#         sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / sqrt(complex(k**2 - (s*pi/H)**2)) * (</span>
-<span class="c1">#         exp( 1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(</span>
-<span class="c1">#         exp(-1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )</span>
-<span class="c1">#         for s in range(1,N_modes)]) )</span>
-    
-<span class="c1">#     I3 = 1j*k*H*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(</span>
-<span class="c1">#         sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / conj(sqrt(complex(k**2 - (s*pi/H)**2))) * (</span>
-<span class="c1">#         exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(</span>
-<span class="c1">#         exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )</span>
-<span class="c1">#         for s in range(1,N_modes)]) )</span>
-
-<span class="c1">#     return  I1 + I2 + I3</span>
-
-
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">LHS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">d_v</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">I_duv</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">I_uv</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">d_u</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">RHS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">d_v</span><span class="p">:</span> <span class="n">float_array</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+        <span class="n">plane_wave</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+        <span class="k">return</span> <span class="n">I_pw_dv</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">plane_wave</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">I_pw_v</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">plane_wave</span><span class="p">,</span> <span class="n">d_v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div>
 
 </pre></div>
         </article>
@@ -526,8 +496,8 @@
     </aside>
   </div>
 </div><script src="../../../_static/documentation_options.js?v=01f34227"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

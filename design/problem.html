@@ -3,9 +3,9 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Workflow" href="workflow.html"><link rel="prev" title="Data Structures" href="data_structures.html">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Problem object - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
@@ -172,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -190,13 +190,43 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+  <p class="caption" role="heading"><span class="caption-text">Theory</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html">Fluxes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_structures.html">Data Structures</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api/mesh.html">TrefftzMesh</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../theory/index.html">Theory</a><input aria-label="Toggle navigation of Theory" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../theory/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/kernels.html">Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html">Fluxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/dg_trefftz.html">DG Trefftz</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Design</a><input aria-label="Toggle navigation of Design" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data_structures.html">Data Structures</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Problem object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input aria-label="Toggle navigation of Tutorials" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/fluxes.html">Fluxes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/kernels.html">Kernels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/assembly.html">Assembly</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/mesh.html">Mesh</a></li>
 </ul>
 </li>
 </ul>
@@ -232,14 +262,14 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
           <section class="tex2jax_ignore mathjax_ignore" id="problem-object">
 <h1>Problem object<a class="headerlink" href="#problem-object" title="Link to this heading">¶</a></h1>
-<p>The problem cass is an abstract class or template (we will see), so I can hace more specific problems like:</p>
+<p>The problem class is an abstract class or template (we will see), so I can hace more specific problems like:</p>
 <ul class="simple">
 <li><p>Helmholtz waveguide problem</p></li>
 <li><p>Helmholtz free-space problem</p></li>
@@ -257,6 +287,20 @@
 </ul>
 <p>As such this class should be a top class that calls specific domain creators, basis, assemblers etc…</p>
 <p>This is interesting because for example, the exact solutions are something which is specific to the pair (physics + domain). The fundamental solution for the helmholtz problem in a waveguide is not the same than in free space, nor is the same for the Helmholtz equation or the Maxwell equations.</p>
+<section id="waveguide-problem">
+<h2>Waveguide problem<a class="headerlink" href="#waveguide-problem" title="Link to this heading">¶</a></h2>
+<p>A waveguide is a class in itself. Why? because it has parameters defining it (<span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(H\)</span>), it has specific plotting functions and it has modes (exact solutions). We do not have an analogous class for the free-space problem, we dont have a “free-space”. Perhaps we should, if we say that the truncation distance <span class="math notranslate nohighlight">\(R\)</span> defines the waveguide, then <span class="math notranslate nohighlight">\(R\)</span> would also define the truncation of the free-space (i.e. a centered circle).</p>
+<p>In any case, I don’t think “problem” should expect to know if its working with a waveguide or in free-space. Problem knows about:</p>
+<ul class="simple">
+<li><p>The mesh.</p></li>
+<li><p>The basis (or its directions)</p></li>
+<li><p>Physics: the boundary conditions imposed (i.e. a dictionary between known regions and boundary condition type)</p></li>
+<li><p>Numerics: the mapping between boundary condition and kernel ( specially important to set the correct NtD kernels, circular/waveguide)</p></li>
+<li><p>Assembling A and b</p></li>
+<li><p>Solving the system</p></li>
+<li><p>Computing errors against a given solution (perhaps an exact one).</p></li>
+</ul>
+</section>
 </section>
 
         </article>
@@ -264,8 +308,26 @@
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="workflow.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Workflow</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="data_structures.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Data Structures</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -284,15 +346,36 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Problem object</a><ul>
+<li><a class="reference internal" href="#waveguide-problem">Waveguide problem</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
   </div>
 </div><script src="../_static/documentation_options.js?v=01f34227"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

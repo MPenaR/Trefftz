@@ -3,9 +3,9 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="API Reference" href="../api/index.html"><link rel="prev" title="Fluxes" href="../theory/fluxes.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Problem object" href="problem.html"><link rel="prev" title="Design" href="index.html">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Data Structures - Trefftz 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
@@ -190,13 +190,43 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+  <p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../theory/index.html">Theory</a><input aria-label="Toggle navigation of Theory" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../theory/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/kernels.html">Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html">Fluxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/dg_trefftz.html">DG Trefftz</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html">Fluxes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../theory/fluxes.html#notation">Notation:</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Data Structures</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api/mesh.html">TrefftzMesh</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Design</a><input aria-label="Toggle navigation of Design" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Data Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="problem.html">Problem object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input aria-label="Toggle navigation of Tutorials" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/fluxes.html">Fluxes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/kernels.html">Kernels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/assembly.html">Assembly</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/mesh.html">Mesh</a></li>
 </ul>
 </li>
 </ul>
@@ -240,20 +270,46 @@
           <section class="tex2jax_ignore mathjax_ignore" id="data-structures">
 <h1>Data Structures<a class="headerlink" href="#data-structures" title="Link to this heading">¶</a></h1>
 <p>The mesh basically exports points, edges and triangles as numpy arrays. <code class="docutils literal notranslate"><span class="pre">points</span></code> is a simple (N,2) array of dtype np.float64, however both edges and triangles are structured arrays.</p>
+<section id="mesh">
+<h2>Mesh<a class="headerlink" href="#mesh" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>A point <span class="math notranslate nohighlight">\(\mathbf{x} \in \mathbb{R}^n\)</span> is <em>never</em> in a subset with 0 <span class="math notranslate nohighlight">\(n\)</span>-Lebesgue measure. Hence <code class="docutils literal notranslate"><span class="pre">get_ID</span></code> only returns triangles.</p></li>
+<li><p>A mesh has two types of structures/philosophies:</p>
+<ul>
+<li><p>For mesh creation and manipulation we use pythonic datacontainers and methods ( collections, lists comprehensions, dictionaries…). They are not vectorized but they are only called a couple of times during initialization of the mesh.</p></li>
+<li><p>Mesh only exports numpy structured arrays for fast manipulation by the DG-Trefftz assembler. These are vectorized, the assembler knows nothing about the mesh internals.</p></li>
+</ul>
+</li>
+</ul>
+<!-- Mesh internals: 
+- an edge IS a couple of nodes, they could be a frozenset, they could be hashable.
+
+A mesh should export two different sets of edges: inner edges and outer edges
+The former belong to two triangles while the last only to one. Furthermore the this two subset of edges should be further separated by boundary conditions (by boundary definition) -->
+</section>
 <section id="process">
 <h2>Process<a class="headerlink" href="#process" title="Link to this heading">¶</a></h2>
-<p>In order to allow to reusability the code is split in several classes minimizing coupling:</p>
+<p>In order to allow to reusability the code is split three packages:</p>
 <ul class="simple">
-<li><p>Domain: geometric definition, mesh, regions…
-- Waveguide: R, H
-- CleanWaveguide: a constructor
-- Unbounded: R</p></li>
-<li><p>PhysicalModel: Helmholtz, Maxwell, Lamb-waves,  sets boundary conditions, material properties, depends on a domain</p></li>
-<li></li>
+<li><p>trefftz: general functions, independent of the particular problem.</p></li>
+<li><p>cases:</p>
+<ul>
+<li><p>waveguide: functions only meaningfull for a waveguide problem: waveguide modes, waveguide plots, NtD…</p></li>
+<li><p>open_space: functions only meaningfull for an open space problem: Fourier modes, circular plots, NtD…</p></li>
 </ul>
-<p>Sigma_L and Sigma_R should be defined separately (not as Sigma) so the assembler knows that there is no coupling among them</p>
-<p>I need the fluxes indexed from 0 to 1 to be able to construct the numpy structured arrays BUT, once they are constructed I don’t use the edge ID any more, as each edges element carries its normal its neighbours etc… so I can constructs subsets of edges as slices of edges</p>
-</section>
+</li>
+</ul>
+<!-- - Domain: geometric definition, mesh, regions...
+        - Waveguide: R, H
+            - CleanWaveguide: a constructor
+        - Unbounded: R
+- PhysicalModel: Helmholtz, Maxwell, Lamb-waves,  sets boundary conditions, material properties, depends on a domain -->
+<!-- - 
+
+Sigma_L and Sigma_R should be defined separately (not as Sigma) so the assembler knows that there is no coupling among them
+
+
+I need the fluxes indexed from 0 to 1 to be able to construct the numpy structured arrays BUT, once they are constructed I don't use the edge ID any more, as each edges element carries its normal its neighbours etc... so I can constructs subsets of edges as slices of edges --></section>
 </section>
 
         </article>
@@ -261,23 +317,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../api/index.html">
+          <a class="next-page" href="problem.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">API Reference</div>
+                <div class="title">Problem object</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../theory/fluxes.html">
+          <a class="prev-page" href="index.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Fluxes</div>
+                <div class="title">Design</div>
                 
               </div>
             </a>
@@ -312,6 +368,7 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Data Structures</a><ul>
+<li><a class="reference internal" href="#mesh">Mesh</a></li>
 <li><a class="reference internal" href="#process">Process</a></li>
 </ul>
 </li>
@@ -325,8 +382,10 @@
     </aside>
   </div>
 </div><script src="../_static/documentation_options.js?v=01f34227"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>
