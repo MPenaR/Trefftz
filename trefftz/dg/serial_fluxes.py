@@ -3,59 +3,66 @@ Module for the evaluation of fluxes for a single pair of test and trial function
 implementation of the code and now serves as a test for the vectorized implementation. It is tested
 against numerical computations of the fluxes.
 
-All around this page, :math:`\Phi_{n}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_n)` and :math:`\Psi_{m}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_m)` 
+All around this page, :math:`\Phi_{n}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_\varphi)` and :math:`\Psi_{m}(\mathbf{x})=\exp(ik\mathbf{x}\cdot\mathbf{d}_\psi)` 
 are the trial and test functions. :math:`l` is the length of an edge, :math:`\mathbf{M}` its midpoint and :math:`\boldsymbol{\tau}` and :math:`\mathbf{n}` 
 its tangent and normal unitary vectors. 
 """
 
-
-import numpy as np
-from numpy import dot, sinc, pi, exp, sqrt, conj
-from dataclasses import dataclass
 from trefftz.numpy_types import float_array
-from typing import Mapping
+from enum import Enum
+from typing import Protocol
+
+from trefftz.dg.kernels.serial import I_uv, I_duv, I_udv, I_dudv, I_pw_dv, I_pw_v
+
+class SIGN(Enum):
+    '''Sign for the transmission kernel
+    where PP (plus plus) stands for both trial
+    and test function coming from the plus triangle
+    whereas PM stands for the test function (psi) coming
+    from the + triangle and the trial function (phi) from
+    the - one.'''
+    PP = (0, 0)
+    PM = (0, 1)
+    MP = (1, 0)
+    MM = (1, 1)
 
 
-# @dataclass
-# class Function:
-#     d: np.ndarray[tuple[int], np.dtype[np.floating]]
-#     n: float
+class SerialTransmissionKernel(Protocol):
+    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float, sign: SIGN) -> complex:
+        ...
 
 
-@dataclass
-class Edge:
-    M: np.ndarray[tuple[int], np.dtype[np.floating]]
-    l: float
-    N: np.ndarray[tuple[int], np.dtype[np.floating]]
-    T: np.ndarray[tuple[int], np.dtype[np.floating]]
+class SerialLocalKernel(Protocol):
+    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+        ...
+
+    def RHS(self, edge, d_v: float_array, k: float) -> complex:
+        ...
 
 
+class SerialNonLocalKernel(Protocol):
+    def LHS(self, edge_u, edge_v, d_u: float_array, d_v: float_array, k: float) -> complex:
+        ...
 
-def SoundHard(phi, psi, k: float, edge: Edge, d_1: float = 0.5) -> complex:
+
+class NeumannFlux:
     r"""
-    Computes the flux on a sound-hard boundary, that is:
+    Computes the flux on a Neumann boundary condition, that is:
 
     .. math::
     
         \int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}
 
-    This quantity can be exactly evaluated as:
-
-    .. math::
-    
-        \boxed{-ikl\left(1+d_{1}\mathbf{d}_{n}\cdot\mathbf{n}\right)\mathbf{d}_{m}\cdot\mathbf{n}e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\boldsymbol{\tau}\right)}
-
-
     Parameters
     ----------
-    phi : Function
-        Trial function.
-    psi : Function
-        Test function.
+    edge : Edge or Arc
+        Edge parameters.
+    d_u : (float, float) array
+        Propatagion direction of the trial function.
+    d_v : (float, float) array
+        Propatagion direction of the test function.
     k : float
         Wavenumber.
-    edge : Edge
-        Edge parameters.
     d_1 : float
         Stabilyzing parameter.
 
@@ -65,22 +72,20 @@ def SoundHard(phi, psi, k: float, edge: Edge, d_1: float = 0.5) -> complex:
         The integral.
     
     """
-
-    d_m = psi.d
-    d_n = phi.d
+    def __init__(self, d_1: float):
+        self.d_1 = d_1
     
-    M = edge.M
-    l = edge.l
-    N = edge.N
-    T = edge.T
+    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+        d_1 = self.d_1
 
-    return -1j*k*l*(1 + d_1 * dot(d_n, N))*dot(d_m, N)*exp(1j*k*dot(d_n - d_m, M)) * sinc(k*l/(2*pi)*dot(d_n-d_m, T))
-    
+        return I_udv(edge, d_u, d_v, k) + d_1/(1j*k)*I_dudv(edge, d_u, d_v, k)
 
-
+    def RHS(self, edge, d_v: float_array, k: float) -> complex:
+        raise NotImplementedError("Not implemented yet")
 
 
-def Inner(phi, psi, edge : Edge, k : float, stabilizing_parameters: Mapping[str, float]) -> complex:
+
+class UltraWeakFlux:
     r"""
     Computes the flux on a inner facet with respect to the degrees
     of freedom from the same cell, that is:
@@ -90,14 +95,14 @@ def Inner(phi, psi, edge : Edge, k : float, stabilizing_parameters: Mapping[str,
 
     Parameters
     ----------
-    phi : Function
-        Trial function.
-    psi : Function
-        Test function.
+    edge : Edge or Arc
+        Edge parameters.
+    d_u : (float, float) array
+        Propatagion direction of the trial function.
+    d_v : (float, float) array
+        Propatagion direction of the test function.
     k : float
         Wavenumber.
-    edge : Edge
-        Edge parameters.
     a : float
         Stabilyzing parameter.
     b : float
@@ -110,55 +115,61 @@ def Inner(phi, psi, edge : Edge, k : float, stabilizing_parameters: Mapping[str,
 
 
     """
-    a = stabilizing_parameters.get("a", 0.5)
-    b = stabilizing_parameters.get("b", 0.5)
+
+    def __init__(self, a: float, b: float):
+        self.a = a 
+        self.b = b
     
+    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float, sign: SIGN) -> complex:
+        match sign:
+            case SIGN.PP:
+                a = self.a
+                b = self.b
+            case SIGN.PM:
+                a = self.a
+                b = self.b
+            case SIGN.MP:
+                a = -self.a
+                b = -self.b
+            case SIGN.MM:
+                a = -self.a
+                b = -self.b
 
-    d_m = psi.d
-    d_n = phi.d
+        k_n = k
+        k_m = k
 
-    k_n = k * sqrt(phi.n)
-    k_m = k * sqrt(psi.n)
+        I = 1/2*I_udv(edge, d_u, d_v, k) + b /(1j*k)*I_dudv(edge, d_u, d_v, k) - a*1j*k*I_uv(edge, d_u, d_v, k) - 1/2*I_duv(edge, d_u, d_v, k)
+        match sign:
+            case SIGN.PP:
+                I = I
+            case SIGN.PM:
+                I = -I
+            case SIGN.MP:
+                I = I
+            case SIGN.MM:
+                I = -I
+        return I
 
-    
-    M = edge.M
-    N = edge.N
-    T = edge.T
-    l = edge.l
-
-    # I = -1j*l/2*(2*a*k + k_n*dot(d_n, N) + k_m*dot(d_m, N) + 2*b/k*k_n*dot(d_n, N)*k_m*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
-    return -1j*k*l*( 1/2*( k_n/k*dot(d_n, N) + k_m/k*dot(d_m, N)) + a + b*k_n/k*k_m/k*dot(d_n, N)*dot(d_m, N))*exp(1j*dot(k_n*d_n - k_m*d_m, M))*sinc(l/(2*pi)*dot(k_n*d_n - k_m*d_m,T))
-
-
-
-def Radiating_local(phi, psi, k : float, edge : Edge, d_2 : float) -> complex:
+# RIGHT NOW RHS only does plane waves as RHS
+class DirichletFlux:
     r"""
-    Computes the flux on a radiating boundary with respect to the degrees
-    of freedom from the same cell, that is:
-
-    TODO: it is assuming that the radiating boundary consists of a vertical segment. This should be easy to generalize.
-    
-    .. math::
-    
-        -\int_{E}\left(d_{2}ik\Phi_n(\mathbf{x})+\nabla \Phi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\Psi_n(\mathbf{x})}\,\mathrm{d}S_{\mathbf{x}}
-
-    which can be computed as:
+    Computes the flux on a Neumann boundary condition, that is:
 
     .. math::
     
-        \boxed{-ikl\left(d_{2}+\mathbf{d}_{n}\cdot\mathbf{n}\right)e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\mathbf{j}\right)}
+        \int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}
 
     Parameters
     ----------
-    phi : Function
-        Trial function.
-    psi : Function
-        Test function.
-    k : float
-        Wave number.
-    edge : Edge
+    edge : Edge or Arc
         Edge parameters.
-    d_2 : float
+    d_u : (float, float) array
+        Propatagion direction of the trial function.
+    d_v : (float, float) array
+        Propatagion direction of the test function.
+    k : float
+        Wavenumber.
+    a : float
         Stabilyzing parameter.
 
     Returns
@@ -168,83 +179,15 @@ def Radiating_local(phi, psi, k : float, edge : Edge, d_2 : float) -> complex:
     
     """
 
-    d_n = phi.d
-    d_m = psi.d
-
-    l = edge.l
-    M = edge.M
-    N = edge.N
-    T = edge.T
-
-
-    return -1j*k*l*(d_2 + dot(d_n, N))*exp(1j*k*dot(d_n - d_m, M))*sinc(k*l/(2*pi)*dot(d_n-d_m, T))
-
-
-# def Radiating_nonlocal(phi : Function, psi : Function, k : float, edge_u : Edge, edge_v : Edge, d_2 : float, N_modes : int, H : float) -> complex:
-#     r"""
-#     Computes the flux on a radiating boundary with respect to the degrees
-#     of freedom from another cell, that is:
-
-#     TODO: it is assuming that the radiating boundary consists of a vertical segment. This should be easy to generalize.
+    def __init__(self, a: float, data = None):
+        self.a = a
+        self.data = data
     
-#     Parameters
-#     ----------
-#     phi : Function
-#         Trial function.
-#     psi : Function
-#         Test function.
-#     k : float
-#         Wave number.
-#     edge_u : Edge
-#         Edge of the triangle associated to the trial function.
-#     edge_v : Edge
-#         Edge of the triangle associated to the test function.
-#     d_2 : float
-#         Stabilyzing parameter.
-#     N_modes : int
-#         Number of modes for the approximation of the NtD map.
-#     H : float
-#         height of the waveguide. 
-
-#     Returns
-#     -------
-#     I : complex
-#         The integral.
-
-    
-#     """
-#     d_n = phi.d
-#     d_m = psi.d
-     
-#     l_u = edge_u.l
-#     M_u = edge_u.M
-#     l_v = edge_v.l
-#     M_v = edge_v.M
-
-
-#     N = edge_u.N
-#     T = edge_u.T
-
-#     I1 = -1j*k*H*dot(d_n,N)*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
-#         sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k**2 / abs(sqrt(complex(k**2 - (s*pi/H)**2)))**2 * (
-#         exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
-#         exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
-#         for s in range(1,N_modes)]) )
-    
-#     I2 = -1j*k*H*dot(d_n,N)*(dot(d_m,N)-d_2)*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
-#         sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / sqrt(complex(k**2 - (s*pi/H)**2)) * (
-#         exp( 1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi*M_u[1]/H)*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
-#         exp(-1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi*M_v[1]/H)*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
-#         for s in range(1,N_modes)]) )
-    
-#     I3 = 1j*k*H*dot(d_m,N)*d_2*exp(1j*k*(dot(d_n,M_u) - dot(d_m,M_v)))*l_u/H*l_v/H*(
-#         sinc(k*l_u/(2*pi)*d_n[1])*sinc(k*l_v/(2*pi)*d_m[1]) + 1/2*sum( [ k / conj(sqrt(complex(k**2 - (s*pi/H)**2))) * (
-#         exp( 1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] + s*l_u/(2*H)) + exp(-1j*s*pi/H*M_u[1])*sinc(k*l_u/(2*pi)*d_n[1] - s*l_u/(2*H)) ) *(
-#         exp(-1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] + s*l_v/(2*H)) + exp( 1j*s*pi/H*M_v[1])*sinc(k*l_v/(2*pi)*d_m[1] - s*l_v/(2*H)) )
-#         for s in range(1,N_modes)]) )
-
-#     return  I1 + I2 + I3
-
-
-
-
+    def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
+        a = self.a
+        return -I_duv(edge, d_u, d_v, k) + 1j*k*a*I_uv(edge, d_u, d_v, k)
+        
+    def RHS(self, edge, d_v: float_array, k: float) -> complex:
+        plane_wave = self.data
+        a = self.a
+        return I_pw_dv(edge, plane_wave, d_v, k) - 1j*a*k*I_pw_v(edge, plane_wave, d_v, k)

@@ -1,17 +1,15 @@
 '''Module for defining Trefftz-DG functions'''
 from trefftz.dg.basis import TrefftzBasis
-from typing import Any, TYPE_CHECKING
 from numpy.typing import DTypeLike
 from trefftz.dg.basis import TrefftzBasis
-if TYPE_CHECKING:
-    from trefftz.mesh import TrefftzMesh
-
+from trefftz.mesh import TrefftzMesh
+from typing import Any
 from trefftz.numpy_types import complex_array, float_array
 import numpy as np
 
 
 class ComplexFunction:
-    def __init__(self, domain: "TrefftzMesh",  N_theta: int, k: float) -> None:
+    def __init__(self, domain: TrefftzMesh[Any],  N_theta: int, k: float) -> None:
         self.domain = domain
         self.N_theta = N_theta
         self.N_DOF = N_theta*domain.n_triangles
@@ -29,10 +27,8 @@ class ComplexFunction:
     
         x = np.asarray(x)
         y = np.asarray(y)
-        XY = np.column_stack([x, y])
-        T_IDs = self.domain.get_cell(XY)
+        T_IDs = self.domain.get_cell(x, y)
         DOFs = self.T_ID_to_DOFs[T_IDs, :]  # (N, Ntheta)
-        # z = np.sum(self.coefficients[DOFs] * np.exp(1j*self.k*(np.outer(x, self.D[:, 0]) + np.outer(y, self.D[:, 1]))), axis=1)
         z = np.sum(self.coefficients[DOFs] * np.exp(1j*self.k*np.dot(XY, self.D.T)), axis=1)
     
         return z
@@ -41,9 +37,9 @@ class ComplexFunction:
 class TrefftzFunction:
     '''Numerical function belonging to the finite dimensiona broken Trefftz space'''
 
-    def __init__(self, domain, basis: TrefftzBasis, dtype: DTypeLike = np.complex128):
+    def __init__(self, mesh: TrefftzMesh[Any], basis: TrefftzBasis, dtype: DTypeLike = np.complex128):
         self.basis = basis
-        self.domain = domain
+        self.mesh = mesh
         self.coefficients = np.zeros(basis.N_DOF, dtype=dtype)
 
     def set(self, coefficients):
@@ -53,15 +49,18 @@ class TrefftzFunction:
     def __call__(self, x: float | float_array, y: float | float_array):
         x = np.asarray(x)
         y = np.asarray(y)
-        XY = np.column_stack([x, y])
 
-        T_IDs = self.domain.mesh.get_cell(XY)
+        T_IDs = self.mesh.get_cell(x, y).ravel()
         DOFs = self.basis.T_ID_to_DOFs[T_IDs, :]  # shape (Npts, Ntheta) 
 
         # evaluate plane-wave basis at points
         D = self.basis.D
         k = self.basis.k # actually it should be a N_Triangles sized vector.
 
-        values = np.sum( self.coefficients[DOFs] * np.exp(1j * k * np.dot(XY, D.T)), axis=1)
+        xy = np.column_stack([x.ravel(), y.ravel()])
+
+        values = np.sum(self.coefficients[DOFs] * np.exp(1j * k * np.dot(xy, D.T)), axis=1)
+        values = np.where(T_IDs >=0, values, np.nan).reshape(x.shape)
 
         return values
+

@@ -1,15 +1,66 @@
-'''
-Module for functions that compute geometric quantities or relations.
-'''
+"""
+Geometric utilities and spatial-query interfaces for mesh operations.
+
+This module provides foundational geometric tools used throughout the
+Trefftz library, including:
+
+- geometric predicates
+- triangle area computations
+- mesh cell type definitions
+- interfaces for spatial point-location algorithms
+
+The utilities are designed to support vectorized NumPy-based workflows.
+
+Classes
+-------
+CellType
+    Enumeration of supported mesh cell types.
+
+CellLocator
+    Protocol defining the interface for point-to-cell location
+    algorithms.
+
+Functions
+---------
+in_triangle
+    Test whether a point lies inside a triangle.
+
+triangle_area
+    Compute the area of one or multiple triangles.
+
+Notes
+-----
+Most functions support vectorized operations over multiple geometric
+entities for efficient numerical computations.
+"""
 
 
 from trefftz.numpy_types import float_array, int_array
 import numpy as np
-from typing import Protocol
 from enum import IntEnum
 
 
 class CellType(IntEnum):
+    """
+    Enumeration of supported mesh cell types.
+
+    Attributes
+    ----------
+    POINT
+        Zero-dimensional cell.
+
+    SEGMENT
+        One-dimensional line segment.
+
+    TRIANGLE
+        Two-dimensional triangular cell.
+
+    Notes
+    -----
+    The current implementation primarily targets triangular meshes,
+    although the enumeration may be extended to support additional
+    element types such as quadrilaterals.
+    """
     POINT = 0
     SEGMENT = 1
     TRIANGLE = 2  # consider modifying it later for quad
@@ -17,23 +68,35 @@ class CellType(IntEnum):
 
 def in_triangle(P: float_array, A: float_array, B: float_array, C: float_array) -> bool:
     """
-    Checks if a point is inside a given triangle.
+    Check whether a point lies inside a triangle.
+
+    The test is performed using barycentric coordinates computed from
+    the triangle vertices.
 
     Parameters
     ----------
     P : (2,) float_array
-        point to check.
+        Point to test.
+
     A : (2,) float_array
-        Vertex A of triangle ABC.
+        First vertex of the triangle.
+
     B : (2,) float_array
-        Vertex B of triangle ABC.
+        Second vertex of the triangle.
+
     C : (2,) float_array
-        Vertex C of triangle ABC.
+        Third vertex of the triangle.
 
     Returns
     -------
     bool
-        True if the point P is inside triangle ABC.
+        ``True`` if the point lies inside or on the boundary of the
+        triangle, otherwise ``False``.
+
+    Notes
+    -----
+    A small numerical tolerance is used to improve robustness for points
+    located near triangle boundaries.
     """
     AC = C - A
     AB = B - A
@@ -47,31 +110,37 @@ def in_triangle(P: float_array, A: float_array, B: float_array, C: float_array) 
 
 def triangle_area(A: float_array, B: float_array, C: float_array) -> int | int_array:
     """
-    Computes the area of a triangle
-
-    If several triangles are passed it computes their areas in a vectorized manner.
+    Compute the area of one or multiple triangles.
 
     Parameters
     ----------
-    A : (2,) float_array
-        Vertex A of triangle ABC.
-    B : (2,) float_array
-        Vertex B of triangle ABC.
-    C : (2,) float_array
-        Vertex C of triangle ABC.
+    A : float_array
+        First triangle vertex or array of vertices.
+
+    B : float_array
+        Second triangle vertex or array of vertices.
+
+    C : float_array
+        Third triangle vertex or array of vertices.
 
     Returns
     -------
-    float
-        Surface area of the triangle ABC.
+    float or float_array
+        Triangle area(s).
+
+        If vectorized inputs are provided, the returned value is an
+        array containing the area of each triangle.
+
+    Notes
+    -----
+    The area is computed from the determinant of the edge vectors:
+
+    :contentReference[oaicite:0]{index=0}
+
+    The implementation supports vectorized NumPy operations for efficient
+    evaluation over multiple triangles.
     """
     u = (C - A).transpose()
     v = (B - A).transpose()
     det = u[0]*v[1] - u[1]*v[0]
     return 0.5*np.abs(det).transpose()
-
-
-class CellLocator(Protocol):
-    '''Protocol for cell locators'''
-    def find_cell(self, p: float_array) -> int_array | int:
-        ...

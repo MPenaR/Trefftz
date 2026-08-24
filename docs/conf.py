@@ -5,10 +5,10 @@ import os
 import sys
 from datetime import datetime
 
-# -- Path setup --------------------------------------------------------------
+# # -- Path setup --------------------------------------------------------------
 
-# Add the Trefftz package to sys.path so autodoc can import it
-sys.path.insert(0, os.path.abspath("../trefftz"))
+# # Add the Trefftz package to sys.path so autodoc can import it
+# sys.path.insert(0, os.path.abspath("../trefftz"))
 
 # -- Project information -----------------------------------------------------
 
@@ -30,6 +30,8 @@ extensions = [
     "sphinx.ext.mathjax"
 ]
 
+
+
 myst_enable_extensions = [
     "amsmath",     #  block math environments
     "dollarmath",  #  $...$ and $$...$$
@@ -37,6 +39,9 @@ myst_enable_extensions = [
 
 # Type hints in documentation
 autodoc_typehints = "description"
+
+napoleon_numpy_docstring = True
+napoleon_google_docstring = False
 
 # Templates
 templates_path = ["_templates"]
@@ -56,8 +61,6 @@ html_static_path = ["_static"]
 
 autodoc_member_order = "bysource"
 autodoc_default_options = {
-    "members": True,
-    "undoc-members": True,
     "show-inheritance": True,
 }
 
@@ -75,5 +78,5 @@ intersphinx_mapping = {
 todo_include_todos = True
 
 
-autoclass_content = "both"
+#autoclass_content = "both"
 
