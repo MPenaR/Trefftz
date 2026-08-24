@@ -50,31 +50,31 @@ def I_dudv(segment, D_u: float_array, D_v: float_array, k: float) -> complex_arr
     return k**2*dot(D_u, N)[None, :]*dot(D_v, N)[:, None]*I_uv(segment, D_u, D_v, k)
 
 
-def I_uincv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex_array:
-    r'''Computes the integral:
-    .. math ::
-        \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
+# def I_uincv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex_array:
+#     r'''Computes the integral:
+#     .. math ::
+#         \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
 
-    where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
+#     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
 
-    l = segment["l"]
-    M = segment["M"]
-    T = segment["T"]
+#     l = segment["l"]
+#     M = segment["M"]
+#     T = segment["T"]
 
-    d_incv = d_inc[None, : ] - D_v[ :, : ]
+#     d_incv = d_inc[None, : ] - D_v[ :, : ]
 
-    return l*exp(1j*k*dot(d_incv, M))*sinc(k*l/(2*pi)*dot(d_incv, T))
+#     return l*exp(1j*k*dot(d_incv, M))*sinc(k*l/(2*pi)*dot(d_incv, T))
 
 
-def I_uincdv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex_array:
-    r'''Computes the integral:
-    .. math ::
-        \int_E u_{\mathrm{inc}} \overline{\nabla v \cdot \mathbf{n}}\,\mathrm{d}\ell
+# def I_uincdv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex_array:
+#     r'''Computes the integral:
+#     .. math ::
+#         \int_E u_{\mathrm{inc}} \overline{\nabla v \cdot \mathbf{n}}\,\mathrm{d}\ell
 
-    where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
+#     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is a segment.'''
 
-    N = segment["N"]
-    return -1j*k*dot(D_v, N)*I_uincv(segment, d_inc, D_v, k)
+#     N = segment["N"]
+#     return -1j*k*dot(D_v, N)*I_uincv(segment, d_inc, D_v, k)
 
 
 def I_pw_v(segment_v, plane_wave: PlaneWave, D_v: float_array, k: float) -> complex_array:
@@ -83,9 +83,13 @@ def I_pw_v(segment_v, plane_wave: PlaneWave, D_v: float_array, k: float) -> comp
         \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
 
     where $u_inc$ is a plane wave and $v$ is a plane wave and $E$ is a segment.'''
+    l = segment_v["l"]
+    M = segment_v["M"]
+    T = segment_v["T"]
 
+    d_iv = plane_wave.d - D_v
 
-    return plane_wave.A*I_uv(segment=segment_v, D_u=plane_wave.d, D_v=D_v, k=k)
+    return plane_wave.A*l*exp(1j*k*dot(d_iv, M))*sinc(k*l/(2*pi)*dot(d_iv, T))
 
 
 def I_pw_dv(segment_v, plane_wave: PlaneWave, D_v: float_array, k: float) -> complex_array:
@@ -97,4 +101,4 @@ def I_pw_dv(segment_v, plane_wave: PlaneWave, D_v: float_array, k: float) -> com
 
     N = segment_v["N"]
 
-    return -1j*k*dot(N, D_v)*I_pw_v(segment_v, plane_wave, D_v, k)
+    return -1j*k*dot(D_v, N)*I_pw_v(segment_v, plane_wave, D_v, k)
