@@ -1,6 +1,6 @@
 from numpy import dot, exp, sinc, pi
 from trefftz.numpy_types import float_array, complex_array
-
+from trefftz.dg.exact import PlaneWave
 
 def I_uv(segment, D_u: float_array, D_v: float_array, k: float) -> complex_array:
     r'''Computes the integral:
@@ -76,3 +76,25 @@ def I_uincdv(segment, d_inc: float_array, D_v: float_array, k: float) -> complex
     N = segment["N"]
     return -1j*k*dot(D_v, N)*I_uincv(segment, d_inc, D_v, k)
 
+
+def I_pw_v(segment_v, plane_wave: PlaneWave, D_v: float_array, k: float) -> complex_array:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
+
+    where $u_inc$ is a plane wave and $v$ is a plane wave and $E$ is a segment.'''
+
+
+    return plane_wave.A*I_uv(segment=segment_v, D_u=plane_wave.d, D_v=D_v, k=k)
+
+
+def I_pw_dv(segment_v, plane_wave: PlaneWave, D_v: float_array, k: float) -> complex_array:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u_{\mathrm{inc}} \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
+
+    where $u_inc$ is a plane wave and $v$ is a plane wave and $E$ is a segment.'''
+
+    N = segment_v["N"]
+
+    return -1j*k*dot(N, D_v)*I_pw_v(segment_v, plane_wave, D_v, k)

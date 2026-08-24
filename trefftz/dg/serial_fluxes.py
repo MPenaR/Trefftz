@@ -12,7 +12,7 @@ from trefftz.numpy_types import float_array
 from enum import Enum
 from typing import Protocol
 
-from trefftz.dg.kernels.serial import I_uv, I_duv, I_udv, I_dudv, I_uincdv, I_uincv
+from trefftz.dg.kernels.serial import I_uv, I_duv, I_udv, I_dudv, I_pw_dv, I_pw_v
 
 class SIGN(Enum):
     '''Sign for the transmission kernel
@@ -188,6 +188,6 @@ class DirichletFlux:
         return -I_duv(edge, d_u, d_v, k) + 1j*k*a*I_uv(edge, d_u, d_v, k)
         
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
-        d_inc = self.data["d_inc"]
+        plane_wave = self.data
         a = self.a
-        return I_uincdv(edge, d_inc, d_v, k) - 1j*a*k*I_uincv(edge, d_inc, d_v, k)
+        return I_pw_dv(edge, plane_wave, d_v, k) - 1j*a*k*I_pw_v(edge, plane_wave, d_v, k)
