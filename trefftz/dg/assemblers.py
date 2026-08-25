@@ -36,10 +36,10 @@ class BlockNumerics:
     nonlocal_boundary_kernels: Mapping[type[BoundaryCondition], BlockNonLocalKernel]
 
 
-class Assembler[BR: (StrEnum, IntEnum), num: Numerics](ABC):
+class Assembler[B: (StrEnum, IntEnum), num: Numerics](ABC):
     def __init__(self,
-                 mesh: TrefftzMesh[BR],
-                 boundary_conditions: Mapping[BR, BoundaryCondition],
+                 mesh: TrefftzMesh[B, Any],
+                 boundary_conditions: Mapping[B, BoundaryCondition],
                  numerics: num,
                  basis: PlanewaveBasis,
                  verbose: bool = True):

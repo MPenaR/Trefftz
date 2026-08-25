@@ -16,6 +16,18 @@ def I_uv(segment, d_u: float_array, d_v: float_array, k: float) -> complex:
     return l*exp(1j*k*dot((d_u - d_v), M))*sinc(k*l/(2*pi)*dot(d_u - d_v, T))
 
 
+def I_uv_(segment, d_u: float_array, n_u: float,  d_v: float_array, n_v: float, k: float) -> complex:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u \overline{v}\,\mathrm{d}\ell
+
+    where $u$ and $v$ are plane waves and $E$ is a segment.'''
+    l = segment["l"]
+    M = segment["M"]
+    T = segment["T"]
+    return l*exp(1j*k*dot((n_u*d_u - n_v*d_v), M))*sinc(k*l/(2*pi)*dot(n_u*d_u - n_u*d_v, T))
+
+
 def I_duv(segment, d_u: float_array, d_v: float_array, k: float) -> complex:
     r'''Computes the integral:
     .. math ::

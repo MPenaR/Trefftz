@@ -1,15 +1,14 @@
 '''Module for defining Trefftz-DG functions'''
 from trefftz.dg.basis import TrefftzBasis
 from numpy.typing import DTypeLike
-from trefftz.dg.basis import TrefftzBasis
 from trefftz.mesh import TrefftzMesh
 from typing import Any
 from trefftz.numpy_types import complex_array, float_array
 import numpy as np
-
+from enum import Enum
 
 class ComplexFunction:
-    def __init__(self, domain: TrefftzMesh[Any],  N_theta: int, k: float) -> None:
+    def __init__(self, domain: TrefftzMesh[Any, Any],  N_theta: int, k: float) -> None:
         self.domain = domain
         self.N_theta = N_theta
         self.N_DOF = N_theta*domain.n_triangles
@@ -37,7 +36,7 @@ class ComplexFunction:
 class TrefftzFunction:
     '''Numerical function belonging to the finite dimensiona broken Trefftz space'''
 
-    def __init__(self, mesh: TrefftzMesh[Any], basis: TrefftzBasis, dtype: DTypeLike = np.complex128):
+    def __init__(self, mesh: TrefftzMesh[Any, Any], basis: TrefftzBasis, dtype: DTypeLike = np.complex128):
         self.basis = basis
         self.mesh = mesh
         self.coefficients = np.zeros(basis.N_DOF, dtype=dtype)
@@ -64,3 +63,20 @@ class TrefftzFunction:
 
         return values
 
+
+class ElementwiseParameter[R: Enum, T]:
+    def __init__(self, mesh: TrefftzMesh[Any, R], parameter_mapping: dict[R, T]):
+        self._mesh = mesh
+        self._parameter_mapping = parameter_mapping
+
+    def _from_ID(self, ID: int) -> T:
+        ...
+
+    def _from_coordinates(self, x: float, y: float) -> T:
+        ID = self._mesh.get_cell(x, y)
+        p = self._from_ID(ID)
+        return p
+    
+    def __call__(self, x: float, y: float) -> T:
+        return self._from_coordinates(x, y)
+    

@@ -1,28 +1,27 @@
-from trefftz.mesh import TrefftzMesh  #, BoundaryRegions
+from trefftz.mesh import TrefftzMesh 
 from trefftz.dg.basis import PlanewaveBasis
 from collections.abc import Mapping
-from scipy.sparse.linalg import spsolve, gmres, bicgstab
+from scipy.sparse.linalg import spsolve, bicgstab
 from scipy.sparse import coo_array, csr_array, csc_array
 from trefftz.numpy_types import complex_array
 from trefftz.dg.functions import TrefftzFunction
-from trefftz.dg.assemblers import Assembler, SerialAssembler, SerialNumerics, Numerics
+from trefftz.dg.assemblers import Assembler, Numerics
 from trefftz.dg.boundary_conditions import BoundaryCondition
 from enum import Enum
-
+from typing import Any
 
 class ExactSolution:
     ...
 
 
 
-class Problem[BR: Enum, N: Numerics]:
+class Problem[B: Enum, N: Numerics]:
     def __init__(self,
-                 mesh: TrefftzMesh[BR],
+                 mesh: TrefftzMesh[B, Any],
                  wavenumber: float,
                  basis: PlanewaveBasis,
-                 boundary_conditions: Mapping[BR, BoundaryCondition],
-                #  numerics: SerialNumerics,
-                 assembler: Assembler[BR, N],
+                 boundary_conditions: Mapping[B, BoundaryCondition],
+                 assembler: Assembler[B, N],
                  u: ExactSolution | None = None,
                  direct_solver: bool = True):
         
@@ -31,26 +30,10 @@ class Problem[BR: Enum, N: Numerics]:
         self.basis = basis
         self.boundary_conditions = boundary_conditions
         self.u = u
-        # self.numerics = numerics
         self.assembler = assembler
         self._A: coo_array | None = None
         self._b: complex_array | None = None
         self.direct_solver = direct_solver
-        # self._regions_local_kernel = [region for region, bc in self.boundary_conditions.items() if type(bc) in numerics.local_boundary_kernels]
-        # self._regions_nonlocal_kernel = [region for region, bc in self.boundary_conditions.items() if type(bc) in numerics.nonlocal_boundary_kernels]
-        # self._regions_RHS_term = [region for region, bc in self.boundary_conditions.items() if bc.data is not None]
-
-    # @property
-    # def regions_local_kernel(self):
-    #     return self._regions_local_kernel
-
-    # @property
-    # def regions_nonlocal_kernel(self):
-    #     return self._regions_nonlocal_kernel
-    
-    # @property
-    # def regions_RHS_term(self):
-    #     return self._regions_RHS_term
 
     @property
     def N_DOF(self):

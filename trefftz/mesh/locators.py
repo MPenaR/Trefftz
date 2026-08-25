@@ -29,7 +29,7 @@ additional locator strategies.
 
 
 from trefftz.numpy_types import float_array, int_array
-from typing import Protocol
+from typing import Protocol, overload
 from scipy.spatial import cKDTree
 import numpy as np
 from .geometry import in_triangle
@@ -56,7 +56,15 @@ class CellLocator(Protocol):
     - bounding volume hierarchies
     - geometric predicates
     """
-    def find_cell(self, x: float_array, y: float_array) -> int_array | int:
+
+    @overload
+    def find_cell(self, x: float, y: float) -> int: ...
+
+    @overload
+    def find_cell(self, x: float_array, y: float_array) -> int_array: ...
+
+
+    def find_cell(self, x: float_array | float, y: float_array | float) -> int_array | int:
         """
         Find the mesh cell containing one or more query points.
 

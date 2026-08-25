@@ -1,5 +1,5 @@
 from trefftz.mesh import TrefftzMesh
-from enum import StrEnum
+from enum import StrEnum, IntEnum
 import numpy as np
 
 try:
@@ -13,13 +13,22 @@ except ImportError as e:
     ) from e
 
 
-class Regions(StrEnum):
-    OMEGA = "Omega"
+class Boundaries(StrEnum):
     SIGMA = "Sigma"
-    d_Omega = "d_Omega"
+    D_OMEGA = "d_Omega"
 
 
-def CleanCircle(R: float = 5., lc: float = 0.3, verbosity: int = 0) -> TrefftzMesh[Regions]:
+class Regions(IntEnum):
+    OUT = 0
+    BACKGROUND = 1
+    OMEGA = 2
+
+class Materials(StrEnum):
+    AIR = "air"
+    DIELECTRIC = "dielectric" 
+
+
+def CleanCircle(R: float = 5., lc: float = 0.3, verbosity: int = 0) -> TrefftzMesh[Boundaries, Regions]:
 
     '''Creates a circular domain without scatterers
     It assumes the default tags for the subregions, i.e.:
@@ -28,16 +37,16 @@ def CleanCircle(R: float = 5., lc: float = 0.3, verbosity: int = 0) -> TrefftzMe
     '''
 
     geo = SplineGeometry()
-    geo.AddCircle((0.0, 0.0), R, bc=Regions.SIGMA, maxh=lc)
+    geo.AddCircle((0.0, 0.0), R, bc=Boundaries.SIGMA, maxh=lc)
 
     ngmesh = Mesh(geo.GenerateMesh(maxh=lc, perfstepsend=verbosity))
     
-    mesh = TrefftzMesh.from_ngsolve(ngmesh, boundary_regions=Regions)
+    mesh = TrefftzMesh.from_ngsolve(ngmesh, boundaries=Boundaries, regions=Regions)
 
     return mesh
 
 
-def AnularDomain(R: float = 5., r: float = 1., lc: float = 0.3, Lc: float = 0.5, verbosity: int = 0) -> TrefftzMesh[Regions]:
+def AnularDomain(R: float = 5., r: float = 1., lc: float = 0.3, Lc: float = 0.5, verbosity: int = 0) -> TrefftzMesh[Boundaries, Regions]:
 
     '''Creates an anular domain without scatterers
     It assumes the default tags for the subregions, i.e.:
@@ -46,19 +55,26 @@ def AnularDomain(R: float = 5., r: float = 1., lc: float = 0.3, Lc: float = 0.5,
     '''
 
     geo = SplineGeometry()
-    geo.AddCircle((0.0, 0.0), r, bc=Regions.d_Omega, leftdomain=0, rightdomain=1, maxh=lc)
-    geo.AddCircle((0.0, 0.0), R, bc=Regions.SIGMA, leftdomain=1, rightdomain=0, maxh=Lc)
+    geo.AddCircle((0.0, 0.0), r, bc=Boundaries.D_OMEGA, leftdomain=Regions.OUT, rightdomain=Regions.BACKGROUND, maxh=lc)
+    geo.AddCircle((0.0, 0.0), R, bc=Boundaries.SIGMA, leftdomain=Regions.BACKGROUND, rightdomain=Regions.OUT, maxh=Lc)
     ngmesh = Mesh(geo.GenerateMesh(maxh=lc, perfstepsend=verbosity))
     
-    mesh = TrefftzMesh.from_ngsolve(ngmesh, boundary_regions=Regions)
+    mesh = TrefftzMesh.from_ngsolve(ngmesh, boundaries=Boundaries, regions=Regions)
 
     return mesh
 
 
+class Material():
+    pass
+class Dielectric(Material):
+    def __init__(self, relative_permittivity: float):
+        self.eps_r = relative_permittivity
+
+class Metallic(Material):
+    pass
 
 
-
-def U(R: float = 5., lc: float = 0.3, Lc: float = 0.5, scale: float = 1., angle: float = 0., verbosity: int = 0) -> TrefftzMesh[Regions]:
+def U(R: float = 5., lc: float = 0.3, Lc: float = 0.5, scatterer_material: Material = Metallic(), scale: float = 1., angle: float = 0., verbosity: int = 0) -> TrefftzMesh[Boundaries, Regions]:
 
     '''Creates an U-shaped scatterer like the one from Fresnel database:
     - Omega = 0
@@ -68,13 +84,14 @@ def U(R: float = 5., lc: float = 0.3, Lc: float = 0.5, scale: float = 1., angle:
     geo = SplineGeometry()
 
 
-    # match scatterer_material:
-    #     case Dielectric():
-    #         scatterer_label = Region.SCATTERER
-    #     case Metallic():
-    #         scatterer_label = Region.OUT
-    #     case _:
-    #         raise TypeError(f"Unsupported scatterer material: {type(scatterer_material).__name__}")
+    match scatterer_material:
+        case Dielectric():
+            scatterer_label = Regions.OMEGA
+        case Metallic():
+            scatterer_label = Regions.OUT
+        case _:
+            raise TypeError(f"Unsupported scatterer material: {type(scatterer_material).__name__}")
+
 
 
     # scatterer
@@ -98,23 +115,24 @@ def U(R: float = 5., lc: float = 0.3, Lc: float = 0.5, scale: float = 1., angle:
 
     corners = [ geo.AppendPoint(*v) for v in vertices]
     
-    # for i in range(len(corners)):
-    #     geo.Append(["line", corners[i], corners[(i+1) % len(corners)]], leftdomain=scatterer_label, rightdomain=Region.BACKGROUND, maxh=e, bc=Regions.d_Omega)
 
     for i in range(len(corners)):
-        geo.Append(["line", corners[i], corners[(i+1) % len(corners)]], leftdomain=0, rightdomain=1, maxh=e, bc=Regions.d_Omega)
+        geo.Append(["line", corners[i], corners[(i+1) % len(corners)]], leftdomain=scatterer_label,
+                                                                        rightdomain=Regions.BACKGROUND,
+                                                                        maxh=e, bc=Boundaries.D_OMEGA)
 
 
-
-    # mesh.SetMaterial(Region.BACKGROUND, materials.AIR)
-    # if isinstance(scatterer_material, Dielectric):
-    #     mesh.SetMaterial(Region.SCATTERER, materials.DIELECTRIC)
-
-    geo.AddCircle((0.0, 0.0), R, bc=Regions.SIGMA, leftdomain=1, rightdomain=0, maxh=Lc)
+    geo.AddCircle((0.0, 0.0), R, bc=Boundaries.SIGMA, leftdomain=Regions.BACKGROUND, rightdomain=Regions.OUT, maxh=Lc)
 
 
-    ngmesh = Mesh(geo.GenerateMesh(maxh=lc, perfstepsend=verbosity))
+    ntmesh = geo.GenerateMesh(maxh=lc, perfstepsend=verbosity)
+
+    ntmesh.SetMaterial(Regions.BACKGROUND, Materials.AIR)
     
-    mesh = TrefftzMesh.from_ngsolve(ngmesh, boundary_regions=Regions)
+    if isinstance(scatterer_material, Dielectric):
+        ntmesh.SetMaterial(Regions.OMEGA, Materials.DIELECTRIC)
+
+    
+    mesh = TrefftzMesh.from_ngsolve(Mesh(ntmesh), boundaries=Boundaries, regions=Materials)
 
     return mesh
