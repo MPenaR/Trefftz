@@ -45,7 +45,7 @@ def I_duv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: fl
     phi_u = atan2(D_u[:, 1], D_u[:, 0])
 
     def I(theta: float) -> complex_array:
-        return k*R*(-jv(1, k*R*D_uv)*cos(phi_uv - phi_u[None, :])*theta + sum(1j**p/p*(jv(p-1, k*R*D_uv)*sin(p*(theta-phi_uv)+(phi_uv-phi_u[None, :]))-
+        return k*n_u*R*(-jv(1, k*R*D_uv)*cos(phi_uv - phi_u[None, :])*theta + sum(1j**p/p*(jv(p-1, k*R*D_uv)*sin(p*(theta-phi_uv)+(phi_uv-phi_u[None, :]))-
                                                                                        jv(p+1, k*R*D_uv)*sin(p*(theta-phi_uv)-(phi_uv-phi_u[None, :])))
                                                                                               for p in range(1, JAC_ANGER_MODES))) 
     return I(theta_2) - I(theta_1)
@@ -69,7 +69,7 @@ def I_udv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: fl
     phi_v = atan2(D_v[:, 1], D_v[:, 0])
 
     def I(theta: float) -> complex_array:
-        return -k*R*(-jv(1, k*R*D_uv)*cos(phi_uv - phi_v[:, None])* theta + sum(1j**p/p*(jv(p-1, k*R*D_uv)*sin(p*(theta-phi_uv)+(phi_uv-phi_v[:, None]))-
+        return -k*n_v*R*(-jv(1, k*R*D_uv)*cos(phi_uv - phi_v[:, None])* theta + sum(1j**p/p*(jv(p-1, k*R*D_uv)*sin(p*(theta-phi_uv)+(phi_uv-phi_v[:, None]))-
                                                                                          jv(p+1, k*R*D_uv)*sin(p*(theta-phi_uv)-(phi_uv-phi_v[:, None])))
                                                                                               for p in range(1, JAC_ANGER_MODES)))
 
@@ -135,7 +135,7 @@ def I_pw_dv(arc, plane_wave: PlaneWave, D_v: float_array, n_v: float | complex, 
     phi_v = atan2(D_v[:, 1], D_v[:, 0])
 
     def I(theta: float) -> complex_array:
-        return -k*R*(-jv(1, k*R*D_iv)*cos(phi_iv - phi_v)*theta + sum(1j**p/p*(jv(p-1, k*R*D_iv)*sin(p*(theta-phi_iv)+(phi_iv-phi_v))-
+        return -k*n_v*R*(-jv(1, k*R*D_iv)*cos(phi_iv - phi_v)*theta + sum(1j**p/p*(jv(p-1, k*R*D_iv)*sin(p*(theta-phi_iv)+(phi_iv-phi_v))-
                                                                                jv(p+1, k*R*D_iv)*sin(p*(theta-phi_iv)-(phi_iv-phi_v)))
                                                                                               for p in range(1, JAC_ANGER_MODES)))
 
