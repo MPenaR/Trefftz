@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="&lt;no title&gt;" href="assembly.html"><link rel="prev" title="Fluxes" href="fluxes.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Assembly" href="assembly.html"><link rel="prev" title="Fluxes" href="fluxes.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Kernels - Trefftz 0.1.0 documentation</title>
@@ -223,6 +223,7 @@
 <li class="toctree-l2 current has-children"><a class="reference internal" href="dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="fluxes.html">Fluxes</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Kernels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="assembly.html">Assembly</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
@@ -270,84 +271,12 @@
 <h1>Kernels<a class="headerlink" href="#kernels" title="Link to this heading">¶</a></h1>
 <section id="i-uv">
 <h2>I_uv<a class="headerlink" href="#i-uv" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="trefftz.dg.kernels.serial_kernels.I_uv">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.kernels.serial_kernels.</span></span><span class="sig-name descname"><span class="pre">I_uv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/kernels/serial_kernels.html#I_uv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.kernels.serial_kernels.I_uv" title="Link to this definition">¶</a></dt>
-<dd><p>Bases:</p>
-<p>Computes the integral:
-.. math</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\<span class="n">int_E</span> <span class="n">u</span> \<span class="n">overline</span><span class="p">{</span><span class="n">v</span><span class="p">}</span>\<span class="p">,</span>\<span class="n">mathrm</span><span class="p">{</span><span class="n">d</span><span class="p">}</span>\<span class="n">ell</span>
-</pre></div>
-</div>
-<p>where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>d_u</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
-<li><p><strong>d_v</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="i-duv">
 <h2>I_duv<a class="headerlink" href="#i-duv" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="trefftz.dg.kernels.serial_kernels.I_duv">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.kernels.serial_kernels.</span></span><span class="sig-name descname"><span class="pre">I_duv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/kernels/serial_kernels.html#I_duv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.kernels.serial_kernels.I_duv" title="Link to this definition">¶</a></dt>
-<dd><p>Bases:</p>
-<p>Computes the integral:
-.. math</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\<span class="n">int_E</span> \<span class="n">nabla</span> <span class="n">u</span>\<span class="n">cdot</span>\<span class="n">mathbf</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> \<span class="n">overline</span><span class="p">{</span><span class="n">v</span><span class="p">}</span>\<span class="p">,</span>\<span class="n">mathrm</span><span class="p">{</span><span class="n">d</span><span class="p">}</span>\<span class="n">ell</span>
-</pre></div>
-</div>
-<p>where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>d_u</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
-<li><p><strong>d_v</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="i-udv">
 <h2>I_udv<a class="headerlink" href="#i-udv" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="trefftz.dg.kernels.serial_kernels.I_udv">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">trefftz.dg.kernels.serial_kernels.</span></span><span class="sig-name descname"><span class="pre">I_udv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trefftz/dg/kernels/serial_kernels.html#I_udv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trefftz.dg.kernels.serial_kernels.I_udv" title="Link to this definition">¶</a></dt>
-<dd><p>Bases:</p>
-<p>Computes the integral:
-.. math</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\<span class="n">int_E</span> <span class="n">u</span> \<span class="n">overline</span><span class="p">{</span>\<span class="n">nabla</span> <span class="n">v</span> \<span class="n">cdot</span> \<span class="n">mathbf</span><span class="p">{</span><span class="n">n</span><span class="p">}}</span>\<span class="p">,</span>\<span class="n">mathrm</span><span class="p">{</span><span class="n">d</span><span class="p">}</span>\<span class="n">ell</span>
-</pre></div>
-</div>
-<p>where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>d_u</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
-<li><p><strong>d_v</strong> (<em>NDArray</em><em>[</em><em>float64</em><em>]</em>)</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)">complex</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 </section>
 
@@ -361,7 +290,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">&lt;no title&gt;</div>
+                <div class="title">Assembly</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -407,18 +336,9 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Kernels</a><ul>
-<li><a class="reference internal" href="#i-uv">I_uv</a><ul>
-<li><a class="reference internal" href="#trefftz.dg.kernels.serial_kernels.I_uv"><code class="docutils literal notranslate"><span class="pre">I_uv</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#i-duv">I_duv</a><ul>
-<li><a class="reference internal" href="#trefftz.dg.kernels.serial_kernels.I_duv"><code class="docutils literal notranslate"><span class="pre">I_duv</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#i-udv">I_udv</a><ul>
-<li><a class="reference internal" href="#trefftz.dg.kernels.serial_kernels.I_udv"><code class="docutils literal notranslate"><span class="pre">I_udv</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#i-uv">I_uv</a></li>
+<li><a class="reference internal" href="#i-duv">I_duv</a></li>
+<li><a class="reference internal" href="#i-udv">I_udv</a></li>
 </ul>
 </li>
 </ul>

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Mesh" href="mesh.html"><link rel="prev" title="Discontinuous Galerkin" href="dg.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Kernels" href="kernels.html"><link rel="prev" title="Discontinuous Galerkin" href="dg.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Fluxes - Trefftz 0.1.0 documentation</title>
@@ -221,10 +221,11 @@
 <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Fluxes</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Fluxes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kernels.html">Kernels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="assembly.html">Assembly</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Fluxes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh</a></li>
 </ul>
 </li>
@@ -279,11 +280,6 @@
 <div class="math notranslate nohighlight">
 \[\int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}\]</div>
 </div>
-<p>This quantity can be exactly evaluated as:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\boxed{a}\]</div>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -314,11 +310,6 @@
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[\int_{E}\left(\varphi_n(\mathbf{x})+\frac{d_{1}}{ik}\nabla \varphi_n(\mathbf{x})\cdot\mathbf{n}\right)\overline{\nabla \psi_m(\mathbf{x})\cdot\mathbf{n}}\,\mathrm{d}S_{\mathbf{x}}\]</div>
-</div>
-<p>This quantity can be exactly evaluated as:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\boxed{-ikl\left(1+d_{1}\mathbf{d}_{n}\cdot\mathbf{n}\right)\mathbf{d}_{m}\cdot\mathbf{n}e^{ik\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\mathbf{M}}\mathrm{sinc}\left(\frac{kl}{2\pi}\left(\mathbf{d}_{n}-\mathbf{d}_{m}\right)\cdot\boldsymbol{\tau}\right)}\]</div>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -380,12 +371,12 @@ of freedom from the same cell, that is:</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="mesh.html">
+          <a class="next-page" href="kernels.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Mesh</div>
+                <div class="title">Kernels</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

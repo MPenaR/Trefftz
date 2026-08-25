@@ -64,7 +64,10 @@ class NGsolveLocator:
 
     def find_cell(self, x: float_array, y: float_array) -> int_array:
         mp = self._mesh(x, y)
-        nr = mp["nr"]
+        if np.isscalar(x):
+            nr = mp.nr
+        else:
+            nr = mp["nr"]
         return np.where(nr >=0, self._elem_to_faces[nr], -1)
 
 

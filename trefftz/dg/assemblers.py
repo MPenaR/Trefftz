@@ -13,8 +13,9 @@ from trefftz.dg.boundary_conditions import BoundaryCondition
 from abc import ABC, abstractmethod
 from enum import IntEnum, StrEnum
 from tqdm import tqdm
+from trefftz.dg.functions import ElementwiseParameter
 
-## THIS IS WRONG, CHECK IT LATER FOR THE BLOCK KERNELS 
+
 @dataclass
 class Numerics(Protocol):
     interior_kernel: SerialTransmissionKernel
@@ -39,6 +40,7 @@ class BlockNumerics:
 class Assembler[B: (StrEnum, IntEnum), num: Numerics](ABC):
     def __init__(self,
                  mesh: TrefftzMesh[B, Any],
+                 refractive_index: ElementwiseParameter[B, float | complex ], 
                  boundary_conditions: Mapping[B, BoundaryCondition],
                  numerics: num,
                  basis: PlanewaveBasis,
@@ -52,6 +54,7 @@ class Assembler[B: (StrEnum, IntEnum), num: Numerics](ABC):
         self._regions_nonlocal_kernel = [region for region, bc in boundary_conditions.items() if type(bc) in numerics.nonlocal_boundary_kernels]
         self._regions_RHS_term = [region for region, bc in boundary_conditions.items() if bc.data is not None]
         self.verbose = verbose
+        self.refractive_index = refractive_index
 
     @abstractmethod
     def assemble_LHS(self) -> coo_array:
@@ -122,12 +125,14 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                          disable=not verbose,
                          unit="edge"):
             for (i_v, T_v) in enumerate(edge["triangles"]):
+                n_v = self.refractive_index.at(T_v)
                 for (i_u, T_u) in enumerate(edge["triangles"]):
+                    n_u = self.refractive_index.at(T_u)
                     sign = SSIGN((i_u, i_v))
                     for i in basis.dofs_on_element(T_v):
+                        d_psi = basis.global_direction(i)
                         for j in basis.dofs_on_element(T_u):
                             d_phi = basis.global_direction(j)
-                            d_psi = basis.global_direction(i)
                             val = interior_kernel.LHS(edge=edge, d_u=d_phi, d_v=d_psi, k=basis.k, sign=sign)
                             rows.append(i)
                             cols.append(j)
@@ -139,24 +144,6 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
         for region in regions_nonlocal_kernel:
             bc = boundary_conditions[region]
             non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
-            # for edge_1 in tqdm(mesh.boundary_Edges[region],
-            #                    desc=f"NtD, {region}",
-            #                    disable=not verbose,
-            #                    unit="edge"):
-            #     T_1, _ = edge_1["triangles"]
-            #     for edge_2 in mesh.boundary_Edges[region]:
-            #         T_2, _ = edge_2["triangles"]
-            #         for i in basis.dofs_on_element(T_1):
-            #             for j in basis.dofs_on_element(T_2):
-            #                 d_phi = basis.global_direction(j)
-            #                 d_psi = basis.global_direction(i)
-            #                 value = non_local_kernel.LHS(edge_u=edge_1,                       # ... esto es una liada...
-            #                                              edge_v=edge_2,                       # ... edge_u = edge_1, pero:
-            #                                              d_u=d_phi, d_v=d_psi, k=basis.k)     # d_phi = global_direction(i)
-            #                 rows.append(i)                                                    # i = dof on (T_1)
-            #                 cols.append(j)                                                    # T_1 = edge_1["Triangle"]
-            #                 values.append(value)
-
             for edge_1 in tqdm(mesh.boundary_Edges[region],
                                desc=f"NtD, {region}",
                                disable=not verbose,

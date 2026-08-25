@@ -201,6 +201,14 @@ class TrefftzMesh[B: Enum, R: Enum]:
 
 
     @property
+    def regions(self) -> type[R]:
+        return self._regions
+    
+    @property
+    def boundaries(self) -> type[B] :
+        return self._boundaries
+
+    @property
     def boundary_edges(self):
         return self.edges[self.edges["on_boundary"]]
 
@@ -214,10 +222,6 @@ class TrefftzMesh[B: Enum, R: Enum]:
     def triangles_on(self, region: R):
         return self.triangles[self._reg_indexes[region]]
 
-
-    @property
-    def boundaries(self) -> type[B]:
-        return self._boundaries
 
     def construct_numpy_arrays(self):
         """
