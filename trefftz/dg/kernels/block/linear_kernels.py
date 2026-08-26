@@ -75,3 +75,15 @@ def I_pw_dv(segment_v, plane_wave: PlaneWave, D_v: float_array, n_v: float | com
     N = segment_v["N"]
 
     return -1j*k*dot(n_v*D_v, N)*I_pw_v(segment_v, plane_wave, D_v, n_v, k)
+
+
+def I_dpw_v(segment_v, plane_wave: PlaneWave, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+    r'''Computes the integral:
+    .. math ::
+        \int_E u_{\mathrm{inc}} \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
+
+    where $u_inc$ is a plane wave and $v$ is a plane wave and $E$ is a segment.'''
+
+    N = segment_v["N"]
+
+    return 1j*k*dot(plane_wave.d, N)*I_pw_v(segment_v, plane_wave, D_v, n_v, k)

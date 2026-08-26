@@ -87,3 +87,13 @@ def I_pw_dv(edge, plane_wave: PlaneWave, D_v: float_array, n_v: float | complex,
     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is either an arc of circunference or a segment.'''
 
     return _KERNELS[edge.dtype].I_pw_dv(edge, plane_wave, D_v, n_v, k)
+
+
+def I_dpw_v(edge, plane_wave: PlaneWave, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+    r'''Computes the integral:
+    .. math ::
+        \int_E \nabla u_{\mathrm{inc}}\cdot\mathbf{n} \overline{v}\,\mathrm{d}\ell
+
+    where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is either an arc of circunference or a segment.'''
+
+    return _KERNELS[edge.dtype].I_dpw_v(edge, plane_wave, D_v, n_v, k)
