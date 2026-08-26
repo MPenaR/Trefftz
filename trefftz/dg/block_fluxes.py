@@ -22,20 +22,20 @@ class SIGN(Enum):
 
 
 class BlockTransmissionKernel(Protocol):
-    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float, sign: SIGN) -> complex_array:
+    def LHS(self, edge, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float, sign: SIGN) -> complex_array:
         ...
 
 
 class BlockLocalKernel(Protocol):
-    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float) -> complex_array:
+    def LHS(self, edge, D: float_array, n: float | complex, k: float) -> complex_array:
         ...
 
-    def RHS(self, edge, D_v: float_array, k: float) -> complex_array:
+    def RHS(self, edge, D: float_array, n: float | complex, k: float) -> complex_array:
         ...
 
 
 class BlockNonLocalKernel(Protocol):
-    def LHS(self, edge_u, edge_v, D_u: float_array, D_v: float_array, k: float) -> complex_array:
+    def LHS(self, edge_u, edge_v, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
         ...
 
 
@@ -69,10 +69,10 @@ class NeumannFlux:
     def __init__(self, d_1: float):
         self.d_1 = d_1
     
-    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float) -> complex_array:
+    def LHS(self, edge, D: float_array, n: float | complex, k: float) -> complex_array:
         d_1 = self.d_1
 
-        return I_udv(edge, D_u, D_v, k) + d_1/(1j*k)*I_dudv(edge, D_u, D_v, k)
+        return I_udv(edge, D_u=D, n_u=n, D_v=D, n_v=n, k=k) + d_1/(1j*k)*I_dudv(edge, D_u=D, n_u=n, D_v=D, n_v=n, k=k)
 
     def RHS(self, edge, D_v: float_array, k: float) -> complex_array:
         raise NotImplementedError("Not implemented yet")
@@ -114,7 +114,7 @@ class UltraWeakFlux:
         self.a = a 
         self.b = b
     
-    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float, sign: SIGN) -> complex_array:
+    def LHS(self, edge, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float, sign: SIGN) -> complex_array:
         match sign:
             case SIGN.PP:
                 a = self.a
@@ -129,10 +129,7 @@ class UltraWeakFlux:
                 a = -self.a
                 b = -self.b
 
-        k_n = k
-        k_m = k
-
-        I = 1/2*I_udv(edge, D_u, D_v, k) + b /(1j*k)*I_dudv(edge, D_u, D_v, k) - a*1j*k*I_uv(edge, D_u, D_v, k) - 1/2*I_duv(edge, D_u, D_v, k)
+        I = 1/2*I_udv(edge, D_u, n_u, D_v, n_v, k) + b /(1j*k)*I_dudv(edge, D_u, n_u, D_v, n_v, k) - a*1j*k*I_uv(edge, D_u, n_u, D_v, n_v, k) - 1/2*I_duv(edge, D_u, n_u, D_v, n_v, k)
         match sign:
             case SIGN.PP:
                 I = I
@@ -177,16 +174,12 @@ class DirichletFlux:
         self.a = a
         self.data = data
     
-    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float) -> complex_array:
+    def LHS(self, edge, D: float_array, n: float | complex, k: float) -> complex_array:
         a = self.a
-        return -I_duv(edge, D_u, D_v, k) + 1j*k*a*I_uv(edge, D_u, D_v, k)
-        
-    # def RHS(self, edge, D_v: float_array, k: float) -> complex_array:
-    #     d_inc = self.data["d_inc"]
-    #     a = self.a
-    #     return I_uincdv(edge, d_inc, D_v, k) - 1j*a*k*I_uincv(edge, d_inc, D_v, k)
+        return -I_duv(edge, D_u=D, n_u=n, D_v=D, n_v=n, k=k) + 1j*k*a*I_uv(edge, D_u=D, n_u=n, D_v=D, n_v=n, k=k)
+
     
-    def RHS(self, edge, D_v: float_array, k: float) -> complex_array:
+    def RHS(self, edge, D: float_array, n: float | complex, k: float) -> complex_array:
         plane_wave = self.data
         a = self.a
-        return I_pw_dv(edge, plane_wave, D_v, k) - 1j*a*k*I_pw_v(edge, plane_wave, D_v, k)
+        return I_pw_dv(edge, plane_wave, D_v=D, n_v=n, k=k) - 1j*a*k*I_pw_v(edge, plane_wave, D_v=D, n_v=n, k=k)

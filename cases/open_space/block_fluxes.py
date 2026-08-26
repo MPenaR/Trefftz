@@ -10,7 +10,7 @@ class NtDLocal:
         self.d_2 = d_2
         self.NtD_modes = NtD_modes
     
-    def LHS(self, edge, D_u: float_array, D_v: float_array, k: float) -> complex_array:
+    def LHS(self, edge, D: float_array, n: float | complex, k: float) -> complex_array:
         r"""
         Computes the flux on a circular radiating boundary with respect to the degrees
         of freedom from the same cell, that is:
@@ -42,19 +42,19 @@ class NtDLocal:
 
         d_2 = self.d_2
 
-        I = -I_duv(edge, D_u, D_v, k) -1j*k*d_2*I_uv(edge, D_u, D_v, k)
+        I = -I_duv(edge, D_u=D,n_u=n, D_v=D, n_v=n, k=k) -1j*k*d_2*I_uv(edge, D_u=D,n_u=n, D_v=D, n_v=n, k=k)
 
         return I
 
-    def RHS(self, edge, D_v: float_array, k: float) -> complex_array:
+    def RHS(self, edge, D: float_array, n: float | complex,  k: float) -> complex_array:
         d_inc = self.data["d_inc"]
         d_2 = self.d_2
         NtD_modes = self.NtD_modes
-        I = -I_duv(edge, d_inc, D_v, k) +  I_Nuincdv(edge, d_inc, D_v, k, NtD_modes, JACOBI_ANGER_MODES) -1j*k*d_2*(
-             I_NuincNv(edge, d_inc, D_v, k, NtD_modes, JACOBI_ANGER_MODES)
-            -I_Nuincv(edge, d_inc, D_v, k, NtD_modes, JACOBI_ANGER_MODES)
-            -I_uincNv(edge, d_inc, D_v, k, NtD_modes, JACOBI_ANGER_MODES)
-            +I_uv(edge, d_inc, D_v, k))
+        I = -I_duv(edge, D_u=d_inc, n_u=n, D_v=D, n_v=n, k=k) +  I_Nuincdv(edge, d_inc, D_v, k, NtD_modes, JACOBI_ANGER_MODES) -1j*k*d_2*(
+             I_NuincNv(edge, d_inc, D, k, NtD_modes, JACOBI_ANGER_MODES)
+            -I_Nuincv(edge, d_inc, D, k, NtD_modes, JACOBI_ANGER_MODES)
+            -I_uincNv(edge, d_inc, D, k, NtD_modes, JACOBI_ANGER_MODES)
+            +I_uv(edge, D_u=d_inc, n_u=n, D_v=D, n_v=n, k=k))
         return I
 
 class NtDNonLocal:
@@ -63,7 +63,7 @@ class NtDNonLocal:
         self.d_2 = d_2
         self.NtD_modes = NtD_modes
     
-    def LHS(self, edge_u, edge_v, D_u: float_array, D_v: float_array, k: float) -> complex_array:
+    def LHS(self, edge_u, edge_v, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
         r"""
         Computes the flux on a circular radiating boundary with respect to the degrees
         of freedom from the same cell, that is:
