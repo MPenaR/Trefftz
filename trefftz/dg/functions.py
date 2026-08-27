@@ -51,7 +51,6 @@ class TrefftzFunction:
         T_IDs = self.mesh.get_cell(x, y).ravel()
         n = self.basis.refractive_index.at(T_IDs) # I can also do it evaluating at the points...
         DOFs = self.basis.T_ID_to_DOFs[T_IDs, :]  # shape (Npts, Ntheta) 
-
         # evaluate plane-wave basis at points
         D = self.basis.D
         k = self.basis.k 

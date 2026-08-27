@@ -43,7 +43,7 @@ def nf_diel_cylinder_plane_wave( X: float_array, Y: float_array, k: float,
 
     d = np.array([np.cos(theta_inc), np.sin(theta_inc)])
 
-    n = np.expand_dims(np.arange(-M, M+1), list(np.arange(X.ndim, dtype=int)+1))  #set of "n" values in the "infinite" sum
+    n = np.expand_dims(np.arange(-M, M+1), tuple(list( np.arange(X.ndim, dtype=int)+1)))  #set of "n" values in the "infinite" sum
     kR = k*R
     
     W = jn(n, np.sqrt(eps_r)*kR)*h1vp(n, kR) - np.sqrt(eps_r)*jvp(n, np.sqrt(eps_r)*kR)*hankel1(n, kR)
