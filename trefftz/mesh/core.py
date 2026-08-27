@@ -2,7 +2,7 @@
 Core mesh data structures and geometric representations for Trefftz methods.
 
 This module defines the primary mesh container used throughout the
-Trefftz library together with the associated structured NumPy dtypes
+Trefftz liBary together with the associated structured NumPy dtypes
 used for efficient geometric and topological computations.
 
 The implementation is designed around vectorized NumPy operations and
@@ -56,7 +56,7 @@ The module currently targets two-dimensional triangular meshes.
 """
 
 
-from typing import Final
+from typing import Final, overload
 import numpy as np
 from numpy.linalg import norm
 from .locators import CellLocator
@@ -114,7 +114,7 @@ triangle_dtype = [("A", np.float64, DIM),
                   ("area", np.float64)]
 
 
-class TrefftzMesh[BR: Enum]:
+class TrefftzMesh[B: Enum, R: Enum]:
     """
     Mesh container for Trefftz-based methods using NumPy structured arrays.
 
@@ -177,8 +177,8 @@ class TrefftzMesh[BR: Enum]:
     """
 
     def __init__(self, points: float_array, edges: int_array, triangles: int_array,
-                 boundary_regions: type[BR], edge2triangles: int_array,
-                 locator: CellLocator, cell_sets: dict[BR, int_array]):
+                 boundaries: type[B], regions: type[R], edge2triangles: int_array,
+                 locator: CellLocator, bnd_indexes: dict[B, int_array], reg_indexes: dict[R, int_array]):
         """
         Initialize the mesh and construct geometric data structures.
         """
@@ -186,17 +186,27 @@ class TrefftzMesh[BR: Enum]:
         self._edges = edges
         self._triangles = triangles
         self.locator = locator
-        self._cell_sets = cell_sets
-        self._boundary_regions = boundary_regions
+        self._reg_indexes = reg_indexes 
+        self._bnd_indexes = bnd_indexes 
+        
+        self._boundaries = boundaries
+        self._regions = regions
         self._edge2triangles = edge2triangles
         self.construct_numpy_arrays()
-        self._edges_on = cell_sets
         # I DONT LIKE THIS, MOVING TOWARDS TWO TYPES OF EDGES, and HAVE THEM SEPARATED IN THE MESH
         self.boundary_Edges = {}
-        self.curved_regions = []
-        for reg in self.boundary_regions:
-            self.boundary_Edges[reg] = self.edges_on(reg)
+        self.curved_boundaries = []
+        for bnd in self.boundaries:
+            self.boundary_Edges[bnd] = self.edges_on(bnd)
 
+
+    @property
+    def regions(self) -> type[R]:
+        return self._regions
+    
+    @property
+    def boundaries(self) -> type[B] :
+        return self._boundaries
 
     @property
     def boundary_edges(self):
@@ -206,12 +216,12 @@ class TrefftzMesh[BR: Enum]:
     def interior_edges(self):
         return self.edges[~self.edges["on_boundary"]]
 
-    def edges_on(self, region: BR):
-        return self.edges[self._edges_on[region]]
+    def edges_on(self, boundary: B):
+        return self.edges[self._bnd_indexes[boundary]]
 
-    @property
-    def boundary_regions(self) -> type[BR]:
-        return self._boundary_regions
+    def triangles_on(self, region: R):
+        return self.triangles[self._reg_indexes[region]]
+
 
     def construct_numpy_arrays(self):
         """
@@ -283,8 +293,15 @@ class TrefftzMesh[BR: Enum]:
         inner_normals = np.sign(np.vecdot(bar_minus-bar_plus, inner_edges["N"]))[:, np.newaxis]*inner_edges["N"]
         edges["N"][~edges["on_boundary"]] = inner_normals
 
+    @overload
+    def get_cell(self, x: float, y: float) -> int: ...
 
-    def get_cell(self, x: float_array, y: float_array) -> int_array | int:
+    @overload
+    def get_cell(self, x: float_array, y: float_array) -> int_array: ...
+
+
+
+    def get_cell(self, x: float | float_array, y: float | float_array) -> int | int_array:
         """
         Find the mesh cell containing a point.
 
@@ -340,7 +357,7 @@ class TrefftzMesh[BR: Enum]:
         return self._triangles.shape[0]
     
     @classmethod
-    def from_msh(cls, file_path: Path | str, boundary_regions: type[BR]) -> "TrefftzMesh[BR]":
+    def from_msh(cls, file_path: Path | str, boundaries: type[B], regions: type[R]) -> "TrefftzMesh[B, R]":
         from trefftz.mesh.readers.gmsh import GmshReader
         """
         Create a mesh from a Gmsh .mesh file.
@@ -350,7 +367,7 @@ class TrefftzMesh[BR: Enum]:
         file_path: Path or str
             Path to the Gmsh ``.msh`` file.
         
-        boundary_regions: Enum
+        boundaries: Enum
             Enun with the names of the boundary regions
 
         Returns
@@ -358,11 +375,12 @@ class TrefftzMesh[BR: Enum]:
         TrefftzMesh
             Constructed mesh instance.
         """
-        points, edges, triangles, edges2triangles, locator, cell_sets = GmshReader(file_path)
-        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets)
+        points, edges, triangles, edges2triangles, locator, bnd_indexes = GmshReader(file_path) # !! FIX THIS
+        reg_indexes = {}
+        return cls(points, edges, triangles, boundaries, regions, edges2triangles, locator, bnd_indexes, reg_indexes)
 
     @classmethod
-    def from_gmsh(cls, model, boundary_regions: type[BR]) -> "TrefftzMesh[BR]":
+    def from_gmsh(cls, model, boundaries: type[B], regions: type[R]) -> "TrefftzMesh[B, R]":
         from trefftz.mesh.readers.gmsh import GmshArrays
         """
         Create a mesh from a Gmsh model object.
@@ -372,7 +390,7 @@ class TrefftzMesh[BR: Enum]:
         model: gmsh model object (geometry has to be initialized)
             Geometry has to be initialized.
 
-        boundary_regions: Enum
+        boundaries: Enum
             Enun with the names of the boundary regions
 
         Returns
@@ -380,12 +398,13 @@ class TrefftzMesh[BR: Enum]:
         TrefftzMesh
             Constructed mesh instance.
         """
-        points, edges, triangles, edges2triangles, locator, cell_sets = GmshArrays(model)
-        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets)
+        points, edges, triangles, edges2triangles, locator, bnd_indexes = GmshArrays(model)
+        reg_indexes = {}
+        return cls(points, edges, triangles, boundaries, regions, edges2triangles, locator, bnd_indexes, reg_indexes)
 
 
     @classmethod
-    def from_ngsolve(cls, mesh, boundary_regions: type[BR]) -> "TrefftzMesh[BR]":
+    def from_ngsolve(cls, mesh, boundaries: type[B], regions: type[R]) -> "TrefftzMesh[B, R]":
         from trefftz.mesh.readers.ngsolve import NGsolveReader
         """
         Create a mesh from a ngsolve mesh.
@@ -395,7 +414,7 @@ class TrefftzMesh[BR: Enum]:
         mesh : NGsolve mesh
             mesh.
 
-        boundary_regions: Enum
+        boundaries: Enum
             Enun with the names of the boundary regions
 
         Returns
@@ -403,34 +422,35 @@ class TrefftzMesh[BR: Enum]:
         TrefftzMesh
             Constructed mesh instance.
         """
-        points, edges, triangles, edges2triangles, locator, cell_sets = NGsolveReader(mesh, boundary_regions)
-        return cls(points, edges, triangles, boundary_regions, edges2triangles, locator, cell_sets)
+        points, edges, triangles, edges2triangles, locator, bnd_indexes, reg_indexes = NGsolveReader(mesh, boundaries, regions)
+        return cls(points, edges, triangles, boundaries, regions, edges2triangles, locator, bnd_indexes, reg_indexes)
     
-    def curve_region(self, region: BR, radius: float, center: tuple[float, float] = (0., 0.)):
-        edges = self.edges_on(region)
-        ne = len(edges)
-        curved_edges = np.empty(shape=(ne,), dtype=arc_dtype)
-        O = np.asarray(center)
-        R = radius
-        for i, edge in enumerate(edges):
-            P = edge["P"]
-            Q = edge["Q"]
+    def curve_boundaries(self, bnds: list[B], radius: list[float], center: tuple[float, float] = (0., 0.)):
+        
+        for bnd, R in zip(bnds, radius):
+            edges = self.edges_on(bnd)
+            ne = len(edges)
+            curved_edges = np.empty(shape=(ne,), dtype=arc_dtype)
+            O = np.asarray(center)
+            for i, edge in enumerate(edges):
+                P = edge["P"]
+                Q = edge["Q"]
 
-            OP = P - O
-            OQ = Q - O
+                OP = P - O
+                OQ = Q - O
 
-            theta_1 = np.atan2(OP[1], OP[0])
-            theta_2 = np.atan2(OQ[1], OQ[0])
-            d_theta = np.mod(theta_2 - theta_1, 2*np.pi)
-            if d_theta <= np.pi:
-                theta_1, theta_2 = theta_1, theta_1+d_theta
-            else:
-                d_theta = 2*np.pi - d_theta
-                theta_1, theta_2 = theta_2, theta_2+d_theta
-            
-            l = R*d_theta
+                theta_1 = np.atan2(OP[1], OP[0])
+                theta_2 = np.atan2(OQ[1], OQ[0])
+                d_theta = np.mod(theta_2 - theta_1, 2*np.pi)
+                if d_theta <= np.pi:
+                    theta_1, theta_2 = theta_1, theta_1+d_theta
+                else:
+                    d_theta = 2*np.pi - d_theta
+                    theta_1, theta_2 = theta_2, theta_2+d_theta
+                
+                l = R*d_theta
 
-            curved_edges[i] = (theta_1, theta_2, l, R, O, edge["on_boundary"], edge["triangles"])
+                curved_edges[i] = (theta_1, theta_2, l, R, O, edge["on_boundary"], edge["triangles"])
 
-        self.boundary_Edges[region] = curved_edges
-        self.curved_regions.append(region)
+            self.boundary_Edges[bnd] = curved_edges
+            self.curved_boundaries.append(bnd)

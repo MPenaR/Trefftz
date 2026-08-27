@@ -51,7 +51,8 @@ from trefftz.numpy_types import float_array, int_array
 from dataclasses import dataclass
 from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
-
+from trefftz.dg.parameters import Elementwise
+from typing import Any
 
 @dataclass(slots=True)
 class PlanewaveBasis:
@@ -100,6 +101,7 @@ class PlanewaveBasis:
     """
 
     k: float #not really sure if k should be an attribute. 
+    refractive_index: Elementwise[Any, float]
     _N_theta: int
     _N_DOF: int
     _N_elements: int
@@ -107,7 +109,7 @@ class PlanewaveBasis:
     _D: float_array
     _D_D: float_array
         
-    def __init__(self, N_elements: int, thetas: float_array, k: float) -> None:
+    def __init__(self, N_elements: int, refractive_index: Elementwise[Any, float], thetas: float_array, k: float) -> None:
         self._N_theta = len(thetas)
         self.k = k
         self._N_elements = N_elements
@@ -119,6 +121,7 @@ class PlanewaveBasis:
         # plane-wave directions
         self._D = np.column_stack([np.cos(thetas), np.sin(thetas)])
         self._D_D = self._D[:, None, :] - self._D[None, :, :]
+        self.refractive_index = refractive_index
 
     @property
     def N_theta(self):
@@ -174,7 +177,7 @@ class PlanewaveBasis:
         plt.show()
 
 
-def LinearlySpacedBasis(N_elements: int, k: float, N_theta: int, theta_0: float = 0. ) -> PlanewaveBasis:
+def LinearlySpacedBasis(N_elements: int, k: float, N_theta: int, refractive_index: Elementwise[Any, float], theta_0: float = 0. ) -> PlanewaveBasis:
     """
     Construct a plane-wave basis with uniformly distributed directions.
 
@@ -208,7 +211,7 @@ def LinearlySpacedBasis(N_elements: int, k: float, N_theta: int, theta_0: float 
     :contentReference[oaicite:4]{index=4}
     """
     thetas = np.linspace(0, 2*np.pi, N_theta, endpoint=False) + theta_0
-    return PlanewaveBasis(N_elements=N_elements, thetas=thetas, k=k)
+    return PlanewaveBasis(N_elements=N_elements, refractive_index=refractive_index, thetas=thetas, k=k)
 
 
 def WaveguideTayloredBasis(N_elements: int, k: float, H: float, direction: str="right") -> PlanewaveBasis:

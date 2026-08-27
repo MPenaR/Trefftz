@@ -14,7 +14,7 @@ from abc import ABC, abstractmethod
 from enum import IntEnum, StrEnum
 from tqdm import tqdm
 
-## THIS IS WRONG, CHECK IT LATER FOR THE BLOCK KERNELS 
+
 @dataclass
 class Numerics(Protocol):
     interior_kernel: SerialTransmissionKernel
@@ -35,11 +35,10 @@ class BlockNumerics:
     local_boundary_kernels: Mapping[type[BoundaryCondition], BlockLocalKernel]
     nonlocal_boundary_kernels: Mapping[type[BoundaryCondition], BlockNonLocalKernel]
 
-
-class Assembler[BR: (StrEnum, IntEnum), num: Numerics](ABC):
+class Assembler[B: (StrEnum, IntEnum), num: Numerics](ABC):
     def __init__(self,
-                 mesh: TrefftzMesh[BR],
-                 boundary_conditions: Mapping[BR, BoundaryCondition],
+                 mesh: TrefftzMesh[B, Any], 
+                 boundary_conditions: Mapping[B, BoundaryCondition],
                  numerics: num,
                  basis: PlanewaveBasis,
                  verbose: bool = True):
@@ -112,7 +111,7 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
             kernel = numerics.local_boundary_kernels[type(bc)]
             self.assemble_local_bc(edges_on_region, kernel, basis, rows, cols, values)
 
-
+        refractive_index = basis.refractive_index
 
         # interior edges
         interior_kernel = numerics.interior_kernel
@@ -122,12 +121,14 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                          disable=not verbose,
                          unit="edge"):
             for (i_v, T_v) in enumerate(edge["triangles"]):
+                n_v = refractive_index.at(T_v)
                 for (i_u, T_u) in enumerate(edge["triangles"]):
+                    n_u = refractive_index.at(T_u)
                     sign = SSIGN((i_u, i_v))
                     for i in basis.dofs_on_element(T_v):
+                        d_psi = basis.global_direction(i)
                         for j in basis.dofs_on_element(T_u):
                             d_phi = basis.global_direction(j)
-                            d_psi = basis.global_direction(i)
                             val = interior_kernel.LHS(edge=edge, d_u=d_phi, d_v=d_psi, k=basis.k, sign=sign)
                             rows.append(i)
                             cols.append(j)
@@ -139,24 +140,6 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
         for region in regions_nonlocal_kernel:
             bc = boundary_conditions[region]
             non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
-            # for edge_1 in tqdm(mesh.boundary_Edges[region],
-            #                    desc=f"NtD, {region}",
-            #                    disable=not verbose,
-            #                    unit="edge"):
-            #     T_1, _ = edge_1["triangles"]
-            #     for edge_2 in mesh.boundary_Edges[region]:
-            #         T_2, _ = edge_2["triangles"]
-            #         for i in basis.dofs_on_element(T_1):
-            #             for j in basis.dofs_on_element(T_2):
-            #                 d_phi = basis.global_direction(j)
-            #                 d_psi = basis.global_direction(i)
-            #                 value = non_local_kernel.LHS(edge_u=edge_1,                       # ... esto es una liada...
-            #                                              edge_v=edge_2,                       # ... edge_u = edge_1, pero:
-            #                                              d_u=d_phi, d_v=d_psi, k=basis.k)     # d_phi = global_direction(i)
-            #                 rows.append(i)                                                    # i = dof on (T_1)
-            #                 cols.append(j)                                                    # T_1 = edge_1["Triangle"]
-            #                 values.append(value)
-
             for edge_1 in tqdm(mesh.boundary_Edges[region],
                                desc=f"NtD, {region}",
                                disable=not verbose,
@@ -219,6 +202,7 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
         rows_dof: list[int_array] = []
         cols_dof: list[int_array] = []
         blocks: list[complex_array] = []
+        refractive_index = basis.refractive_index
 
         verbose = self.verbose
 
@@ -236,13 +220,14 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
                             disable=not verbose,
                             unit="edge"):
                 T, _ = edge["triangles"]
-                u_dof = basis.dofs_on_element(T)
-                v_dof = basis.dofs_on_element(T)
-                D_v =  basis.global_direction(v_dof)
-                D_u =  basis.global_direction(u_dof)
-                block = local_flux.LHS(edge=edge, D_u=D_u, D_v=D_v, k=basis.k)
-                rows_dof.append(v_dof)
-                cols_dof.append(u_dof)
+                dof = basis.dofs_on_element(T)
+                # v_dof = basis.dofs_on_element(T)
+                # D_v =  basis.global_direction(v_dof)
+                D =  basis.global_direction(dof)
+                n = refractive_index.at(T)
+                block = local_flux.LHS(edge=edge, D=D, n=n, k=basis.k)
+                rows_dof.append(dof)
+                cols_dof.append(dof)
                 blocks.append(block)
 
 
@@ -259,7 +244,9 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
                     v_dof = basis.dofs_on_element(T_v)
                     D_v =  basis.global_direction(v_dof)
                     D_u =  basis.global_direction(u_dof)
-                    block = interior_flux.LHS(edge=edge, D_u=D_u, D_v=D_v, k=basis.k, sign=sign)
+                    n_u = refractive_index.at(T_u)
+                    n_v = refractive_index.at(T_v)
+                    block = interior_flux.LHS(edge=edge, D_u=D_u, n_u=n_u, D_v=D_v, n_v=n_v, k=basis.k, sign=sign)
                     rows_dof.append(v_dof)
                     cols_dof.append(u_dof)
                     blocks.append(block)
@@ -277,11 +264,13 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
                 T_u, _ = edge_u["triangles"]
                 u_dof = basis.dofs_on_element(T_u)
                 D_u =  basis.global_direction(u_dof)
+                n_u = refractive_index.at(T_u)
                 for edge_v in mesh.boundary_Edges[region]:
                     T_v, _ = edge_v["triangles"]
                     v_dof = basis.dofs_on_element(T_v)
                     D_v =  basis.global_direction(v_dof)
-                    block = non_local_flux.LHS(edge_u=edge_u, edge_v=edge_v, D_u=D_u, D_v=D_v, k=basis.k)
+                    n_v = refractive_index.at(T_v)
+                    block = non_local_flux.LHS(edge_u=edge_u, edge_v=edge_v, D_u=D_u, n_u=n_u, D_v=D_v, n_v=n_v, k=basis.k)
                     rows_dof.append(v_dof)
                     cols_dof.append(u_dof)
                     blocks.append(block)
@@ -315,7 +304,7 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
                 v_dof = basis.dofs_on_element(T)
                 rows_dof.append(v_dof)
                 D_v = basis.global_direction(v_dof)
-                block = flux.RHS(edge=edge, D_v=D_v, k=basis.k)
+                block = flux.RHS(edge=edge, D=D_v, n=1., k=basis.k)
                 blocks.append(block)
             
         rows = np.concatenate(rows_dof)

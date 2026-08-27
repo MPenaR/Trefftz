@@ -31,7 +31,7 @@ The current implementation targets:
 - Gmsh version 4.x formats
 
 Physical groups defined in Gmsh are propagated into the mesh
-``cell_sets`` structure and may be used for:
+``bnd_indexes`` structure and may be used for:
 
 - boundary condition assignment
 - region tagging
@@ -57,19 +57,6 @@ except ImportError as e:
     ) from e
 
 
-# class NGsolveLocator:
-#     def __init__(self, mesh: ngsolve.comp.Mesh):
-#         self._mesh = mesh
-#         self._elem_to_faces = np.array([E.faces[0].nr for E in mesh.Elements()])
-
-#     def find_cell(self, p: float_array) -> int_array:
-#         x = p[:, 0]
-#         y = p[:, 1]
-#         mp = self._mesh(x, y)
-#         nr = mp["nr"]
-#         return self._elem_to_faces[nr]
-
-
 class NGsolveLocator:
     def __init__(self, mesh: ngsolve.comp.Mesh):
         self._mesh = mesh
@@ -77,11 +64,14 @@ class NGsolveLocator:
 
     def find_cell(self, x: float_array, y: float_array) -> int_array:
         mp = self._mesh(x, y)
-        nr = mp["nr"]
+        if np.isscalar(x):
+            nr = mp.nr
+        else:
+            nr = mp["nr"]
         return np.where(nr >=0, self._elem_to_faces[nr], -1)
 
 
-def NGsolveReader(mesh: ngsolve.comp.Mesh, boundary_regions: StrEnum) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array]]:
+def NGsolveReader(mesh: ngsolve.comp.Mesh, boundaries: StrEnum, regions: StrEnum) -> tuple[float_array, int_array, int_array, int_array, CellLocator, dict[int, int_array], dict[int, int_array]]:
     """
     Extract mesh arrays from a Gmsh model.
 
@@ -115,7 +105,7 @@ def NGsolveReader(mesh: ngsolve.comp.Mesh, boundary_regions: StrEnum) -> tuple[f
     - KD-tree locator construction
 
     Physical groups of dimension one are propagated into the resulting
-    ``cell_sets`` dictionary and may be used for boundary-condition
+    ``bnd_indexes`` dictionary and may be used for boundary-condition
     assignment.
 
     The current implementation assumes:
@@ -133,11 +123,17 @@ def NGsolveReader(mesh: ngsolve.comp.Mesh, boundary_regions: StrEnum) -> tuple[f
     edge2triangles = np.array([(E.faces[0].nr, E.faces[1].nr if len(E.faces) > 1 else -1) for E in mesh.edges])
 
     locator = NGsolveLocator(mesh)
-    # cell_sets: dict[boundary_regions, int_array] = {}
-    cell_sets = {}
+    # bnd_indexes: dict[boundary_regions, int_array] = {}
+    bnd_indexes = {}
+    for bnd in boundaries:
+        mask = mesh.Boundaries(bnd).Mask()
+        bnd_indexes[bnd] = [el.edges[0].nr for el in mesh.Elements(ngsolve.BND) if mask[el.index]]
 
-    for reg in boundary_regions:
-        mask = mesh.Boundaries(reg).Mask()
-        cell_sets[reg] = [el.edges[0].nr for el in mesh.Elements(ngsolve.BND) if mask[el.index]]
+    reg_indexes = {}
+    for reg in regions:
+        mask = mesh.Materials(reg).Mask()
+        reg_indexes[reg] = [ locator._elem_to_faces[el.nr] for el in mesh.Elements(ngsolve.VOL) if mask[el.index]]
 
-    return points, edges, triangles, edge2triangles, locator, cell_sets
+        
+
+    return points, edges, triangles, edge2triangles, locator, bnd_indexes, reg_indexes

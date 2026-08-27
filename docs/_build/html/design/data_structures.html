@@ -222,9 +222,10 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../api/dg.html">Discontinuous Galerkin</a><input aria-label="Toggle navigation of Discontinuous Galerkin" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api/fluxes.html">Fluxes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/kernels.html">Kernels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/assembly.html">Assembly</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../api/fluxes.html">Fluxes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/mesh.html">Mesh</a></li>
 </ul>
 </li>
@@ -279,6 +280,7 @@
 <li><p>Mesh only exports numpy structured arrays for fast manipulation by the DG-Trefftz assembler. These are vectorized, the assembler knows nothing about the mesh internals.</p></li>
 </ul>
 </li>
+<li><p>Right now, <code class="docutils literal notranslate"><span class="pre">mesh.edges</span></code> and <code class="docutils literal notranslate"><span class="pre">mesh.triangles</span></code> are <a class="reference external" href="https://numpy.org/doc/stable/user/basics.rec.html">structured numpy arrays</a> with no “ID” field. This is because at the moment the code is not design to allow remeshing or refining of a mesh, so the index in <code class="docutils literal notranslate"><span class="pre">mesh.triangles</span></code> or <code class="docutils literal notranslate"><span class="pre">mesh.edges</span></code> serves as an identificator.</p></li>
 </ul>
 <!-- Mesh internals: 
 - an edge IS a couple of nodes, they could be a frozenset, they could be hashable.

@@ -10,6 +10,8 @@ The mesh basically exports points, edges and triangles as numpy arrays. `points`
   - For mesh creation and manipulation we use pythonic datacontainers and methods ( collections, lists comprehensions, dictionaries...). They are not vectorized but they are only called a couple of times during initialization of the mesh.
   - Mesh only exports numpy structured arrays for fast manipulation by the DG-Trefftz assembler. These are vectorized, the assembler knows nothing about the mesh internals.
 
+- Right now, `mesh.edges` and `mesh.triangles` are [structured numpy arrays](https://numpy.org/doc/stable/user/basics.rec.html) with no "ID" field. This is because at the moment the code is not design to allow remeshing or refining of a mesh, so the index in `mesh.triangles` or `mesh.edges` serves as an identificator. 
+
 <!-- Mesh internals: 
 - an edge IS a couple of nodes, they could be a frozenset, they could be hashable.
 
