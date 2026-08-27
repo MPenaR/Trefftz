@@ -425,31 +425,32 @@ class TrefftzMesh[B: Enum, R: Enum]:
         points, edges, triangles, edges2triangles, locator, bnd_indexes, reg_indexes = NGsolveReader(mesh, boundaries, regions)
         return cls(points, edges, triangles, boundaries, regions, edges2triangles, locator, bnd_indexes, reg_indexes)
     
-    def curve_boundary(self, region: B, radius: float, center: tuple[float, float] = (0., 0.)):
-        edges = self.edges_on(region)
-        ne = len(edges)
-        curved_edges = np.empty(shape=(ne,), dtype=arc_dtype)
-        O = np.asarray(center)
-        R = radius
-        for i, edge in enumerate(edges):
-            P = edge["P"]
-            Q = edge["Q"]
+    def curve_boundaries(self, bnds: list[B], radius: list[float], center: tuple[float, float] = (0., 0.)):
+        
+        for bnd, R in zip(bnds, radius):
+            edges = self.edges_on(bnd)
+            ne = len(edges)
+            curved_edges = np.empty(shape=(ne,), dtype=arc_dtype)
+            O = np.asarray(center)
+            for i, edge in enumerate(edges):
+                P = edge["P"]
+                Q = edge["Q"]
 
-            OP = P - O
-            OQ = Q - O
+                OP = P - O
+                OQ = Q - O
 
-            theta_1 = np.atan2(OP[1], OP[0])
-            theta_2 = np.atan2(OQ[1], OQ[0])
-            d_theta = np.mod(theta_2 - theta_1, 2*np.pi)
-            if d_theta <= np.pi:
-                theta_1, theta_2 = theta_1, theta_1+d_theta
-            else:
-                d_theta = 2*np.pi - d_theta
-                theta_1, theta_2 = theta_2, theta_2+d_theta
-            
-            l = R*d_theta
+                theta_1 = np.atan2(OP[1], OP[0])
+                theta_2 = np.atan2(OQ[1], OQ[0])
+                d_theta = np.mod(theta_2 - theta_1, 2*np.pi)
+                if d_theta <= np.pi:
+                    theta_1, theta_2 = theta_1, theta_1+d_theta
+                else:
+                    d_theta = 2*np.pi - d_theta
+                    theta_1, theta_2 = theta_2, theta_2+d_theta
+                
+                l = R*d_theta
 
-            curved_edges[i] = (theta_1, theta_2, l, R, O, edge["on_boundary"], edge["triangles"])
+                curved_edges[i] = (theta_1, theta_2, l, R, O, edge["on_boundary"], edge["triangles"])
 
-        self.boundary_Edges[region] = curved_edges
-        self.curved_boundaries.append(region)
+            self.boundary_Edges[bnd] = curved_edges
+            self.curved_boundaries.append(bnd)
