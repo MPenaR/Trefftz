@@ -1,7 +1,7 @@
 from trefftz.numpy_types import float_array, complex_array
 from cases.open_space.block_kernels import I_Nuv, I_Nudv, I_NuNv, I_uNv, I_Nuincv, I_Nuincdv, I_NuincNv, I_uincNv
 
-from trefftz.dg.kernels.block import I_uv, I_duv, I_pw_v, I_dpw_v
+from trefftz.dg.kernels.block import I_uv, I_duv, I_pw_v, I_dpw_v, I_pw_dv
 
 JACOBI_ANGER_MODES = 30
 class NtDLocal:
@@ -51,7 +51,7 @@ class NtDLocal:
         d_inc = plane_wave.d
         d_2 = self.d_2
         NtD_modes = self.NtD_modes
-        I = -I_dpw_v(edge, plane_wave=plane_wave, n_v=n, D_v=D, k=k) +  I_Nuincdv(edge, d_inc, D, k, NtD_modes, JACOBI_ANGER_MODES) -1j*k*d_2*(
+        I = -I_pw_dv(edge, plane_wave=plane_wave, n_v=n, D_v=D, k=k) +  I_Nuincdv(edge, d_inc, D, k, NtD_modes, JACOBI_ANGER_MODES) -1j*k*d_2*(
              I_NuincNv(edge, d_inc, D, k, NtD_modes, JACOBI_ANGER_MODES)
             -I_Nuincv(edge, d_inc, D, k, NtD_modes, JACOBI_ANGER_MODES)
             -I_uincNv(edge, d_inc, D, k, NtD_modes, JACOBI_ANGER_MODES)
