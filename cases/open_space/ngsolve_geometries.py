@@ -67,7 +67,7 @@ def AnularDomain(R: float = 5., r: float = 1., scatterer_material: Material = Me
     geo.AddCircle((0.0, 0.0), r, bc=Boundaries.D_OMEGA, leftdomain=scatterer_label, rightdomain=Labels.BACKGROUND, maxh=lc)
     geo.AddCircle((0.0, 0.0), R, bc=Boundaries.SIGMA, leftdomain=Labels.BACKGROUND, rightdomain=Labels.OUT, maxh=Lc)
     
-    ntmesh = geo.GenerateMesh(maxh=lc, perfstepsend=verbosity)
+    ntmesh = geo.GenerateMesh(maxh=Lc, perfstepsend=verbosity)
 
     ntmesh.SetMaterial(Labels.BACKGROUND, Regions.BACKGROUND)
     
