@@ -1,8 +1,11 @@
 import numpy as np
 from itertools import permutations
 from trefftz.numpy_types import float_array, int_array
+from typing import Callable
 
-def fekete3(f, r_A=(0,0), r_B=(1,0), r_C=(0,1)):
+def fekete3[T](f: Callable[[float_array, float_array], T], r_A: tuple[float, float] = (0., 0.),
+                                               r_B: tuple[float, float] = (1., 0.),
+                                               r_C: tuple[float, float] = (0., 1.)) -> T:
     ABx = r_B[0] - r_A[0]
     ABy = r_B[1] - r_A[1]
     ACx = r_C[0] - r_A[0]
@@ -10,21 +13,21 @@ def fekete3(f, r_A=(0,0), r_B=(1,0), r_C=(0,1)):
     S = 0.5 * np.abs(ABx*ACy - ABy*ACx)
     J = S/2.
     points = np.array([[1./3, 1./3, 1./3],
-                    [0., 0., 1.],
-                    [0., 1., 0.],
-                    [1., 0., 0.],
-                    [0., 0.2763932023, 0.7236067977],
-                    [0.7236067977, 0.2763932023, 0.],
-                    [0.7236067977, 0., 0.2763932023],
-                    [0., 0.7236067977, 0.2763932023],
-                    [0.2763932023, 0.7236067977, 0.],
-                    [0.2763932023, 0., 0.7236067977]]) 
+                       [0., 0., 1.],
+                       [0., 1., 0.],
+                       [1., 0., 0.],
+                       [0., 0.2763932023, 0.7236067977],
+                       [0.7236067977, 0.2763932023, 0.],
+                       [0.7236067977, 0., 0.2763932023],
+                       [0., 0.7236067977, 0.2763932023],
+                       [0.2763932023, 0.7236067977, 0.],
+                       [0.2763932023, 0., 0.7236067977]]) 
     
     x = r_A[0]*points[:,0] + r_B[0]*points[:,1] + r_C[0]*points[:,2]
     y = r_A[1]*points[:,0] + r_B[1]*points[:,1] + r_C[1]*points[:,2]
     
     w = np.array([ 0.9, 0.1/3, 0.1/3, 0.1/3, 1./6, 1./6, 1./6, 1./6, 1./6, 1./6 ])
-    z = f(x,y)
+    z = f(x, y)
     I = np.sum(z*w)
     return J*I 
 
