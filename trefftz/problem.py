@@ -8,7 +8,9 @@ from trefftz.dg.functions import TrefftzFunction
 from trefftz.dg.assemblers import Assembler, Numerics
 from trefftz.dg.boundary_conditions import BoundaryCondition
 from enum import Enum
-from typing import Any
+from typing import Any, Callable
+from trefftz.dg.numerical.integrators import fekete3 as Int
+import numpy as np
 
 class ExactSolution:
     ...
@@ -22,7 +24,8 @@ class Problem[B: Enum, N: Numerics]:
                  basis: PlanewaveBasis,
                  boundary_conditions: Mapping[B, BoundaryCondition],
                  assembler: Assembler[B, N],
-                 u: ExactSolution | None = None,
+                 u: Callable[[float, float], float] = None, 
+                #  u: ExactSolution | None = None,
                  direct_solver: bool = True):
         
         self.mesh = mesh
@@ -80,5 +83,10 @@ class Problem[B: Enum, N: Numerics]:
             return None
         
     def compute_error(self):
-        # some code like || u-u_h ||²
-        raise NotImplementedError
+        S = 0.
+        for T in self.mesh.triangles:
+            A, B, C = T["A"], T["B"], T["C"]
+            I = Int(lambda x, y: np.abs(self.u_h(x, y) - self.u(x, y))**2, A, B, C)
+            print(I)
+            S+= I
+        return np.sqrt(S)
