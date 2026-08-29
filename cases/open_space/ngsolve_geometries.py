@@ -29,7 +29,7 @@ class Regions(StrEnum):
     OMEGA = "Omega" 
 
 
-def CleanCircle(R: float = 5., lc: float = 0.3, verbosity: int = 0) -> TrefftzMesh[Boundaries, Regions]:
+def CleanCircle(R: float = 5., Lc: float = 0.3, verbosity: int = 0) -> TrefftzMesh[Boundaries, Regions]:
 
     '''Creates a circular domain without scatterers
     It assumes the default tags for the subregions, i.e.:
@@ -38,9 +38,9 @@ def CleanCircle(R: float = 5., lc: float = 0.3, verbosity: int = 0) -> TrefftzMe
     '''
 
     geo = SplineGeometry()
-    geo.AddCircle((0.0, 0.0), R, bc=Boundaries.SIGMA, maxh=lc)
+    geo.AddCircle((0.0, 0.0), R, bc=Boundaries.SIGMA, maxh=Lc)
 
-    ngmesh = Mesh(geo.GenerateMesh(maxh=lc, perfstepsend=verbosity))
+    ngmesh = Mesh(geo.GenerateMesh(maxh=Lc, perfstepsend=verbosity))
     
     mesh = TrefftzMesh.from_ngsolve(ngmesh, boundaries=Boundaries, regions=Regions)
 
@@ -66,7 +66,7 @@ def AnularDomain(R: float = 5., r: float = 1., scatterer_material: Material = Me
     geo = SplineGeometry()
     geo.AddCircle((0.0, 0.0), r, bc=Boundaries.D_OMEGA, leftdomain=scatterer_label, rightdomain=Labels.BACKGROUND, maxh=lc)
     geo.AddCircle((0.0, 0.0), R, bc=Boundaries.SIGMA, leftdomain=Labels.BACKGROUND, rightdomain=Labels.OUT, maxh=Lc)
-    
+    geo.SetDomainMaxH(scatterer_label, lc)
     ntmesh = geo.GenerateMesh(maxh=Lc, perfstepsend=verbosity)
 
     ntmesh.SetMaterial(Labels.BACKGROUND, Regions.BACKGROUND)
