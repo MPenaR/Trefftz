@@ -194,10 +194,10 @@ class TrefftzMesh[B: Enum, R: Enum]:
         self._edge2triangles = edge2triangles
         self.construct_numpy_arrays()
         # I DONT LIKE THIS, MOVING TOWARDS TWO TYPES OF EDGES, and HAVE THEM SEPARATED IN THE MESH
-        self.boundary_Edges = {}
+        self._edges_per_boundary = {}
         self.curved_boundaries = []
         for bnd in self.boundaries:
-            self.boundary_Edges[bnd] = self.edges_on(bnd)
+            self._edges_per_boundary[bnd] = self.edges_on(bnd)
 
 
     @property
@@ -218,6 +218,10 @@ class TrefftzMesh[B: Enum, R: Enum]:
 
     def edges_on(self, boundary: B):
         return self.edges[self._bnd_indexes[boundary]]
+
+
+    def edges_on_boundary(self, boundary: B):
+        return self._edges_per_boundary[boundary]
 
     def triangles_on(self, region: R):
         return self.triangles[self._reg_indexes[region]]
@@ -275,11 +279,11 @@ class TrefftzMesh[B: Enum, R: Enum]:
         self.triangles = triangles
 
         # orienting boundary normals
-        boundary_edges = edges[edges["on_boundary"]]
-        boundary_triangles = triangles[boundary_edges["triangles"][:, 0]]
+        _edges_per_boundary = edges[edges["on_boundary"]]
+        boundary_triangles = triangles[_edges_per_boundary["triangles"][:, 0]]
         baricenters = boundary_triangles["M"]
-        midpoints = boundary_edges["M"]
-        boundary_normals = np.sign(np.vecdot(midpoints-baricenters, boundary_edges["N"]))[:, np.newaxis]*boundary_edges["N"]
+        midpoints = _edges_per_boundary["M"]
+        boundary_normals = np.sign(np.vecdot(midpoints-baricenters, _edges_per_boundary["N"]))[:, np.newaxis]*_edges_per_boundary["N"]
         edges["N"][edges["on_boundary"]] = boundary_normals
 
         # orienting inner normals (i don't think it should matter)
@@ -289,7 +293,7 @@ class TrefftzMesh[B: Enum, R: Enum]:
         bar_plus = inner_triangles[:, 0]["M"]
         bar_minus = inner_triangles[:, 1]["M"]
 
-        # midpoints = boundary_edges["M"]
+        # midpoints = _edges_per_boundary["M"]
         inner_normals = np.sign(np.vecdot(bar_minus-bar_plus, inner_edges["N"]))[:, np.newaxis]*inner_edges["N"]
         edges["N"][~edges["on_boundary"]] = inner_normals
 
@@ -452,5 +456,5 @@ class TrefftzMesh[B: Enum, R: Enum]:
 
                 curved_edges[i] = (theta_1, theta_2, l, R, O, edge["on_boundary"], edge["triangles"])
 
-            self.boundary_Edges[bnd] = curved_edges
+            self._edges_per_boundary[bnd] = curved_edges
             self.curved_boundaries.append(bnd)
