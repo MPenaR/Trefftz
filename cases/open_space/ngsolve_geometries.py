@@ -66,7 +66,9 @@ def AnularDomain(R: float = 5., r: float = 1., scatterer_material: Material = Me
     geo = SplineGeometry()
     geo.AddCircle((0.0, 0.0), r, bc=Boundaries.D_OMEGA, leftdomain=scatterer_label, rightdomain=Labels.BACKGROUND, maxh=lc)
     geo.AddCircle((0.0, 0.0), R, bc=Boundaries.SIGMA, leftdomain=Labels.BACKGROUND, rightdomain=Labels.OUT, maxh=Lc)
-    geo.SetDomainMaxH(scatterer_label, lc)
+    if isinstance(scatterer_material, Dielectric):
+        geo.SetDomainMaxH(scatterer_label, lc)
+    
     ntmesh = geo.GenerateMesh(maxh=Lc, perfstepsend=verbosity)
 
     ntmesh.SetMaterial(Labels.BACKGROUND, Regions.BACKGROUND)
