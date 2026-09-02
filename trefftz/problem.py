@@ -23,7 +23,8 @@ class Problem[B: Enum, N: Numerics]:
                  wavenumber: float,
                  basis: PlanewaveBasis,
                  boundary_conditions: Mapping[B, BoundaryCondition],
-                 assembler: Assembler[B, N],
+                 assembler: Assembler[B],
+                 numerics: N,
                  u: Callable[[float, float], float] = None, 
                 #  u: ExactSolution | None = None,
                  direct_solver: bool = True):
@@ -34,9 +35,14 @@ class Problem[B: Enum, N: Numerics]:
         self.boundary_conditions = boundary_conditions
         self.u = u
         self.assembler = assembler
+        self.numerics = numerics
         self._A: coo_array | None = None
         self._b: complex_array | None = None
         self.direct_solver = direct_solver
+        self._boundaries_local_flux = [boundary for boundary, bc in boundary_conditions.items() if type(bc) in numerics.local_boundary_kernels]
+        self._boundaries_nonlocal_flux = [boundary for boundary, bc in boundary_conditions.items() if type(bc) in numerics.nonlocal_boundary_kernels]
+        self._boundaries_RHS = [boundary for boundary, bc in boundary_conditions.items() if bc.data is not None]
+
 
     @property
     def N_DOF(self):
@@ -47,7 +53,12 @@ class Problem[B: Enum, N: Numerics]:
         return self.A is not None and self.b is not None
 
     def assemble_LHS(self):
-        self._A = self.assembler.assemble_LHS()
+        self._A = self.assembler.assemble_LHS(mesh=self.mesh,
+                                              boundary_conditions=self.boundary_conditions,
+                                              numerics=self.numerics,
+                                              basis=self.basis,
+                                              boundaries_local_flux=self._boundaries_local_flux,
+                                              boundaries_non_local_flux=self._boundaries_nonlocal_flux)
         return self._A
 
     @property
@@ -55,7 +66,11 @@ class Problem[B: Enum, N: Numerics]:
         return self._A
 
     def assemble_RHS(self):
-        self._b = self.assembler.assemble_RHS()
+        self._b = self.assembler.assemble_RHS(mesh=self.mesh,
+                                              boundary_conditions=self.boundary_conditions,
+                                              numerics=self.numerics,
+                                              basis=self.basis,
+                                              boundaries_RHS=self._boundaries_RHS)
         return self._b
 
     @property

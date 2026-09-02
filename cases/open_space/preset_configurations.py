@@ -37,13 +37,13 @@ def SoundSoft_scattered_field_problem(R: float = 1., r: float = 0.2, Lc: float =
     Regions = mesh.regions
     refractive_index = Elementwise(mesh, {Regions.BACKGROUND: 1., Regions.OMEGA : 1.})
     basis = LinearlySpacedBasis(N_elements=mesh.n_triangles, refractive_index=refractive_index, k=k, N_theta=N_theta)
-    assembler = BlockAssembler(mesh=mesh, boundary_conditions=boundary_conditions, numerics=numerics, basis=basis)
-
+    
     P = Problem(mesh=mesh,
             wavenumber=k,
             basis=basis,
             boundary_conditions=boundary_conditions,
-            assembler=assembler,
+            assembler=BlockAssembler(),
+            numerics=numerics,
             direct_solver=direct_solver,
             u=lambda x, y: CircularDirichlet(x, y, R=r, k=k, theta_inc=theta_inc))
     return P
@@ -85,8 +85,7 @@ def SoundSoft_total_field_problem(R: float = 1., r: float = 0.2, Lc: float = 2.,
     Regions = mesh.regions
     refractive_index = Elementwise(mesh, {Regions.BACKGROUND: 1., Regions.OMEGA : 1.})
     basis = LinearlySpacedBasis(N_elements=mesh.n_triangles, refractive_index=refractive_index, k=k, N_theta=N_theta)
-    assembler = BlockAssembler(mesh=mesh, boundary_conditions=boundary_conditions, numerics=numerics, basis=basis)
-
+    
     def u_tot(x, y):
       u_s = CircularDirichlet(x, y, R=r, k=k, theta_inc=theta_inc)
       u_i = np.exp(1j*k*(d_inc[0]*x + d_inc[1]*y))
@@ -97,7 +96,8 @@ def SoundSoft_total_field_problem(R: float = 1., r: float = 0.2, Lc: float = 2.,
             wavenumber=k,
             basis=basis,
             boundary_conditions=boundary_conditions,
-            assembler=assembler,
+            assembler=BlockAssembler(),
+            numerics=numerics,
             direct_solver=direct_solver,
             u=lambda x, y: u_tot(x, y))
     return P
@@ -139,7 +139,6 @@ def Penetrable_total_field_problem(R: float = 1., r: float = 0.2, Lc: float = 2.
     Regions = mesh.regions
     refractive_index = Elementwise(mesh, {Regions.BACKGROUND: 1., Regions.OMEGA : np.sqrt(eps_r)})
     basis = LinearlySpacedBasis(N_elements=mesh.n_triangles, refractive_index=refractive_index, k=k, N_theta=N_theta)
-    assembler = BlockAssembler(mesh=mesh, boundary_conditions=boundary_conditions, numerics=numerics, basis=basis)
 
     def u_tot(x, y):
       u_s = nf_diel_cylinder_plane_wave(x, y, k, theta_inc=theta_inc, n=np.sqrt(eps_r), c=np.array([0., 0.]), R=r)
@@ -151,7 +150,8 @@ def Penetrable_total_field_problem(R: float = 1., r: float = 0.2, Lc: float = 2.
             wavenumber=k,
             basis=basis,
             boundary_conditions=boundary_conditions,
-            assembler=assembler,
+            assembler=BlockAssembler(),
+            numerics=numerics,
             direct_solver=direct_solver,
             u=lambda x, y: u_tot(x, y))
     return P

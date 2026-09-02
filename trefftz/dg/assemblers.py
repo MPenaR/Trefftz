@@ -35,43 +35,41 @@ class BlockNumerics:
     local_boundary_kernels: Mapping[type[BoundaryCondition], BlockLocalKernel]
     nonlocal_boundary_kernels: Mapping[type[BoundaryCondition], BlockNonLocalKernel]
 
-class Assembler[B: (StrEnum, IntEnum), num: Numerics](ABC):
-    def __init__(self,
-                 mesh: TrefftzMesh[B, Any], 
-                 boundary_conditions: Mapping[B, BoundaryCondition],
-                 numerics: num,
-                 basis: PlanewaveBasis,
-                 verbose: bool = True):
-        
-        self._mesh = mesh
-        self._boundary_conditions = boundary_conditions
-        self._numerics = numerics
-        self._basis = basis
-        self._regions_local_kernel = [region for region, bc in boundary_conditions.items() if type(bc) in numerics.local_boundary_kernels]
-        self._regions_nonlocal_kernel = [region for region, bc in boundary_conditions.items() if type(bc) in numerics.nonlocal_boundary_kernels]
-        self._regions_RHS_term = [region for region, bc in boundary_conditions.items() if bc.data is not None]
+class Assembler[B: (StrEnum, IntEnum)](ABC):
+    def __init__(self, verbose: bool = True):
         self.verbose = verbose
 
     @abstractmethod
-    def assemble_LHS(self) -> coo_array:
+    def assemble_LHS(self,
+                     mesh: TrefftzMesh[B, Any],
+                     boundary_conditions: Mapping[B, BoundaryCondition],
+                     numerics: Numerics,
+                     basis: PlanewaveBasis,
+                     boundaries_local_flux: list[B],
+                     boundaries_non_local_flux: list[B]) -> coo_array:
         ...
 
     @abstractmethod
-    def assemble_RHS(self) -> complex_array:
+    def assemble_RHS(self,
+                     mesh: TrefftzMesh[B, Any],
+                     boundary_conditions: Mapping[B, BoundaryCondition],
+                     numerics: Numerics,
+                     basis: PlanewaveBasis,
+                     boundaries_RHS: list[B]) -> complex_array:
         ...
 
 
-class SerialAssembler(Assembler[Any, SerialNumerics]):
+class SerialAssembler[B](Assembler[B]):
 
     def assemble_local_bc(self,
-                          edges_on_region,
-                          kernel: SerialLocalKernel,
+                          edges,
+                          flux: SerialLocalKernel,
                           basis: PlanewaveBasis,
                           rows: list[int],
                           cols: list[int],
                           values: list[complex]):
         verbose = True
-        for edge in tqdm(edges_on_region,
+        for edge in tqdm(edges,
                          disable=not verbose,
                          unit="edge"):
             T, _ = edge["triangles"]
@@ -79,20 +77,18 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
                 for j in basis.dofs_on_element(T):
                     d_psi = basis.global_direction(i)
                     d_phi = basis.global_direction(j)
-                    value = kernel.LHS(edge=edge, d_u=d_phi, d_v=d_psi, k=basis.k)
+                    value = flux.LHS(edge=edge, d_u=d_phi, d_v=d_psi, k=basis.k)
                     rows.append(i)
                     cols.append(j)
                     values.append(value)
 
-    def assemble_LHS(self) -> coo_array:
-
-        regions_local_kernel = self._regions_local_kernel
-        regions_nonlocal_kernel = self._regions_nonlocal_kernel
-        mesh = self._mesh
-        boundary_conditions = self._boundary_conditions
-        numerics = self._numerics
-        basis = self._basis
-
+    def assemble_LHS(self,
+                     mesh: TrefftzMesh[B, Any],
+                     boundary_conditions: Mapping[B, BoundaryCondition],
+                     numerics: SerialNumerics,
+                     basis: PlanewaveBasis,
+                     boundaries_local_flux: list[B],
+                     boundaries_non_local_flux: list[B]) -> coo_array:
 
         rows: list[int] = []
         cols: list[int] = []
@@ -103,13 +99,13 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
         # boundary conditions implemented as local operators
         if verbose: 
             print('assembling local operators')
-        for region in regions_local_kernel:
+        for boundary in boundaries_local_flux:
             if verbose: 
-                print(f'region: {region}')
-            edges_on_region = mesh.edges_on_boundary(region)
-            bc = boundary_conditions[region]
-            kernel = numerics.local_boundary_kernels[type(bc)]
-            self.assemble_local_bc(edges_on_region, kernel, basis, rows, cols, values)
+                print(f'Boundary: {boundary}')
+            edges_on_boundary = mesh.edges_on_boundary(boundary)
+            bc = boundary_conditions[boundary]
+            flux = numerics.local_boundary_kernels[type(bc)]
+            self.assemble_local_bc(edges_on_boundary, flux, basis, rows, cols, values)
 
         refractive_index = basis.refractive_index
 
@@ -137,15 +133,15 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
 
         print("assembling non-local operators")
         # boundary conditions implemented as non-local operators
-        for region in regions_nonlocal_kernel:
-            bc = boundary_conditions[region]
+        for boundary in boundaries_non_local_flux:
+            bc = boundary_conditions[boundary]
             non_local_kernel = numerics.nonlocal_boundary_kernels[type(bc)]
-            for edge_1 in tqdm(mesh.edges_on_boundary(region),
-                               desc=f"NtD, {region}",
+            for edge_1 in tqdm(mesh.edges_on_boundary(boundary),
+                               desc=f"NtD, {boundary}",
                                disable=not verbose,
                                unit="edge"):
                 T_1, _ = edge_1["triangles"]
-                for edge_2 in mesh.edges_on_boundary(region):
+                for edge_2 in mesh.edges_on_boundary(boundary):
                     T_2, _ = edge_2["triangles"]
                     for j in basis.dofs_on_element(T_1):
                         for i in basis.dofs_on_element(T_2):
@@ -160,25 +156,24 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
 
         return coo_array((np.asarray(values), (np.asarray(rows), np.asarray(cols))), shape=(basis.N_DOF, basis.N_DOF))
 
-    def assemble_RHS(self) -> complex_array:
+    def assemble_RHS(self,
+                     mesh: TrefftzMesh[B, Any],
+                     boundary_conditions: Mapping[B, BoundaryCondition],
+                     numerics: SerialNumerics,
+                     basis: PlanewaveBasis,
+                     boundaries_RHS: list[B]) -> complex_array:
 
         rows: list[int] = []
         values: list[complex] = []
 
-        regions_RHS_term = self._regions_RHS_term
-        mesh = self._mesh
-        boundary_conditions = self._boundary_conditions
-        numerics = self._numerics
-        basis = self._basis
-
-        for region in regions_RHS_term:  # I should check redefining this lists as sets or something like that, because of the local AND RHS
-            bc = boundary_conditions[region]
-            local_kernel = numerics.local_boundary_kernels[type(bc)]
-            for edge in mesh.edges_on_boundary(region):
+        for boundary in boundaries_RHS:
+            bc = boundary_conditions[boundary]
+            flux = numerics.local_boundary_kernels[type(bc)]
+            for edge in mesh.edges_on_boundary(boundary):
                 T, _ = edge["triangles"]
                 for i in basis.dofs_on_element(T):
                     d_psi = basis.global_direction(i)
-                    value = local_kernel.RHS(edge=edge, d_v=d_psi, k=basis.k)
+                    value = flux.RHS(edge=edge, d_v=d_psi, k=basis.k)
                     rows.append(i)
                     values.append(value)
 
@@ -186,17 +181,15 @@ class SerialAssembler(Assembler[Any, SerialNumerics]):
         np.add.at(b, rows, values)
         return b
 
-class BlockAssembler(Assembler[Any, BlockNumerics]):
+class BlockAssembler[B](Assembler[B]):
 
-    def assemble_LHS(self) -> coo_array:
-
-        regions_local_kernel = self._regions_local_kernel
-        regions_nonlocal_kernel = self._regions_nonlocal_kernel
-        mesh = self._mesh
-        boundary_conditions = self._boundary_conditions
-        numerics = self._numerics
-        basis = self._basis
-
+    def assemble_LHS(self,
+                     mesh: TrefftzMesh[B, Any],
+                     boundary_conditions: Mapping[B, BoundaryCondition],
+                     numerics: BlockNumerics,
+                     basis: PlanewaveBasis,
+                     boundaries_local_flux: list[B],
+                     boundaries_non_local_flux: list[B]) -> coo_array:
 
         rows_dof: list[int_array] = []
         cols_dof: list[int_array] = []
@@ -208,14 +201,14 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
         # boundary conditions implemented as local operators
         if verbose: 
             print('assembling local operators')
-        for region in regions_local_kernel:
+        for boundary in boundaries_local_flux:
             if verbose: 
-                print(f'region: {region}')
-            edges_on_region = mesh.edges_on_boundary(region)
-            bc = boundary_conditions[region]
+                print(f'Boundary: {boundary}')
+            edges_on_boundary = mesh.edges_on_boundary(boundary)
+            bc = boundary_conditions[boundary]
             local_flux = numerics.local_boundary_kernels[type(bc)]
 
-            for edge in tqdm(edges_on_region,
+            for edge in tqdm(edges_on_boundary,
                             disable=not verbose,
                             unit="edge"):
                 T, _ = edge["triangles"]
@@ -251,18 +244,19 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
 
         print("assembling non-local operators")
         # boundary conditions implemented as non-local operators
-        for region in regions_nonlocal_kernel:
-            bc = boundary_conditions[region]
+        for boundary in boundaries_non_local_flux:
+            edges_on_boundary = mesh.edges_on_boundary(boundary)
+            bc = boundary_conditions[boundary]
             non_local_flux = numerics.nonlocal_boundary_kernels[type(bc)]
-            for edge_u in tqdm(mesh.edges_on_boundary(region),
-                               desc=f"NtD, {region}",
+            for edge_u in tqdm(edges_on_boundary,
+                               desc=f"NtD, {boundary}",
                                disable=not verbose,
                                unit="edge"):
                 T_u, _ = edge_u["triangles"]
                 u_dof = basis.dofs_on_element(T_u)
                 D_u =  basis.global_direction(u_dof)
                 n_u = refractive_index.at(T_u)
-                for edge_v in mesh.edges_on_boundary(region):
+                for edge_v in edges_on_boundary:
                     T_v, _ = edge_v["triangles"]
                     v_dof = basis.dofs_on_element(T_v)
                     D_v =  basis.global_direction(v_dof)
@@ -271,6 +265,7 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
                     rows_dof.append(v_dof)
                     cols_dof.append(u_dof)
                     blocks.append(block)
+
         rows: list[int_array] = []
         cols: list[int_array] = []
         values: list[complex_array] = []
@@ -282,21 +277,20 @@ class BlockAssembler(Assembler[Any, BlockNumerics]):
 
         return coo_array((np.concatenate(values), (np.concatenate(rows), np.concatenate(cols))), shape=(basis.N_DOF, basis.N_DOF))
 
-    def assemble_RHS(self) -> complex_array:
+    def assemble_RHS(self,
+                     mesh: TrefftzMesh[B, Any],
+                     boundary_conditions: Mapping[B, BoundaryCondition],
+                     numerics: BlockNumerics,
+                     basis: PlanewaveBasis,
+                     boundaries_RHS: list[B]) -> complex_array:
 
         rows_dof: list[int_array] = []
         blocks: list[complex_array] = []
 
-        regions_RHS_term = self._regions_RHS_term
-        mesh = self._mesh
-        boundary_conditions = self._boundary_conditions
-        numerics = self._numerics
-        basis = self._basis
-
-        for region in regions_RHS_term:  # I should check redefining this lists as sets or something like that, because of the local AND RHS
-            bc = boundary_conditions[region]
+        for boundary in boundaries_RHS:
+            bc = boundary_conditions[boundary]
             flux = numerics.local_boundary_kernels[type(bc)]
-            for edge in mesh.edges_on_boundary(region):
+            for edge in mesh.edges_on_boundary(boundary):
                 T, _ = edge["triangles"]
                 v_dof = basis.dofs_on_element(T)
                 rows_dof.append(v_dof)
