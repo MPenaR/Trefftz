@@ -31,7 +31,40 @@ def fekete3[T](f: Callable[[float_array, float_array], T], r_A: tuple[float, flo
     I = np.sum(z*w)
     return J*I 
 
+def fekete3_vectorized[T](f: Callable[[float_array, float_array], T],
+                          r_A: float_array = np.array([0., 0.]),
+                          r_B: float_array = np.array([1., 0.]),
+                          r_C: float_array = np.array([0., 1.])) -> T:
 
+    AB = r_B - r_A
+    AC = r_C - r_A
+
+    S = 0.5 * np.abs(AB[:, 0] * AC[:, 1] - AB[:, 1] * AC[:, 0])
+    J = S / 2.
+
+    points = np.array([
+        [1./3, 1./3, 1./3],
+        [0.,   0.,   1.],
+        [0.,   1.,   0.],
+        [1.,   0.,   0.],
+        [0.,   0.2763932023, 0.7236067977],
+        [0.7236067977, 0.2763932023, 0.],
+        [0.7236067977, 0., 0.2763932023],
+        [0.,   0.7236067977, 0.2763932023],
+        [0.2763932023, 0.7236067977, 0.],
+        [0.2763932023, 0., 0.7236067977],
+    ])
+    # x,y  are (N, N_points)
+    x = r_A[:, None, 0] * points[None, :, 0] + r_B[:, None, 0] * points[None, :, 1] + r_C[:, None, 0] * points[None, :, 2]
+    y = r_A[:, None, 1] * points[None, :, 0] + r_B[:, None, 1] * points[None, :, 1] + r_C[:, None, 1] * points[None, :, 2]
+
+    w = np.array([0.9, 0.1/3, 0.1/3, 0.1/3, 1./6, 1./6, 1./6, 1./6, 1./6, 1./6])
+
+    z = f(x, y) # (N, N_points)
+
+    I = np.sum(z * w, axis=-1)
+
+    return J * I
 
 
 

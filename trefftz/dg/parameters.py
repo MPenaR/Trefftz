@@ -4,10 +4,14 @@ from typing import Any
 import numpy as np
 
 class Elementwise[R: Enum, T]:
-    def __init__(self, mesh: TrefftzMesh[Any, R], parameter_mapping: dict[R, T]):
+    def __init__(self, mesh: TrefftzMesh[Any, R],
+                 parameter_mapping: dict[R, T] | None = None,
+                 default: T = 1.):
         self._mesh = mesh
         self._parameter_mapping = parameter_mapping
-        self._values = np.empty(mesh.n_triangles, dtype=np.asarray(list(parameter_mapping.values())).dtype)
+        self._values = np.full(mesh.n_triangles,
+                               fill_value=default,
+                               dtype=np.asarray(list(parameter_mapping.values())).dtype)
         for reg in mesh.regions:
             self._values[mesh._reg_indexes[reg]] = parameter_mapping[reg]
 

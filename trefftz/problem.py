@@ -10,6 +10,7 @@ from trefftz.dg.boundary_conditions import BoundaryCondition
 from enum import Enum
 from typing import Any, Callable
 from trefftz.dg.numerical.integrators import fekete3 as Int
+from trefftz.dg.numerical.integrators import fekete3_vectorized as Int_vectorized
 import numpy as np
 
 class ExactSolution:
@@ -102,6 +103,14 @@ class Problem[B: Enum, N: Numerics]:
         for T in self.mesh.triangles:
             A, B, C = T["A"], T["B"], T["C"]
             I = Int(lambda x, y: np.abs(self.u_h(x, y) - self.u(x, y))**2, A, B, C)
-            print(I)
             S+= I
+        return np.sqrt(S)
+
+    def compute_error_vectorized(self):
+        S = 0.
+        A = self.mesh.triangles["A"]
+        B = self.mesh.triangles["B"]
+        C = self.mesh.triangles["C"]
+        I = Int_vectorized(lambda x, y: np.abs(self.u_h(x, y) - self.u(x, y))**2, A, B, C) #I need this to vectorize over A, B, C
+        S = np.sum(I)
         return np.sqrt(S)
