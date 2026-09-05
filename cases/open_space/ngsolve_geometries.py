@@ -69,7 +69,7 @@ def AnularDomain(R: float = 5., r: float = 1., scatterer_material: Material = Me
     if isinstance(scatterer_material, Dielectric):
         geo.SetDomainMaxH(scatterer_label, lc)
     
-    ntmesh = geo.GenerateMesh(maxh=Lc, perfstepsend=verbosity)
+    ntmesh = geo.GenerateMesh(maxh=Lc, grading=0.05, perfstepsend=verbosity)
 
     ntmesh.SetMaterial(Labels.BACKGROUND, Regions.BACKGROUND)
     

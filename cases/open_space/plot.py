@@ -15,7 +15,7 @@ def plot_openspace(mesh: TrefftzMesh[Any, Any], plot_tangents: bool = False, plo
 
     ax.add_collection(LineCollection(np.stack([inner_edges["P"], inner_edges["Q"]], axis=1), colors='k', linewidths=lw))
     for bnd in mesh.boundaries:
-        edges = mesh.boundary_Edges[bnd]
+        edges = mesh.edges_on_boundary(bnd)
         if edges.dtype == arc_dtype:
             theta_1 = edges["theta_1"]
             theta_2 = edges["theta_2"]

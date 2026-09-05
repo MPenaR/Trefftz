@@ -2,7 +2,7 @@ import pytest
 from numpy.testing import assert_allclose
 import trefftz.dg.serial_fluxes as exact
 import trefftz.dg.numerical.fluxes as numerical
-from ...data import k, DIRECTIONS, EDGE_1, ARC_1, TOL
+from ..data import k, DIRECTIONS, EDGE_1, ARC_1, TOL
 
 
 @pytest.mark.parametrize('d_m', DIRECTIONS)

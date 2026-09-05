@@ -20,6 +20,9 @@ pygmsh = [
 gmsh = [
     "gmsh>=4.15.0",
 ]
+gpu = [
+    "cupy-cuda12x[ctk]>=14.2.0",
+]
 
 [dependency-groups]
 dev = [
@@ -38,6 +41,7 @@ dev = [
     "sphinx-rtd-theme>=0.5.1",
     "tqdm>=4.70.0",
 ]
+
 
 [build-system]
 requires = ["setuptools>=61"]

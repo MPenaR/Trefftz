@@ -7,28 +7,23 @@ from trefftz.dg.exact import PlaneWave
 JAC_ANGER_MODES = 80
 
 
-def I_uv(arcs, D_u: float_array, n_u: float_array, D_v: float_array, n_v: float_array,  k: float) -> complex_array:
+def I_uv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex,  k: float) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{v}\,\mathrm{d}\ell
 
-    where $u$ and $v$ are plane waves and $E$ are a set of arcs of circunference.'''
+    where $u$ and $v$ are plane waves and $E$ is an arc of circunference.'''
 
-    theta_1 = arcs["theta_1"]
-    theta_2 = arcs["theta_2"]
-    R = arcs["R"]
+    theta_1 = arc["theta_1"]
+    theta_2 = arc["theta_2"]
+    R = arc["R"]
 
-    # D_u: (N_E, N_theta, 2)
-    # D_v: (N_E, N_theta, 2)
-    # n_u: (N_E)
-    # n_v: (N_E)
-
-    d_uv = n_u[:, None, None, None]*D_u[None, None, :, :] - n_v[:, None, None, None]*D_v[None, :, None, :]
+    d_uv = n_u*D_u[None, :, :] - n_v*D_v[:, None, :]
     D_uv = norm(d_uv, axis=-1)
-    phi_uv = atan2(d_uv[:,  :, :, 1], d_uv[:, :, :, 0])
+    phi_uv = atan2(d_uv[ :, :, 1], d_uv[ :, :, 0])
 
-    return R[:, None, None]*(jv(0, k*R[:, None, None]*D_uv)*(theta_2-theta_1)[:, None, None] +
-              2*sum(1j**t/t*jv(t, k*R[:, None, None]*D_uv)*(sin(t*(theta_2[:, None, None] - phi_uv)) - sin(t*(theta_1[:, None, None] - phi_uv)))
+    return R*(jv(0, k*R*D_uv)*(theta_2-theta_1) +
+              2*sum(1j**t/t*jv(t, k*R*D_uv)*(sin(t*(theta_2 - phi_uv)) - sin(t*(theta_1 - phi_uv)))
                     for t in range(1, JAC_ANGER_MODES)))
 
 
