@@ -104,7 +104,8 @@ def SoundSoft_total_field_problem(R: float = 1., r: float = 0.2, Lc: float = 2.,
     return P
 
 
-def Penetrable_total_field_problem(R: float = 1., r: float = 0.2, Lc: float = 2., lc: float = 0.03,
+def Penetrable_total_field_problem(R: float = 1., r: float = 0.2, center: tuple[float, float] = (0., 0.),
+                                   Lc: float = 2., lc: float = 0.03,
                           eps_r: float = 16., curve_scatterer: bool = False, theta_inc: float = -np.pi,
                           a: float = 0.5, b: float = 0.5, d_2: float = 0.5, NtD_modes: int = 15,
                           k: float = 8.0, N_theta: int = 12, direct_solver: bool = True):
@@ -121,7 +122,7 @@ def Penetrable_total_field_problem(R: float = 1., r: float = 0.2, Lc: float = 2.
     from trefftz.problem import Problem
     from cases.open_space.exact import nf_diel_cylinder_plane_wave
 
-    mesh = AnularDomain(R=R, r=r, Lc=Lc, lc=lc, scatterer_material=Dielectric(relative_permittivity=eps_r))
+    mesh = AnularDomain(R=R, r=r, center=center, Lc=Lc, lc=lc, scatterer_material=Dielectric(relative_permittivity=eps_r))
     Boundaries = mesh.boundaries
 
     if curve_scatterer: 
@@ -142,9 +143,10 @@ def Penetrable_total_field_problem(R: float = 1., r: float = 0.2, Lc: float = 2.
     basis = LinearlySpacedBasis(N_elements=mesh.n_triangles, refractive_index=refractive_index, k=k, N_theta=N_theta)
 
     def u_tot(x, y):
-      u_s = nf_diel_cylinder_plane_wave(x, y, k, theta_inc=theta_inc, n=np.sqrt(eps_r), c=np.array([0., 0.]), R=r)
+      u_s = nf_diel_cylinder_plane_wave(X=x, Y=y,
+                                        c=center, k=k, theta_inc=theta_inc, n=np.sqrt(eps_r), R=r)
       u_i = np.exp(1j*k*(d_inc[0]*x + d_inc[1]*y))
-      RHO = np.sqrt(x**2 + y**2)
+      RHO = np.sqrt((x-center[0])**2 + (y-center[1])**2)
       return np.where(RHO<r, u_s, u_s+u_i)
 
     P = Problem(mesh=mesh,

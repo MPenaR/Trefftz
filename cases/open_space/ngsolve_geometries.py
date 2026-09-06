@@ -47,7 +47,7 @@ def CleanCircle(R: float = 5., Lc: float = 0.3, verbosity: int = 0) -> TrefftzMe
     return mesh
 
 
-def AnularDomain(R: float = 5., r: float = 1., scatterer_material: Material = Metallic(), lc: float = 0.3, Lc: float = 0.5, verbosity: int = 0) -> TrefftzMesh[Boundaries, Regions]:
+def AnularDomain(R: float = 5., r: float = 1., center: tuple[float, float] = (0., 0.),  scatterer_material: Material = Metallic(), lc: float = 0.3, Lc: float = 0.5, verbosity: int = 0) -> TrefftzMesh[Boundaries, Regions]:
 
     '''Creates an anular domain without scatterers
     It assumes the default tags for the subregions, i.e.:
@@ -64,7 +64,7 @@ def AnularDomain(R: float = 5., r: float = 1., scatterer_material: Material = Me
             raise TypeError(f"Unsupported scatterer material: {type(scatterer_material).__name__}")
 
     geo = SplineGeometry()
-    geo.AddCircle((0.0, 0.0), r, bc=Boundaries.D_OMEGA, leftdomain=scatterer_label, rightdomain=Labels.BACKGROUND, maxh=lc)
+    geo.AddCircle(center, r, bc=Boundaries.D_OMEGA, leftdomain=scatterer_label, rightdomain=Labels.BACKGROUND, maxh=lc)
     geo.AddCircle((0.0, 0.0), R, bc=Boundaries.SIGMA, leftdomain=Labels.BACKGROUND, rightdomain=Labels.OUT, maxh=Lc)
     if isinstance(scatterer_material, Dielectric):
         geo.SetDomainMaxH(scatterer_label, lc)

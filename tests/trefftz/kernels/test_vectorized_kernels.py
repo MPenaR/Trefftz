@@ -48,18 +48,16 @@ def test_Iuv_arc():
         I_block[e, :, :] = block.I_uv(edge=arc, D_u=DIRECTIONS, n_u=n_u, D_v=DIRECTIONS, n_v=n_v, k=k)
     assert_allclose(I_vector, I_block, rtol=TOL, atol=TOL)
 
-# def test_Iduv_arc():
-#     I_block = block.I_duv(edge=ARC_1, D_u=DIRECTIONS, D_v=DIRECTIONS, k=k)
-#     I_serial = np.zeros_like(I_block)
-#     for n, d_n in enumerate(DIRECTIONS):
-#         for m, d_m in enumerate(DIRECTIONS):
-#             I_serial[m, n] = serial.I_duv(edge=ARC_1, d_u=d_n, d_v=d_m, k=k)
-#     assert_allclose(I_block, I_serial, rtol=TOL, atol=TOL)
+def test_Iduv_arc():
+    I_vector =vectorized.I_duv(edges=ARCS, D_u=DIRECTIONS, n_u=N_u, D_v=DIRECTIONS, n_v=N_v, k=k) 
+    I_block = np.zeros_like(I_vector)
+    for e, (arc, n_u, n_v) in enumerate(zip(ARCS, N_u, N_v)):
+        I_block[e, :, :] = block.I_duv(edge=arc, D_u=DIRECTIONS, n_u=n_u, D_v=DIRECTIONS, n_v=n_v, k=k)
+    assert_allclose(I_vector, I_block, rtol=TOL, atol=TOL)
 
-# def test_Iudv_arc():
-#     I_block = block.I_udv(edge=ARC_1, D_u=DIRECTIONS, D_v=DIRECTIONS, k=k)
-#     I_serial = np.zeros_like(I_block)
-#     for n, d_n in enumerate(DIRECTIONS):
-#         for m, d_m in enumerate(DIRECTIONS):
-#             I_serial[m, n] = serial.I_udv(edge=ARC_1, d_u=d_n, d_v=d_m, k=k)
-#     assert_allclose(I_block, I_serial, rtol=TOL, atol=TOL)
+def test_Iudv_arc():
+    I_vector =vectorized.I_udv(edges=ARCS, D_u=DIRECTIONS, n_u=N_u, D_v=DIRECTIONS, n_v=N_v, k=k) 
+    I_block = np.zeros_like(I_vector)
+    for e, (arc, n_u, n_v) in enumerate(zip(ARCS, N_u, N_v)):
+        I_block[e, :, :] = block.I_udv(edge=arc, D_u=DIRECTIONS, n_u=n_u, D_v=DIRECTIONS, n_v=n_v, k=k)
+    assert_allclose(I_vector, I_block, rtol=TOL, atol=TOL)

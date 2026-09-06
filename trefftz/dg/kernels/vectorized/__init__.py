@@ -52,25 +52,6 @@ def I_dudv(edges, D_u: float_array, n_u: float_array, D_v: float_array, n_v: flo
     return _KERNELS[edges.dtype].I_dudv(edges, D_u, n_u, D_v, n_v, k)
 
 
-# def I_uincv(edges, d_inc: float_array, D_v: float_array, k: float) -> complex_array:
-#     r'''Computes the integral:
-# .. math ::
-#         \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
-
-#     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is either an arc of circunference or a segment.'''
-
-#     return _KERNELS[edges.dtype].I_uincv(edges, d_inc, D_v, k)
-
-
-# def I_uincdv(edges, d_inc: float_array, D_v: float_array, k: float) -> complex_array:
-#     r'''Computes the integral:
-#     .. math ::
-#         \int_E u_{\mathrm{inc}} \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
-
-#     where $u_inc$ is an incident plane wave and $v$ is a plane wave and $E$ is either an arc of circunference or a segment.'''
-
-#     return _KERNELS[edges.dtype].I_uincdv(edges, d_inc, D_v, k)
-
 def I_pw_v(edges, plane_wave: PlaneWave, D_v: float_array, n_v: float_array, k: float) -> complex_array:
     r'''Computes the integral:
 .. math ::
