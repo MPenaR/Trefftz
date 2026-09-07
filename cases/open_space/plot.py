@@ -2,18 +2,21 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 from trefftz.mesh.core import TrefftzMesh, edge_dtype, arc_dtype
 from typing import Any
 
-def plot_openspace(mesh: TrefftzMesh[Any, Any], plot_tangents: bool = False, plot_normals: bool = False):
+def plot_openspace(mesh: TrefftzMesh[Any, Any], ax: Axes | None = None, plot_tangents: bool = False, plot_normals: bool = False, color = "k"):
     from matplotlib.collections import LineCollection
-    _, ax = plt.subplots(figsize=(8,8))
+    if ax is None:
+        _, ax = plt.subplots(figsize=(8,8))
+    
     lw = 1
     # ax.triplot(Triangulation(x=M._points[:,0], y=M._points[:,1], triangles=M._triangles),linewidth=lw, color='k')
 
     inner_edges = mesh.interior_edges
 
-    ax.add_collection(LineCollection(np.stack([inner_edges["P"], inner_edges["Q"]], axis=1), colors='k', linewidths=lw))
+    ax.add_collection(LineCollection(np.stack([inner_edges["P"], inner_edges["Q"]], axis=1), colors=color, linewidths=lw))
     for bnd in mesh.boundaries:
         edges = mesh.edges_on_boundary(bnd)
         if edges.dtype == arc_dtype:
@@ -48,6 +51,5 @@ def plot_openspace(mesh: TrefftzMesh[Any, Any], plot_tangents: bool = False, plo
     #               mesh.edges["N"][:, 0],
     #               mesh.edges["N"][:, 1], angles='xy', scale_units='xy', scale=5)
 
-    ax.axis('equal')
-    ax.axis('off')
-    plt.show()
+    # ax.axis('equal')
+    # ax.axis('off')
