@@ -3,7 +3,7 @@ from trefftz.dg.boundary_conditions import NtDBC, DirichletBC
 import numpy as np
 import trefftz.dg.serial_fluxes as serial
 import trefftz.dg.block_fluxes as block
-from trefftz.dg.assemblers import SerialNumerics, BlockNumerics, SerialAssembler, BlockAssembler
+from trefftz.dg.assemblers import Numerics, SerialAssembler, BlockAssembler
 import cases.open_space.block_fluxes as os_block
 import cases.open_space.serial_fluxes as os_serial
 from trefftz.dg.basis import LinearlySpacedBasis
@@ -28,14 +28,27 @@ a = 0.5
 b = 0.5
 d2 = 0.5
 
-s_numerics = SerialNumerics(interior_kernel= serial.UltraWeakFlux(a=a, b=b),
+# s_numerics = SerialNumerics(interior_kernel= serial.UltraWeakFlux(a=a, b=b),
+#                           local_boundary_kernels={DirichletBC: serial.DirichletFlux(a=a, data=data), NtDBC: os_serial.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=None)},
+#                           nonlocal_boundary_kernels={NtDBC: os_serial.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = None)})
+
+
+# b_numerics = BlockNumerics(interior_kernel= block.UltraWeakFlux(a=a, b=b),
+#                           local_boundary_kernels={DirichletBC: block.DirichletFlux(a=a, data=data), NtDBC: os_block.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=None)},
+#                           nonlocal_boundary_kernels={NtDBC: os_block.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = None)})
+
+
+s_numerics = Numerics(interior_kernel= serial.UltraWeakFlux(a=a, b=b),
                           local_boundary_kernels={DirichletBC: serial.DirichletFlux(a=a, data=data), NtDBC: os_serial.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=None)},
                           nonlocal_boundary_kernels={NtDBC: os_serial.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = None)})
 
 
-b_numerics = BlockNumerics(interior_kernel= block.UltraWeakFlux(a=a, b=b),
+b_numerics = Numerics(interior_kernel= block.UltraWeakFlux(a=a, b=b),
                           local_boundary_kernels={DirichletBC: block.DirichletFlux(a=a, data=data), NtDBC: os_block.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=None)},
                           nonlocal_boundary_kernels={NtDBC: os_block.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = None)})
+
+
+
 
 k = 16.0
 Ntheta = 3

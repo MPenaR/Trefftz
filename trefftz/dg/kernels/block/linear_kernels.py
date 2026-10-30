@@ -2,7 +2,7 @@ from numpy import dot, exp, sinc, pi
 from trefftz.numpy_types import float_array, complex_array
 from trefftz.dg.exact import PlaneWave
 
-def I_uv(segment, D_u: float_array, n_u: float | complex,  D_v: float_array, n_v: float | complex,  k: float) -> complex_array:
+def I_uv(segment,  k: float, D_u: float_array,  D_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{v}\,\mathrm{d}\ell

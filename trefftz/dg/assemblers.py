@@ -1,3 +1,6 @@
+from typing import Protocol, Mapping, Any, Sequence
+
+
 from trefftz.mesh import TrefftzMesh
 from scipy.sparse import coo_array
 from trefftz.dg.serial_fluxes import SIGN as SSIGN
@@ -7,7 +10,6 @@ from trefftz.numpy_types import complex_array, int_array
 from trefftz.dg.serial_fluxes import SerialLocalKernel, SerialNonLocalKernel, SerialTransmissionKernel
 from trefftz.dg.block_fluxes import BlockLocalKernel, BlockNonLocalKernel, BlockTransmissionKernel
 from trefftz.dg.basis import PlanewaveBasis
-from typing import Protocol, Mapping, Any, Sequence
 from dataclasses import dataclass
 from trefftz.dg.boundary_conditions import BoundaryCondition
 from abc import ABC, abstractmethod
@@ -554,73 +556,73 @@ class ParallelAssembler[B](Assembler[B]):
 
 
 
-class GeneralAssembler[B]:
+# class GeneralAssembler[B]:
 
-    def __init__(self,
-                mesh: TrefftzMesh[B, Any], 
-                boundary_conditions: Mapping[B, BoundaryCondition],
-                numerics: Numerics,
-                basis: PlanewaveBasis,
-                verbose: bool = True):
+#     def __init__(self,
+#                 mesh: TrefftzMesh[B, Any], 
+#                 boundary_conditions: Mapping[B, BoundaryCondition],
+#                 numerics: Numerics,
+#                 basis: PlanewaveBasis,
+#                 verbose: bool = True):
         
-        self._mesh = mesh
-        self._boundary_conditions = boundary_conditions
-        self._numerics = numerics
-        self._basis = basis
-        self._regions_local_kernel = [region for region, bc in boundary_conditions.items() if type(bc) in numerics.local_boundary_kernels]
-        self._regions_nonlocal_kernel = [region for region, bc in boundary_conditions.items() if type(bc) in numerics.nonlocal_boundary_kernels]
-        self._regions_RHS_term = [region for region, bc in boundary_conditions.items() if bc.data is not None]
-        self.verbose = verbose
-        self._rows: list[int] = []
-        self._columns: list[int] = []
-        self._values: list[complex] = []
+#         self._mesh = mesh
+#         self._boundary_conditions = boundary_conditions
+#         self._numerics = numerics
+#         self._basis = basis
+#         self._regions_local_kernel = [region for region, bc in boundary_conditions.items() if type(bc) in numerics.local_boundary_kernels]
+#         self._regions_nonlocal_kernel = [region for region, bc in boundary_conditions.items() if type(bc) in numerics.nonlocal_boundary_kernels]
+#         self._regions_RHS_term = [region for region, bc in boundary_conditions.items() if bc.data is not None]
+#         self.verbose = verbose
+#         self._rows: list[int] = []
+#         self._columns: list[int] = []
+#         self._values: list[complex] = []
 
-    # def assemble_block(self, flux: SerialFlux | BlockFlux, edges,
-    #                    dof_u: Sequence[int], dof_v: Sequence[int],
-    #                    D_u: float_array, D_v: float_array):
-    #     basis = self._basis
-    #     refractive_index = basis.refractive_index
-    #     match flux:
-    #         case SerialFlux():
-    #             for edge in tqdm(edges,
-    #                             desc=description,
-    #                             disable=not verbose,
-    #                             unit="edge"):
-    #                 for (i_v, T_v) in enumerate(edge["triangles"]):
-    #                     n_v = refractive_index.at(T_v)
-    #                     for (i_u, T_u) in enumerate(edge["triangles"]):
-    #                         n_u = refractive_index.at(T_u)
-    #                         sign = SSIGN((i_u, i_v))
-    #                         for i, d_v in zip(dof_v, D_v):
-    #                             for j, d_u in dof_u:
-    #                                 val = flux.LHS(edge=edge, d_u=d_u, n_u=n_u, d_v=d_v, n_v=n_v, k=basis.k, sign=sign)
-    #                                 self._rows.append(i)
-    #                                 self._columns.append(j)
-    #                                 self._values.append(val)
-    #         case BlockFlux():
-    #             for edge in tqdm(edges,
-    #                              desc=description,
-    #                 disable=not verbose,
-    #                 unit="edge"):
-    #                 for (i_v, T_v) in enumerate(edge["triangles"]):
-    #                     for (i_u, T_u) in enumerate(edge["triangles"]):
-    #                         sign = BSIGN((i_u, i_v))
-    #                         u_dof = basis.dofs_on_element(T_u)
-    #                         v_dof = basis.dofs_on_element(T_v)
-    #                         D_v =  basis.global_direction(v_dof)
-    #                         D_u =  basis.global_direction(u_dof)
-    #                         n_u = refractive_index.at(T_u)
-    #                         n_v = refractive_index.at(T_v)
-    #                         block = interior_flux.LHS(edge=edge, D_u=D_u, n_u=n_u, D_v=D_v, n_v=n_v, k=basis.k, sign=sign)
-    #                         rows_dof = np.repeat(v_dof, len(u_dof))
-    #                         cols_dof = np.tile(u_dof, len(v_dof))
-    #                         rows.extend(rows_dof)
-    #                         cols.extend(cols_dof)
-    #                         values.extend(block.ravel())
-    #         case _:
-    #             raise TypeError(
-    #                 f"Invalid flux type {type(interior_flux).__name__}: "
-    #                 "flux must inherit from SerialFlux or BlockFlux.")                
+#     def assemble_block(self, flux: SerialFlux | BlockFlux, edges,
+#                        dof_u: Sequence[int], dof_v: Sequence[int],
+#                        D_u: float_array, D_v: float_array):
+#         basis = self._basis
+#         refractive_index = basis.refractive_index
+#         match flux:
+#             case SerialFlux():
+#                 for edge in tqdm(edges,
+#                                 desc=description,
+#                                 disable=not verbose,
+#                                 unit="edge"):
+#                     for (i_v, T_v) in enumerate(edge["triangles"]):
+#                         n_v = refractive_index.at(T_v)
+#                         for (i_u, T_u) in enumerate(edge["triangles"]):
+#                             n_u = refractive_index.at(T_u)
+#                             sign = SSIGN((i_u, i_v))
+#                             for i, d_v in zip(dof_v, D_v):
+#                                 for j, d_u in dof_u:
+#                                     val = flux.LHS(edge=edge, d_u=d_u, n_u=n_u, d_v=d_v, n_v=n_v, k=basis.k, sign=sign)
+#                                     self._rows.append(i)
+#                                     self._columns.append(j)
+#                                     self._values.append(val)
+#             case BlockFlux():
+#                 for edge in tqdm(edges,
+#                                  desc=description,
+#                     disable=not verbose,
+#                     unit="edge"):
+#                     for (i_v, T_v) in enumerate(edge["triangles"]):
+#                         for (i_u, T_u) in enumerate(edge["triangles"]):
+#                             sign = BSIGN((i_u, i_v))
+#                             u_dof = basis.dofs_on_element(T_u)
+#                             v_dof = basis.dofs_on_element(T_v)
+#                             D_v =  basis.global_direction(v_dof)
+#                             D_u =  basis.global_direction(u_dof)
+#                             n_u = refractive_index.at(T_u)
+#                             n_v = refractive_index.at(T_v)
+#                             block = interior_flux.LHS(edge=edge, D_u=D_u, n_u=n_u, D_v=D_v, n_v=n_v, k=basis.k, sign=sign)
+#                             rows_dof = np.repeat(v_dof, len(u_dof))
+#                             cols_dof = np.tile(u_dof, len(v_dof))
+#                             rows.extend(rows_dof)
+#                             cols.extend(cols_dof)
+#                             values.extend(block.ravel())
+#             case _:
+#                 raise TypeError(
+#                     f"Invalid flux type {type(interior_flux).__name__}: "
+#                     "flux must inherit from SerialFlux or BlockFlux.")                
 
 
 
