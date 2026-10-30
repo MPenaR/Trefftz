@@ -4,15 +4,15 @@ from trefftz.numpy_types import float_array
 N_POINTS = int(1E6)
 
 
-def create_numerical_functions(x: float_array, k: float, d_u: float_array, d_v: float_array, N: float_array):
-    u = np.exp(1j*k*np.dot(x, d_u))
-    v = np.exp(1j*k*np.dot(x, d_v))
-    du_dn = 1j*k*np.dot(N, d_u)*u
-    dv_dn = 1j*k*np.dot(N, d_v)*v
+def create_numerical_functions(x: float_array, k: float, d_u: float_array, d_v: float_array, N: float_array, n_u: float | complex = 1., n_v: float | complex = 1.):
+    u = np.exp(1j*k*np.dot(x, n_u*d_u))
+    v = np.exp(1j*k*np.dot(x, n_v*d_v))
+    du_dn = 1j*n_u*k*np.dot(N, d_u)*u
+    dv_dn = 1j*n_v*k*np.dot(N, d_v)*v
     return u, v, du_dn, dv_dn
 
 
-def I_uv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_uv_segment(segment,  k: float, d_u: float_array, d_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex:
     P = segment["P"]
     T = segment["T"]
     l = segment["l"]
@@ -22,7 +22,7 @@ def I_uv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> compl
     x = P + l*np.outer(t, T)
     J = l
 
-    u, v, _, _ = create_numerical_functions(x, k, d_u, d_v, N)
+    u, v, _, _ = create_numerical_functions(x, k, d_u, d_v, N, n_u, n_v)
     I = np.trapezoid(u*np.conj(v), t)*J  # int u*conj(v) dl 
     return I
 
@@ -43,7 +43,7 @@ def I_uv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
     return I
 
 
-def I_duv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_duv_segment(segment, k: float, d_u: float_array, d_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex:
     P = segment["P"]
     T = segment["T"]
     l = segment["l"]
@@ -53,7 +53,7 @@ def I_duv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> comp
     x = P + l*np.outer(t, T)
     J = l
 
-    _, v, du_dn, _ = create_numerical_functions(x, k, d_u, d_v, N)
+    _, v, du_dn, _ = create_numerical_functions(x, k, d_u, d_v, N, n_u, n_v)
     I = np.trapezoid(du_dn*np.conj(v), t)*J  # int u*conj(v) dl 
     return I
 
@@ -73,7 +73,7 @@ def I_duv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
     return I
 
 
-def I_udv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_udv_segment(segment, k: float, d_u: float_array, d_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex:
     P = segment["P"]
     T = segment["T"]
     l = segment["l"]
@@ -83,7 +83,7 @@ def I_udv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> comp
     x = P + l*np.outer(t, T)
     J = l
 
-    u, _, _, dv_dn = create_numerical_functions(x, k, d_u, d_v, N)
+    u, _, _, dv_dn = create_numerical_functions(x, k, d_u, d_v, N, n_u, n_v)
     I = np.trapezoid(u*np.conj(dv_dn), t)*J  # int u*conj(dv/dn) dl 
     return I
 
@@ -102,7 +102,7 @@ def I_udv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
     I = np.trapezoid(u*np.conj(dv_dn), t)*J  # int u*conj(dv/dn) dl 
     return I
 
-def I_dudv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_dudv_segment(segment, k: float, d_u: float_array, d_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex:
     P = segment["P"]
     T = segment["T"]
     l = segment["l"]
@@ -112,7 +112,7 @@ def I_dudv_segment(segment, d_u: float_array, d_v: float_array, k: float) -> com
     x = P + l*np.outer(t, T)
     J = l
 
-    _, _, du_dn, dv_dn = create_numerical_functions(x, k, d_u, d_v, N)
+    _, _, du_dn, dv_dn = create_numerical_functions(x, k, d_u, d_v, N, n_u, n_v)
     I = np.trapezoid(du_dn*np.conj(dv_dn), t)*J  # int u*conj(dv/dn) dl 
     return I
 

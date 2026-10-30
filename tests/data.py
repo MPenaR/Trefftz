@@ -24,5 +24,10 @@ ARCS = np.array([ARC_1, ARC_2], dtype=arc_dtype)
 k = 8.0
 
 
+# generic refraction indexes
+
+n_1 = 1.
+n_2 = 4.
+
 if __name__ == "__main__":
     print(EDGES)
