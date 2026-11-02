@@ -28,7 +28,7 @@ def I_uv_segment(segment,  k: float, d_u: float_array, d_v: float_array, n_u: fl
 
 
 
-def I_uv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_uv_arc(arc, k: float, d_u: float_array, d_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex:
     theta_1 = arc["theta_1"]
     theta_2 = arc["theta_2"]
     R = arc["R"]
@@ -38,7 +38,7 @@ def I_uv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
     x = R*u_r
     J = R
 
-    u, v, _, _ = create_numerical_functions(x, k, d_u, d_v, u_r)
+    u, v, _, _ = create_numerical_functions(x, k, d_u, d_v, u_r, n_u, n_v)
     I = np.trapezoid(u*np.conj(v), t)*J  # int u*conj(v) dl 
     return I
 
@@ -58,7 +58,7 @@ def I_duv_segment(segment, k: float, d_u: float_array, d_v: float_array, n_u: fl
     return I
 
 
-def I_duv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_duv_arc(arc, k: float, d_u: float_array, d_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex:
     theta_1 = arc["theta_1"]
     theta_2 = arc["theta_2"]
     R = arc["R"]
@@ -67,7 +67,7 @@ def I_duv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
     u_r = np.column_stack([np.cos(t), np.sin(t)])
     x = R*u_r
     J = R
-    _, v, du_dn, _ = create_numerical_functions(x, k, d_u, d_v, u_r)
+    _, v, du_dn, _ = create_numerical_functions(x, k, d_u, d_v, u_r, n_u, n_v)
 
     I = np.trapezoid(du_dn*np.conj(v), t)*J  # int du/dn*conj(v) dl 
     return I
@@ -88,7 +88,7 @@ def I_udv_segment(segment, k: float, d_u: float_array, d_v: float_array, n_u: fl
     return I
 
 
-def I_udv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_udv_arc(arc, k: float, d_u: float_array, d_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex:
     theta_1 = arc["theta_1"]
     theta_2 = arc["theta_2"]
     R = arc["R"]
@@ -97,7 +97,7 @@ def I_udv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
     u_r = np.column_stack([np.cos(t), np.sin(t)])
     x = R*u_r
     J = R
-    u, _, _, dv_dn = create_numerical_functions(x, k, d_u, d_v, u_r)
+    u, _, _, dv_dn = create_numerical_functions(x, k, d_u, d_v, u_r, n_u, n_v)
 
     I = np.trapezoid(u*np.conj(dv_dn), t)*J  # int u*conj(dv/dn) dl 
     return I
@@ -117,7 +117,7 @@ def I_dudv_segment(segment, k: float, d_u: float_array, d_v: float_array, n_u: f
     return I
 
 
-def I_dudv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
+def I_dudv_arc(arc, k: float, d_u: float_array, d_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex:
     theta_1 = arc["theta_1"]
     theta_2 = arc["theta_2"]
     R = arc["R"]
@@ -127,6 +127,6 @@ def I_dudv_arc(arc, d_u: float_array, d_v: float_array, k: float) -> complex:
     x = R*u_r
     J = R
 
-    _, _, du_dn, dv_dn = create_numerical_functions(x, k, d_u, d_v, u_r)
+    _, _, du_dn, dv_dn = create_numerical_functions(x, k, d_u, d_v, u_r, n_u, n_v)
     I = np.trapezoid(du_dn*np.conj(dv_dn), t)*J  # int u*conj(dv/dn) dl 
     return I
