@@ -28,3 +28,11 @@ def test_Iudv_arc(d_m, d_n):
     I_exact = exact.I_udv(arc=ARC_1, d_u=d_n, d_v=d_m, k=k, n_u=n_1, n_v=n_2)
     I_num = numerical.I_udv_arc(arc=ARC_1, d_u=d_n, d_v=d_m, k=k, n_u=n_1, n_v=n_2)
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
+
+
+# @pytest.mark.parametrize('d_m', DIRECTIONS)
+# @pytest.mark.parametrize('d_n', DIRECTIONS)
+# def test_Idudv_arc(d_m, d_n):
+#     I_exact = exact.I_dudv(arc=ARC_1, d_u=d_n, d_v=d_m, k=k, n_u=n_1, n_v=n_2)
+#     I_num = numerical.I_dudv_arc(arc=ARC_1, d_u=d_n, d_v=d_m, k=k, n_u=n_1, n_v=n_2)
+#     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)

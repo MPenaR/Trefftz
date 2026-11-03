@@ -4,10 +4,10 @@ from trefftz.numpy_types import float_array, complex_array
 from scipy.special import jv
 from trefftz.dg.exact import PlaneWave
 
-JAC_ANGER_MODES = 80
+JAC_ANGER_MODES = 120
 
 
-def I_uv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex,  k: float) -> complex_array:
+def I_uv(arc,  k: float, D_u: float_array, D_v: float_array, n_u: float | complex,  n_v: float | complex) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{v}\,\mathrm{d}\ell
@@ -27,7 +27,7 @@ def I_uv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: flo
                     for t in range(1, JAC_ANGER_MODES)))
 
 
-def I_duv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_duv(arc,  k: float, D_u: float_array, D_v: float_array, n_u: float | complex,  n_v: float | complex) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E nabla(u)\cdot\mathbf{n} \overline{v}\,\mathrm{d}\ell
@@ -51,7 +51,7 @@ def I_duv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: fl
     return I(theta_2) - I(theta_1)
 
 
-def I_udv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_udv(arc,  k: float, D_u: float_array, D_v: float_array, n_u: float | complex,  n_v: float | complex) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
@@ -76,7 +76,7 @@ def I_udv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: fl
     return I(theta_2) - I(theta_1)
 
 
-def I_dudv(arc, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_dudv(arc,  k: float, D_u: float_array, D_v: float_array, n_u: float | complex,  n_v: float | complex) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell

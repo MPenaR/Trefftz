@@ -17,7 +17,7 @@ def I_uv(segment,  k: float, D_u: float_array,  D_v: float_array, n_u: float | c
     return l*exp(1j*k*dot(d_uv, M))*sinc(k*l/(2*pi)*dot(d_uv, T))
 
 
-def I_duv(segment, D_u: float_array, n_u: float | complex,  D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_duv(segment,  k: float, D_u: float_array,  D_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E nabla(u)\cdot\mathbf{n} \overline{v}\,\mathrm{d}\ell
@@ -26,10 +26,10 @@ def I_duv(segment, D_u: float_array, n_u: float | complex,  D_v: float_array, n_
 
     N = segment["N"]
 
-    return 1j*k*dot(n_u*D_u, N)[None, :]*I_uv(segment, D_u, n_u, D_v, n_v, k)
+    return 1j*k*dot(n_u*D_u, N)[None, :]*I_uv(segment, k, D_u, D_v, n_u, n_v)
 
 
-def I_udv(segment, D_u: float_array, n_u: float | complex,  D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_udv(segment,  k: float, D_u: float_array,  D_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
@@ -37,17 +37,17 @@ def I_udv(segment, D_u: float_array, n_u: float | complex,  D_v: float_array, n_
     where $u$ and $v$ are plane waves and $E$ is a segment.'''
 
     N = segment["N"]
-    return -1j*k*dot(n_v*D_v, N)[:, None]*I_uv(segment, D_u, n_u, D_v, n_v, k)
+    return -1j*k*dot(n_v*D_v, N)[:, None]*I_uv(segment, k, D_u, D_v, n_u, n_v)
 
 
-def I_dudv(segment, D_u: float_array, n_u: float | complex,  D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_dudv(segment,  k: float, D_u: float_array,  D_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E nabla(u)\cdot\mathbf{n} \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
 
     where $u$ and $v$ are plane waves and $E$ is a segment.'''
     N = segment["N"]
-    return k**2*dot(n_u*D_u, N)[None, :]*dot(n_v*D_v, N)[:, None]*I_uv(segment, D_u, n_u, D_v, n_v, k)
+    return k**2*dot(n_u*D_u, N)[None, :]*dot(n_v*D_v, N)[:, None]*I_uv(segment, k, D_u, D_v, n_u, n_v)
 
 
 def I_pw_v(segment_v, plane_wave: PlaneWave, D_v: float_array, n_v: float | complex,  k: float) -> complex_array:

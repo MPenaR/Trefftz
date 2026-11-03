@@ -9,45 +9,45 @@ _KERNELS = {
 }
 
 
-def I_uv(edge, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_uv(edge, k: float,  D_u: float_array, D_v: float_array, n_u: float | complex,  n_v: float | complex) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{v}\,\mathrm{d}\ell
 
     where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.'''
 
-    return _KERNELS[edge.dtype].I_uv(edge, D_u, n_u, D_v, n_v, k)
+    return _KERNELS[edge.dtype].I_uv(edge, k, D_u, D_v, n_u, n_v)
 
 
 
-def I_duv(edge, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_duv(edge, k: float,  D_u: float_array, D_v: float_array, n_u: float | complex,  n_v: float | complex) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E \nabla u\cdot\mathbf{n} \overline{v}\,\mathrm{d}\ell
 
     where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.'''
 
-    return _KERNELS[edge.dtype].I_duv(edge, D_u, n_u, D_v, n_v, k)
+    return _KERNELS[edge.dtype].I_duv(edge, k, D_u, D_v, n_u, n_v)
 
 
-def I_udv(edge, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_udv(edge, k: float,  D_u: float_array, D_v: float_array, n_u: float | complex,  n_v: float | complex) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E u \overline{\nabla v \cdot \mathbf{n}}\,\mathrm{d}\ell
 
     where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.'''
 
-    return _KERNELS[edge.dtype].I_udv(edge, D_u, n_u, D_v, n_v, k)
+    return _KERNELS[edge.dtype].I_udv(edge, k, D_u, D_v, n_u, n_v)
 
 
-def I_dudv(edge, D_u: float_array, n_u: float | complex, D_v: float_array, n_v: float | complex, k: float) -> complex_array:
+def I_dudv(edge, k: float,  D_u: float_array, D_v: float_array, n_u: float | complex,  n_v: float | complex) -> complex_array:
     r'''Computes the integral:
     .. math ::
         \int_E \nabla u \cdot\mathbf{n} \overline{\nabla v \cdot \mathbf{n}}\,\mathrm{d}\ell
 
     where $u$ and $v$ are plane waves and $E$ is either an arc of circunference or a segment.'''
 
-    return _KERNELS[edge.dtype].I_dudv(edge, D_u, n_u, D_v, n_v, k)
+    return _KERNELS[edge.dtype].I_dudv(edge, k, D_u, D_v, n_u, n_v)
 
 
 def I_uincv(edge, d_inc: float_array, D_v: float_array, k: float) -> complex_array:

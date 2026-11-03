@@ -82,22 +82,11 @@ def I_udv(arc, k: float, d_u: float_array, d_v: float_array, n_u: float | comple
 def I_dudv(arc, k: float, d_u: float_array, d_v: float_array, n_u: float | complex = 1., n_v: float | complex = 1.) -> complex:
     r'''Computes the integral:
     .. math ::
-        \int_E u \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
+        \int_E \mabla u \cdot \overline{\nabla v}\,\mathrm{d}\ell
 
     where $u$ and $v$ are plane waves and $E$ is an arc of circunference.'''
 
-    theta_1 = arc["theta_1"]
-    theta_2 = arc["theta_2"]
-    R = arc["R"]
-
-    D_uv = norm(d_u - d_v)
-    phi_uv = atan2((d_u - d_v)[1], (d_u - d_v)[0])
-
-    phi_u = atan2(d_u[1], d_u[0])
-    phi_v = atan2(d_v[1], d_v[0])
-
-    raise NotImplementedError("need to formally compute this case.")
-
+    return NotImplemented
 
 def I_pw_v(arc, plane_wave: PlaneWave, k: float, d_v: float_array, n_v: float | complex = 1.) -> complex:
     r'''Computes the integral:
