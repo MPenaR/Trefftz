@@ -1,5 +1,7 @@
 import numpy as np
 from trefftz.mesh.core import fill_arc_geometry, fill_edge_geometry, edge_dtype, arc_dtype
+from trefftz.dg.exact import PlaneWave
+
 # tolerance 
 TOL = 1E-5
 
@@ -23,11 +25,17 @@ ARCS = np.array([ARC_1, ARC_2], dtype=arc_dtype)
 # wavenumber
 k = 8.0
 
-
 # generic refraction indexes
-
 n_1 = 1.
 n_2 = 4.
+
+# generic incident wave
+theta_inc = np.pi/4
+d_inc = np.array([np.cos(theta_inc), np.sin(theta_inc)])
+U_inc = np.sqrt(2)
+
+u_inc = PlaneWave(d=d_inc, A=U_inc, k=k)
+
 
 if __name__ == "__main__":
     print(EDGES)

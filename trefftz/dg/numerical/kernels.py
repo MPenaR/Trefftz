@@ -1,6 +1,6 @@
 import numpy as np
 from trefftz.numpy_types import float_array
-
+from trefftz.dg.exact import PlaneWave
 N_POINTS = int(1E6)
 
 
@@ -129,4 +129,56 @@ def I_dudv_arc(arc, k: float, d_u: float_array, d_v: float_array, n_u: float | c
 
     _, _, du_dn, dv_dn = create_numerical_functions(x, k, d_u, d_v, u_r, n_u, n_v)
     I = np.trapezoid(du_dn*np.conj(dv_dn), t)*J  # int u*conj(dv/dn) dl 
+    return I
+
+def I_pw_v_segment(segment,  k: float, planewave: PlaneWave, d_v: float_array, n_v: float | complex = 1.) -> complex:
+    P = segment["P"]
+    T = segment["T"]
+    l = segment["l"]
+    N = segment["N"]
+
+    t = np.linspace(0, 1, N_POINTS)
+    x = P + l*np.outer(t, T)
+    J = l
+    d_inc = planewave.d
+    U_inc = planewave.A
+
+    _, v, _, _ = create_numerical_functions(x, k, np.array([1., 0]), d_v, N, 1., n_v)
+    u_inc = U_inc*np.exp(1j*k*np.dot(x, d_inc))
+    I = np.trapezoid(u_inc*np.conj(v), t)*J  # int u*conj(v) dl 
+    return I
+
+def I_pw_dv_segment(segment,  k: float, planewave: PlaneWave, d_v: float_array, n_v: float | complex = 1.) -> complex:
+    P = segment["P"]
+    T = segment["T"]
+    l = segment["l"]
+    N = segment["N"]
+
+    t = np.linspace(0, 1, N_POINTS)
+    x = P + l*np.outer(t, T)
+    J = l
+    d_inc = planewave.d
+    U_inc = planewave.A
+
+    _, _, _, dv = create_numerical_functions(x, k, np.array([1., 0]), d_v, N, 1., n_v)
+    u_inc = U_inc*np.exp(1j*k*np.dot(x, d_inc))
+    I = np.trapezoid(u_inc*np.conj(dv), t)*J  # int u*conj(v) dl 
+    return I
+
+def I_dpw_v_segment(segment,  k: float, planewave: PlaneWave, d_v: float_array, n_v: float | complex = 1.) -> complex:
+    P = segment["P"]
+    T = segment["T"]
+    l = segment["l"]
+    N = segment["N"]
+
+    t = np.linspace(0, 1, N_POINTS)
+    x = P + l*np.outer(t, T)
+    J = l
+    d_inc = planewave.d
+    U_inc = planewave.A
+
+    _, v, _, _ = create_numerical_functions(x, k, np.array([1., 0]), d_v, N, 1., n_v)
+    u_inc = U_inc*np.exp(1j*k*np.dot(x, d_inc))
+    du_inc = 1j*k*np.dot(d_inc, N)*u_inc
+    I = np.trapezoid(du_inc*np.conj(v), t)*J  # int u*conj(v) dl 
     return I
