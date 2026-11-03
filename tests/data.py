@@ -32,9 +32,8 @@ n_2 = 4.
 # generic incident wave
 theta_inc = np.pi/4
 d_inc = np.array([np.cos(theta_inc), np.sin(theta_inc)])
-U_inc = np.sqrt(2)
 
-u_inc = PlaneWave(d=d_inc, A=U_inc, k=k)
+planewave = PlaneWave(d=d_inc, A=np.sqrt(2), k=k)
 
 
 if __name__ == "__main__":

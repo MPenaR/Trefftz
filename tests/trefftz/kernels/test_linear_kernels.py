@@ -2,7 +2,7 @@ import pytest
 from numpy.testing import assert_allclose
 import trefftz.dg.kernels.serial.linear_kernels as exact
 import trefftz.dg.numerical.kernels as numerical
-from ...data import TOL, DIRECTIONS, EDGE_1, k, n_1, n_2, u_inc
+from ...data import TOL, DIRECTIONS, EDGE_1, k, n_1, n_2, planewave
 
 
 @pytest.mark.parametrize('d_m', DIRECTIONS)
@@ -35,18 +35,18 @@ def test_Idudv_segment(d_m, d_n):
 
 @pytest.mark.parametrize('d_m', DIRECTIONS)
 def test_I_pw_v_segment(d_m):
-    I_exact = exact.I_pw_v(segment_v=EDGE_1, plane_wave=u_inc, d_v=d_m, k=k, n_v=n_2)
-    I_num = numerical.I_pw_v_segment(segment=EDGE_1, planewave=u_inc, d_v=d_m, k=k, n_v=n_2)
+    I_exact = exact.I_pw_v(segment_v=EDGE_1, plane_wave=planewave, d_v=d_m, k=k, n_v=n_2)
+    I_num = numerical.I_pw_v_segment(segment=EDGE_1, planewave=planewave, d_v=d_m, k=k, n_v=n_2)
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
 
 @pytest.mark.parametrize('d_m', DIRECTIONS)
 def test_I_pw_dv_segment(d_m):
-    I_exact = exact.I_pw_dv(segment_v=EDGE_1, plane_wave=u_inc, d_v=d_m, k=k, n_v=n_2)
-    I_num = numerical.I_pw_dv_segment(segment=EDGE_1, planewave=u_inc, d_v=d_m, k=k, n_v=n_2)
+    I_exact = exact.I_pw_dv(segment_v=EDGE_1, plane_wave=planewave, d_v=d_m, k=k, n_v=n_2)
+    I_num = numerical.I_pw_dv_segment(segment=EDGE_1, planewave=planewave, d_v=d_m, k=k, n_v=n_2)
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
 
 @pytest.mark.parametrize('d_m', DIRECTIONS)
 def test_I_dpw_v_segment(d_m):
-    I_exact = exact.I_dpw_v(segment_v=EDGE_1, plane_wave=u_inc, d_v=d_m, k=k, n_v=n_2)
-    I_num = numerical.I_dpw_v_segment(segment=EDGE_1, planewave=u_inc, d_v=d_m, k=k, n_v=n_2)
+    I_exact = exact.I_dpw_v(segment_v=EDGE_1, plane_wave=planewave, d_v=d_m, k=k, n_v=n_2)
+    I_num = numerical.I_dpw_v_segment(segment=EDGE_1, planewave=planewave, d_v=d_m, k=k, n_v=n_2)
     assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
