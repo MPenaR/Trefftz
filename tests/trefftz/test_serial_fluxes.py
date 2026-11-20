@@ -38,7 +38,7 @@ def test_DirichletLHS(d_m, d_n):
 @pytest.mark.parametrize('d_inc', DIRECTIONS)
 def test_DirichletRHS(d_m, d_inc):
     a = 0.5
-    data = PlaneWave(d=d_inc, A=1., k=k)
+    data = PlaneWave(d=d_inc, A=1.41, k=k)
     I_exact = exact.DirichletFlux(a=a, data=data).RHS(edge=EDGE_1, d_v=d_m, k=k)
     I_num = numerical.DirichletFlux(a=a, data=data).RHS(edge=EDGE_1, d_v=d_m, k=k)
     assert_allclose(desired=I_num, actual=I_exact, rtol=TOL, atol=TOL)

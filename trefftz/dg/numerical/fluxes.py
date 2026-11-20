@@ -152,6 +152,6 @@ class CircularDirichletFlux:
         v = exp(1j*k*dot(x, d_v))
         dv_dn = 1j*k*dot(N, d_v)*v
 
-        u_inc = -exp(1j*k*dot(x, d_inc))
+        u_inc = exp(1j*k*dot(x, d_inc))*A
 
-        return -Int(u_inc*conj(dv_dn - 1j*a*k*v), theta)*R
+        return Int(u_inc*conj(dv_dn + 1j*a*k*v), theta)*R
