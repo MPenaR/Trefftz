@@ -102,10 +102,12 @@ class DirichletFlux:
         v = exp(1j*k*dot(x, d_v))
         dv_dn = 1j*k*dot(N, d_v)*v
 
+
         u_inc = exp(1j*k*dot(x, d_inc))*A
+        I = Int(u_inc*conj(dv_dn), t)*l
 
         return Int(u_inc*conj(dv_dn + 1j*a*k*v), t)*l
-    
+        
 
 class CircularDirichletFlux:
     '''Serial Dirichlet kernel'''

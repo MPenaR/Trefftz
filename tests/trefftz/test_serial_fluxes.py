@@ -41,7 +41,7 @@ def test_DirichletRHS(d_m, d_inc):
     data = PlaneWave(d=d_inc, A=1., k=k)
     I_exact = exact.DirichletFlux(a=a, data=data).RHS(edge=EDGE_1, d_v=d_m, k=k)
     I_num = numerical.DirichletFlux(a=a, data=data).RHS(edge=EDGE_1, d_v=d_m, k=k)
-    assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
+    assert_allclose(desired=I_num, actual=I_exact, rtol=TOL, atol=TOL)
 
 
 @pytest.mark.parametrize('d_m', DIRECTIONS)
@@ -50,7 +50,7 @@ def test_CircularDirichletLHS(d_m, d_n):
     a = 0.5
     I_exact = exact.DirichletFlux(a=a).LHS(edge=ARC_1, d_u=d_n, d_v=d_m, k=k)
     I_num = numerical.CircularDirichletFlux(a=a).LHS(edge=ARC_1, d_u=d_n, d_v=d_m, k=k)
-    assert_allclose(I_num, I_exact, rtol=TOL, atol=TOL)
+    assert_allclose(desired=I_num, actual=I_exact, rtol=TOL, atol=TOL)
 
 
 @pytest.mark.parametrize('d_m', DIRECTIONS)

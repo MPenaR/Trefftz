@@ -56,7 +56,6 @@ def I_pw_v(segment_v, plane_wave: PlaneWave, k: float, d_v: float_array, n_v: fl
 
     where $u_inc$ is a plane wave and $v$ is a plane wave and $E$ is a segment.'''
 
-
     return plane_wave.A*I_uv(segment=segment_v, d_u=plane_wave.d, d_v=d_v, k=k, n_v=n_v)
 
 
@@ -68,7 +67,7 @@ def I_pw_dv(segment_v, plane_wave: PlaneWave, k: float, d_v: float_array, n_v: f
     where $u_inc$ is a plane wave and $v$ is a plane wave and $E$ is a segment.'''
 
     N = segment_v["N"]
-
+    
     return -1j*k*dot(N, n_v*d_v)*I_pw_v(segment_v, plane_wave=plane_wave, k=k, d_v=d_v, n_v=n_v)
 
 
