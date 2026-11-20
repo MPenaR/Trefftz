@@ -78,7 +78,7 @@ class NeumannFlux:
     def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
         d_1 = self.d_1
 
-        return I_udv(edge, d_u, d_v, k) + d_1/(1j*k)*I_dudv(edge, d_u, d_v, k)
+        return I_udv(edge, d_u=d_u, d_v=d_v, k=k) + d_1/(1j*k)*I_dudv(edge, d_u=d_u, d_v=d_v, k=k)
 
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
         raise NotImplementedError("Not implemented yet")
@@ -138,7 +138,7 @@ class UltraWeakFlux:
         k_n = k
         k_m = k
 
-        I = 1/2*I_udv(edge, d_u, d_v, k) + b /(1j*k)*I_dudv(edge, d_u, d_v, k) - a*1j*k*I_uv(edge, d_u, d_v, k) - 1/2*I_duv(edge, d_u, d_v, k)
+        I = 1/2*I_udv(edge, d_u=d_u, d_v=d_v, k=k) + b /(1j*k)*I_dudv(edge, d_u=d_u, d_v=d_v, k=k) - a*1j*k*I_uv(edge, d_u=d_u, d_v=d_v, k=k) - 1/2*I_duv(edge, d_u=d_u, d_v=d_v, k=k)
         match sign:
             case SIGN.PP:
                 I = I
@@ -185,9 +185,9 @@ class DirichletFlux:
     
     def LHS(self, edge, d_u: float_array, d_v: float_array, k: float) -> complex:
         a = self.a
-        return -I_duv(edge, d_u, d_v, k) + 1j*k*a*I_uv(edge, d_u, d_v, k)
+        return -I_duv(edge, d_u=d_u, d_v=d_v, k=k) + 1j*k*a*I_uv(edge, d_u=d_u, d_v=d_v, k=k)
         
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
         plane_wave = self.data
         a = self.a
-        return I_pw_dv(edge, plane_wave, d_v, k) - 1j*a*k*I_pw_v(edge, plane_wave, d_v, k)
+        return I_pw_dv(edge, d_v=d_v, k=k, plane_wave=plane_wave) - 1j*a*k*I_pw_v(edge, d_v=d_v, k=k, plane_wave=plane_wave)

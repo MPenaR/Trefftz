@@ -49,7 +49,7 @@ def I_dudv(segment, k: float, d_u: float_array, d_v: float_array, n_u: float | c
     N = segment["N"]
     return k**2*dot(n_u*d_u, N)*dot(n_v*d_v, N)*I_uv(segment, k, d_u, d_v, n_u, n_v) 
 
-def I_pw_v(segment_v, plane_wave: PlaneWave, k, d_v: float_array, n_v: float | complex = 1.) -> complex:
+def I_pw_v(segment_v, plane_wave: PlaneWave, k: float, d_v: float_array, n_v: float | complex = 1.) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{v}\,\mathrm{d}\ell
@@ -60,7 +60,7 @@ def I_pw_v(segment_v, plane_wave: PlaneWave, k, d_v: float_array, n_v: float | c
     return plane_wave.A*I_uv(segment=segment_v, d_u=plane_wave.d, d_v=d_v, k=k, n_v=n_v)
 
 
-def I_pw_dv(segment_v, plane_wave: PlaneWave, k, d_v: float_array, n_v: float | complex = 1.) -> complex:
+def I_pw_dv(segment_v, plane_wave: PlaneWave, k: float, d_v: float_array, n_v: float | complex = 1.) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
@@ -69,10 +69,10 @@ def I_pw_dv(segment_v, plane_wave: PlaneWave, k, d_v: float_array, n_v: float | 
 
     N = segment_v["N"]
 
-    return -1j*k*dot(N, n_v*d_v)*I_pw_v(segment_v, plane_wave, k, d_v, n_v)
+    return -1j*k*dot(N, n_v*d_v)*I_pw_v(segment_v, plane_wave=plane_wave, k=k, d_v=d_v, n_v=n_v)
 
 
-def I_dpw_v(segment_v, plane_wave: PlaneWave, k, d_v: float_array, n_v: float | complex = 1.) -> complex:
+def I_dpw_v(segment_v, plane_wave: PlaneWave, k: float, d_v: float_array, n_v: float | complex = 1.) -> complex:
     r'''Computes the integral:
     .. math ::
         \int_E u_{\mathrm{inc}} \overline{\nabla v\cdot\mathbf{n}}\,\mathrm{d}\ell
@@ -81,5 +81,5 @@ def I_dpw_v(segment_v, plane_wave: PlaneWave, k, d_v: float_array, n_v: float | 
 
     N = segment_v["N"]
 
-    return 1j*k*dot(N, plane_wave.d)*I_pw_v(segment_v, plane_wave, k, d_v, n_v)
+    return 1j*k*dot(N, plane_wave.d)*I_pw_v(segment_v, plane_wave=plane_wave, k=k, d_v=d_v, n_v=n_v)
 

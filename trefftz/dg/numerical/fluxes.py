@@ -84,10 +84,11 @@ class DirichletFlux:
         du_dn = 1j*k*dot(N, d_u)*u
         v = exp(1j*k*dot(x, d_v))
 
-        return -Int((du_dn + 1j*a*k*u)*conj(v), t)*l
+        return -Int((du_dn - 1j*a*k*u)*conj(v), t)*l
         
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
-        d_inc = self.data["d_inc"]
+        A = self.data.A
+        d_inc = self.data.d
         a = self.a
 
         N = edge["N"]
@@ -101,9 +102,10 @@ class DirichletFlux:
         v = exp(1j*k*dot(x, d_v))
         dv_dn = 1j*k*dot(N, d_v)*v
 
-        u_inc = -exp(1j*k*dot(x, d_inc))
+        u_inc = exp(1j*k*dot(x, d_inc))*A
 
-        return -Int(u_inc*conj(dv_dn - 1j*a*k*v), t)*l
+        return Int(u_inc*conj(dv_dn + 1j*a*k*v), t)*l
+    
 
 class CircularDirichletFlux:
     '''Serial Dirichlet kernel'''
@@ -128,10 +130,11 @@ class CircularDirichletFlux:
         du_dn = 1j*k*dot(N, d_u)*u
         v = exp(1j*k*dot(x, d_v))
 
-        return -Int((du_dn + 1j*a*k*u)*conj(v), theta)*R
+        return -Int((du_dn - 1j*a*k*u)*conj(v), theta)*R
         
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
-        d_inc = self.data["d_inc"]
+        d_inc = self.data.d
+        A = self.data.A
         a = self.a
 
         R = edge["R"]
