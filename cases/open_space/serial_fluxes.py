@@ -47,7 +47,7 @@ class NtDLocal:
         return I
 
     def RHS(self, edge, d_v: float_array, k: float) -> complex:
-        plane_wave = self.data["d_inc"]
+        plane_wave = self.data
         d_inc = plane_wave.d
         d_2 = self.d_2
         NtD_modes = self.NtD_modes

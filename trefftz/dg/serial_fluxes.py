@@ -135,9 +135,6 @@ class UltraWeakFlux:
                 a = -self.a
                 b = -self.b
 
-        k_n = k
-        k_m = k
-
         I = 1/2*I_udv(edge, d_u=d_u, d_v=d_v, k=k) + b /(1j*k)*I_dudv(edge, d_u=d_u, d_v=d_v, k=k) - a*1j*k*I_uv(edge, d_u=d_u, d_v=d_v, k=k) - 1/2*I_duv(edge, d_u=d_u, d_v=d_v, k=k)
         match sign:
             case SIGN.PP:
