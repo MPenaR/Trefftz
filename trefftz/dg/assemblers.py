@@ -135,8 +135,7 @@ class SerialAssembler[B](Assembler[B]):
                         for i in basis.dofs_on_element(T_2):
                             d_phi = basis.global_direction(j)
                             d_psi = basis.global_direction(i)
-                            value = non_local_kernel.LHS(edge_u=edge_1,                                                                                edge_v=edge_2,                       # ... edge_u = edge_1, pero:
-                                                         d_u=d_phi, d_v=d_psi, k=basis.k)     
+                            value = non_local_kernel.LHS(edge_u=edge_1, edge_v=edge_2, d_u=d_phi, d_v=d_psi, k=basis.k)     
                             rows.append(i)                                                    
                             cols.append(j)                                                    
                             values.append(value)

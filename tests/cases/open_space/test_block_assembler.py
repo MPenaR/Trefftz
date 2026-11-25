@@ -1,4 +1,4 @@
-from cases.open_space.ngsolve_geometries import AnularDomain, Regions, Boundaries
+from cases.open_space.ngsolve_geometries import AnularDomain, Regions, Boundaries, CleanCircle
 from trefftz.dg.boundary_conditions import NtDBC, DirichletBC
 import numpy as np
 import trefftz.dg.serial_fluxes as serial
@@ -13,30 +13,48 @@ from trefftz.dg.parameters import Elementwise
 from ...data import planewave
 
 R = 1.
-r = 0.6
-lc = 0.6
-mesh = AnularDomain(R=R, r=r, verbosity=0, lc=lc)
-
-mesh.curve_boundaries([Boundaries.SIGMA, Boundaries.D_OMEGA], radius=[R, r])
+r = 0.2
+Lc = np.pi*R
+lc = np.pi*r 
 
 data = planewave
 
-boundary_conditions = {Boundaries.SIGMA: NtDBC(truncating_radius=R, data=None), Boundaries.D_OMEGA: DirichletBC(data=data)}
 
-NtD_modes = 15
+# mesh = AnularDomain(R=R, r=r, verbosity=0, Lc=Lc, lc=lc)
+# mesh.curve_boundaries([Boundaries.SIGMA, Boundaries.D_OMEGA], radius=[R, r])
+# boundary_conditions = {Boundaries.SIGMA: NtDBC(truncating_radius=R, data=None), Boundaries.D_OMEGA: DirichletBC(data=data)}
+
+
+mesh = CleanCircle(R=R, Lc=Lc)
+mesh.curve_boundaries([Boundaries.SIGMA], radius=[R])
+boundary_conditions = {Boundaries.SIGMA: NtDBC(truncating_radius=R, data=planewave)}
+
+
+
+NtD_modes = 5
 a = 0.5
 b = 0.5
 d2 = 0.5
 
 
+# s_numerics = Numerics(interior_kernel= serial.UltraWeakFlux(a=a, b=b),
+#                           local_boundary_kernels={DirichletBC: serial.DirichletFlux(a=a, data=data), NtDBC: os_serial.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=None)},
+#                           nonlocal_boundary_kernels={NtDBC: os_serial.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = None)})
+
+
+# b_numerics = Numerics(interior_kernel= block.UltraWeakFlux(a=a, b=b),
+#                           local_boundary_kernels={DirichletBC: block.DirichletFlux(a=a, data=data), NtDBC: os_block.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=None)},
+#                           nonlocal_boundary_kernels={NtDBC: os_block.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = None)})
+
+
 s_numerics = Numerics(interior_kernel= serial.UltraWeakFlux(a=a, b=b),
-                          local_boundary_kernels={DirichletBC: serial.DirichletFlux(a=a, data=data), NtDBC: os_serial.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=None)},
-                          nonlocal_boundary_kernels={NtDBC: os_serial.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = None)})
+                          local_boundary_kernels={NtDBC: os_serial.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=planewave)},
+                          nonlocal_boundary_kernels={NtDBC: os_serial.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = planewave)})
 
 
 b_numerics = Numerics(interior_kernel= block.UltraWeakFlux(a=a, b=b),
-                          local_boundary_kernels={DirichletBC: block.DirichletFlux(a=a, data=data), NtDBC: os_block.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=None)},
-                          nonlocal_boundary_kernels={NtDBC: os_block.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = None)})
+                          local_boundary_kernels={NtDBC: os_block.NtDLocal(d_2=d2, NtD_modes=NtD_modes, data=planewave)},
+                          nonlocal_boundary_kernels={NtDBC: os_block.NtDNonLocal(d_2=d2, NtD_modes=NtD_modes, data = planewave)})
 
 
 

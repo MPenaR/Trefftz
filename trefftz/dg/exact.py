@@ -9,3 +9,7 @@ class PlaneWave():
     k: float
     def __call__(self, X: float, Y: float) -> complex_array:
         return self.A*np.exp(1j*self.k*(self.d[0]*X + self.d[1]*Y))
+    
+@dataclass
+class HankelWave():
+    pass
